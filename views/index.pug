@@ -1,0 +1,96 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    meta(name='theme-color' content='#4DA5F4')
+    meta(name='csrf-token', content=_csrf)
+    title #{title} - Hackathon Starter
+    link(rel='shortcut icon', href='/favicon.png')
+    link(rel='stylesheet', href='/css/main.css')
+    script(src="https://gymkhana.iitb.ac.in/sso/static/widget/js/login.min.js", type="application/javascript")
+    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+
+  body
+    div(id="sso-root")
+    button(id='target')
+  
+  script.
+        var at;
+        function b64EncodeUnicode(str) {
+            // first we use encodeURIComponent to get percent-encoded UTF-8,
+            // then we convert the percent encodings into raw bytes which
+            // can be fed into btoa.
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
+                function toSolidBytes(match, p1) {
+                    return String.fromCharCode('0x' + p1);
+            }));
+        }
+
+        function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
+        if(getUrlParameter('code')){
+            $.ajax({
+                url: 'https://gymkhana.iitb.ac.in/sso/oauth/token/',
+                type: 'POST',
+                crossDomain: true,
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('Authorization', 'Basic '+b64EncodeUnicode('bbQgkfUMC4pI2kCYdt5RIfz9tnmPGLM1W5gInGFr:X689f2keETwV9hRYXtT9EfEmc8eVMMhE0P4BC7JBrvHWAivSVQfkN93svcuabEhNxOrKQD2GDFO4mkfpI3ZtEiALmNcPTCk75p7rbXz2nCaxV41fPpXBgzTdtJfhogoC'));
+                },
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                data: "code="+getUrlParameter('code')+"&redirect_uri=http://192.168.0.102:8080&grant_type=authorization_code",
+                success: function (data) {
+                    
+                },
+                error: function () { alert("fu"); }
+            });
+        }
+        $( "#target" ).click(function() {
+            $.ajax({
+                url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name',
+                type: 'GET',
+                crossDomain: true,
+                beforeSend: function (xhrg) {
+                    xhrg.setRequestHeader('Authorization', 'Bearer '+at);
+                },
+                success: function (info) {alert(info.first_name); },
+                error: function () { alert("fu"); }
+            });
+        });
+
+        new SSO_JS({
+            config: {
+                client_id: 'bbQgkfUMC4pI2kCYdt5RIfz9tnmPGLM1W5gInGFr',   // Compulsory
+                scope: ['basic', 'profile'],    // Optional. Default is  ['basic']
+                state: '', // Optional. Default None
+                response_type: 'code',  // Optional. Default is 'code'
+                redirect_uri: 'http://192.168.0.102:8080',    //Optional
+                new_window: 'false',    // Optional.
+                                        // Where authorization page should be opened in new tab or
+                                        // same tab Default is false.
+                sso_root: document.getElementById('sso-root'),
+                /* Optional
+                 document.getElementById don't work if your element is not in light DOM. In that case you need to
+                 provide selector here. In most of the cases this will work.
+                 */
+            },
+            colors: { // All Optional
+                button_div_bg_color: '303F9F', // Background color of button
+                button_anchor_color: 'FFFFFF', // Font color of Button
+                logout_anchor_color: '727272', // Font color of logout mark (The one with 'Login as other user'
+            },
+        }).init();
+  

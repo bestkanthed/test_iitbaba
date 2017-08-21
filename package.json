@@ -1,0 +1,11 @@
+{
+  "name": "iitb_sso",
+  "version": "1.0.0",
+  "description": "Test to ldap login",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "kanthed",
+  "license": "ISC"
+}

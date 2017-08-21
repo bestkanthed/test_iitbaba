@@ -1,0 +1,41 @@
+.navbar.navbar-default.navbar-fixed-top
+  .container
+    .navbar-header
+      button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+      a.navbar-brand(href='/')
+        i.fa.fa-cube
+        | IIT Baba
+    .collapse.navbar-collapse
+      ul.nav.navbar-nav
+        li(class=(title == 'Home') ? 'active' : undefined)
+          a(href='/') Home
+        li(class=(title == 'Contact') ? 'active' : undefined)
+          a(href='/contact') Contact
+      ul.nav.navbar-nav.navbar-right
+        if user
+          li.dropdown(class=(title == 'Account Management') ? 'active' : undefined)
+            a.dropdown-toggle(href='#', data-toggle='dropdown')
+              if user.profile.profile_picture
+                img(src='https://gymkhana.iitb.ac.in'+user.profile.profile_picture)
+              else
+                img(src=user.gravatar(60))
+              span= user.profile.fisrt_name
+              i.caret
+            ul.dropdown-menu
+              li
+                a(href='/account') My Account
+              li.divider
+              li
+                a(href='/logout') Logout
+              li.divider
+              li
+                a(href='/predict') Predict
+        else
+          li.sso
+            a(href='/auth/iitbsso') Register
+          li.login
+            a(href='/login') Login

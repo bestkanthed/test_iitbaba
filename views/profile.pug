@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  if user.ldap == user_q.ldap
+    p= user.profile.first_name
+    p Your own profile
+
+  else  
+    p= user_q.profile.first_name
+    
+    if !predicted
+      .col-sm-8.col-sm-offset-2
+        form(method='POST')
+          legend Predict Salary
+          input(type='hidden', name='_csrf', value=_csrf)
+          .form-group
+            label(for='salary') Salary
+            input.form-control(type='number', name='salary', id='salary', autofocus, required)
+          .form-group
+            button.btn.btn-primary.btn-reset(type='submit')
+              i.fa.fa-keyboard-o
+              | Predict
+    else
+      p="Income of "+user_q.profile.first_name+" will be INR " + Math.round(salary) + " after graduation"

@@ -11,6 +11,7 @@ const salarySchema = new mongoose.Schema({
 
 salarySchema.pre('save', function save(next) {
   
+  // Adding error handler to places
   // When we current salary is added for someone then the stats of the current salary must be update.
   // The way to do that is to get the old current salary of the person
   // if it exists remove it from the set and add the new current salary to calculate the new current stats for the current salaries

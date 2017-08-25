@@ -8,6 +8,25 @@ const path = require('path');
 const passport = require('passport');
 const flash = require('express-flash');
 const expressValidator = require('express-validator'); 
+const winston = require('winston');
+const fs = require('fs');
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
+const morgan = require('morgan');
+
+const logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.File)({
+      name: 'error',
+      filename: 'errors.log',
+      level: 'error'
+    }),
+    new (winston.transports.File)({
+      name: 'info',
+      filename: 'info.log',
+      level: 'info'
+    })
+  ]
+});
 
 dotenv.load({ path: '.env.test' });
 
@@ -26,6 +45,8 @@ mongoose.connection.on('error', (err) => {
 });
 
 app.set('view engine', 'pug');
+
+app.use(morgan('combined', {stream: accessLogStream}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -84,6 +105,12 @@ app.post('/profile/:ldap', userController.postProfile);
 
 app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile ldap picture sex phone program insti_address' }));
 app.get('/auth/iitbsso/callback', userController.gotCallback);
+
+app.use(function (err, req, res, next) {
+  logger.error(err.stack);
+  console.log(err);
+  res.status(500).send(err);
+});
 
 app.listen(8080,'0.0.0.0' ,() => {
   console.log('  Press CTRL-C to stop\n');

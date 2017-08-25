@@ -5,6 +5,22 @@ const Relation = require('../models/Relation');
 const Prediction = require('../models/Prediction');
 const Authenticity = require('../models/Authenticity');
 const Salary = require('../models/Salary');
+const winston = require('winston');
+
+const logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.File)({
+      name: 'error',
+      filename: 'errors.log',
+      level: 'error'
+    }),
+    new (winston.transports.File)({
+      name: 'info',
+      filename: 'info.log',
+      level: 'info'
+    })
+  ]
+});
 
 /**
  * GET /login
@@ -27,24 +43,29 @@ exports.getLogin = (req, res) => {
 exports.postLogin = (req, res, next) => {
   req.assert('password', 'Password cannot be blank').notEmpty();
   const errors = req.validationErrors();
-
+  
   if (errors) {
     req.flash('errors', errors);
+    logger.info(req.body.username+" : Entered no password "+ errors);
     return res.redirect('/login');
   }
 
   passport.authenticate('local', (err, user, info) => {
     console.log(user);
-    if (err) { return next(err); }
+    if (err) { 
+      logger.error(err);
+      return next(err); 
+    }
     if (!user) {
-      console.log("confirm");
-      console.log(user);
-      console.log("confirm");
+      logger.info(req.body.username+" : username was entered but doesn't exist "+info);
       req.flash('errors', info);
       return res.redirect('/login');
     }
     req.logIn(user, (err) => {
-      if (err) { return next(err); }
+      if (err) { 
+        logger.error(err);
+        return next(err); 
+      }
       req.flash('success', { msg: 'Success! You are logged in.' });
       return res.redirect(req.session.returnTo || '/');
     });
@@ -57,6 +78,7 @@ exports.postLogin = (req, res, next) => {
  */
 exports.getSet = (req, res) => {
   if (!req.user) {
+    logger.info(req.ip + "opened /set");
     return res.redirect('/');
   }
   res.render('account/set', {
@@ -75,18 +97,21 @@ exports.postSet = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
+    logger.info(req.user+" : password and set password don't match");
     req.flash('errors', errors);
     return res.redirect('/set');
   }
 
-
-
   User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
-    if (err) { return next(err); }
+    if (err) { 
+      return next(err); }
     if (existingUser) {
       existingUser.password = req.body.password;
       existingUser.save((err) => {
-        if (err) { return next(err); }
+        if (err) { 
+          logger.error(err);
+          return next(err); 
+        }
       });
       req.flash({ msg: 'Password updated' });
       return res.redirect('/');
@@ -99,9 +124,10 @@ exports.postSet = (req, res, next) => {
  * GET /predict
  * Prediction page.
  */
-exports.getPredict = (req, res) => {
+exports.getPredict = async (req, res, next) => {
   console.log("pred");
   if (!req.user) {
+    logger.info("IP " + req.ip + " /predict without login");
     return res.redirect('/');
   }  
 
@@ -131,7 +157,7 @@ exports.getPredict = (req, res) => {
     console.log(users);
     res.render('account/predict', {
       title: 'Predict',
-      users : users
+      users : await service.newPeopleToPredict(req.user.ldap, 20)
     });
   },(err)=>{
     console.log("not found any user");

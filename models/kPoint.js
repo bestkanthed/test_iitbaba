@@ -8,7 +8,7 @@ const kPointSchema = new mongoose.Schema({
 
 kPointSchema.statics.createKPoint = (ldap, predictor, k) => {
   return new Promise ((resolve, reject) => {
-      this.model('kPoint').create({ 
+      this.model('KPoint').create({ 
       ldap1: ldap, 
       ldap2: predictor, 
       k: k
@@ -19,5 +19,5 @@ kPointSchema.statics.createKPoint = (ldap, predictor, k) => {
   });
 };
 
-const kPoint = mongoose.model('kPoint', kPointSchema);
-module.exports = kPoint;
+const KPoint = mongoose.model('kPoint', kPointSchema);
+module.exports = KPoint;

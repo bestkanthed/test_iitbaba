@@ -13,7 +13,7 @@ const relationSchema = new mongoose.Schema({
 
 relationSchema.statics.createRelation = (ldap1, ldap2) => {
   return new Promise (async (resolve, reject) => {
-    this.model('relation').create({ 
+    this.model('Relation').create({ 
       ldap1: ldap1, 
       ldap2: ldap2,
       predicted: false,
@@ -28,7 +28,7 @@ relationSchema.statics.createRelation = (ldap1, ldap2) => {
 
 relationSchema.statics.getRelation = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
       resolve(rel.relation);
     });
@@ -37,7 +37,7 @@ relationSchema.statics.getRelation = (ldap1, ldap2) => {
 
 relationSchema.statics.areFriends = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
       resolve(rel.friends);
     });
@@ -46,7 +46,7 @@ relationSchema.statics.areFriends = (ldap1, ldap2) => {
 
 relationSchema.statics.getPredictied = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
       resolve(rel.predicted);
     });
@@ -55,7 +55,7 @@ relationSchema.statics.getPredictied = (ldap1, ldap2) => {
 
 relationSchema.statics.updateRelation = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
       rel.relation = await relationMatrix.getRelation(ldap1, ldap2).catch(err=>{ reject(err); })
       rel.save((err) => {
@@ -68,7 +68,7 @@ relationSchema.statics.updateRelation = (ldap1, ldap2) => {
 
 relationSchema.statics.predicted = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
       rel.predicted = true;
       rel.save((err) => {
@@ -81,7 +81,7 @@ relationSchema.statics.predicted = (ldap1, ldap2) => {
 
 relationSchema.statics.makeFriends = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
       rel.friends = true;
       rel.save((err) => {
@@ -94,7 +94,7 @@ relationSchema.statics.makeFriends = (ldap1, ldap2) => {
 
 relationSchema.statics.unfriend = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
       rel.friends = false;
       rel.save((err) => {
@@ -107,12 +107,20 @@ relationSchema.statics.unfriend = (ldap1, ldap2) => {
 
 relationSchema.statics.findMostRelatedUsers = (ldap1, ldap2) => {
   return new Promise ((resolve, reject) => { 
-    this.model('relation').find({ ldap1: ldap1},{},{sort:{ "relation" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
+    this.model('Relation').find({ ldap1: ldap1},{},{sort:{ "relation" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
       if(err) reject(err);
       resolve(rel);
     });
   });
 };
 
+Realtion.getLdapsOfPeopleWhoPredicted = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap, predicted:true },{},{sort:{ "createdAt" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
+      if(err) reject(err);
+      resolve(rel);
+    });
+  });
+};
 const Relation = mongoose.model('Relation', relationSchema);
 module.exports = Relation;

@@ -1,3 +1,4 @@
+const stagnationConstant = 1; // k in your formula
 const mongoose = require('mongoose');
 const Currentstat = require('./Currentstat');
 
@@ -6,16 +7,18 @@ const salarySchema = new mongoose.Schema({
   salary: Number, // Not pure
   mean: Number, // Pure mean of all the predictions till now
   std: Number, // Pure standard deviation of all the predictions till now
+  stdmap: Number,
   n: Number // one more than no of people who have predicted till now
 }, { timestamps: true });
 
-salarySchema.statics.createSalary = (ldap, salary, std) => {
+salarySchema.statics.createSalary = (ldap, salary, stdmap) => {
   return new Promise ((resolve, reject) => {
       this.model('Salary').create({ 
       ldap: ldap, 
       salary: salary,
       mean: salary,
-      std: std,
+      std: 0,
+      stdmap: Number,
       n: 1
     }, (err, pred)=>{
       if(err) reject(err);
@@ -24,21 +27,25 @@ salarySchema.statics.createSalary = (ldap, salary, std) => {
   });
 };
 
-salarySchema.statics.updateSalary = (ldap, prediction) => {
+salarySchema.statics.updateSalary = (ldap, prediction, salWeight, authWeight) => {
   return new Promise ((resolve, reject) => {
     this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
+      if(err) reject(err);
       let mean = (sal.mean*sal.n + prediction) / (sal.n + 1)
-      let std = (1 - 1/sal.n) * sal.std * sal.std + (sal.n + 1)*(mean - sal.mean)*(mean - sal.mean);
-      let salary = 
+      let std = Math.sqrt((1 - 1/sal.n) * sal.std * sal.std + (sal.n + 1)*(mean - sal.mean)*(mean - sal.mean));
+      let weight = salWeight * authWeight * stagnationConstant * stagnationConstant * sal.stdmap * sal.stdmap;
+      let salary = (sal.salary + prediction * weight) / (1 + weight);
+      let stdmap = sal.stdmap / (Math.sqrt(1 + weight));
       this.model('Salary').create({ 
         ldap: ldap, 
         salary: salary,
-        mean: salary,
+        mean: mean,
         std: std,
+        stdmap: stdmap,
         n: 1
       }, (err, pred)=>{
         if(err) reject(err);
-        resolve("created"); 
+        resolve(salary); 
       });
     });
   });
@@ -79,7 +86,7 @@ salarySchema.statics.getNoOfPredictionsFor = (ldap) => {
     });
   });
 };
-
+/*
 salarySchema.pre('save', function save(next) {
   
   // Adding error handler to places
@@ -161,6 +168,6 @@ salarySchema.pre('save', function save(next) {
     });
   });
 });
-
+*/
 const Salary = mongoose.model('Salary', salarySchema);
 module.exports = Salary;

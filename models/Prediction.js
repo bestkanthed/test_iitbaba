@@ -1,11 +1,6 @@
 // For now I am making the most redundant algorthim you can imagine.
 // I'll reason up from here.
-
-const erf = require('math-erf');
 const mongoose = require('mongoose');
-const Salary = require('./Salary');
-const Authenticity = require('./Authenticity');
-const Currentstat = require('./Currentstat');
 
 const predictionSchema = new mongoose.Schema({
   ldap1: String,
@@ -25,7 +20,7 @@ predictionSchema.statics.createPrediction = (ldap, predictor, salary) => {
     });
   });
 };
-
+/*
 
 predictionSchema.post('save', function save(next) {
   const prediction = this;
@@ -120,6 +115,6 @@ predictionSchema.post('save', function save(next) {
     });
   });
 });
-
+*/
 const Prediction = mongoose.model('Prediction', predictionSchema);
 module.exports = Prediction;

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const erf = require('math-erf');
 const authenticitySchema = new mongoose.Schema({
   ldap: String,
   auth: Number,
@@ -28,7 +28,7 @@ authenticitySchema.statics.updateAuthenticity = (ldap, kPoint) => {
     this.model('Authenticity').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, auth)=>{
       if(err) reject(err);
       let mean = (auth.mean*auth.n + authPoint)/(auth.n + 1);
-      let std = (1 - 1/auth.n) * auth.std * auth.std + (auth.n + 1)*(mean - auth.mean)*(mean - auth.mean);
+      let std = Math.sqrt((1 - 1/auth.n) * auth.std * auth.std + (auth.n + 1)*(mean - auth.mean)*(mean - auth.mean));
       this.model('Authenticity').create({ 
         ldap: ldap,
         auth: 1 - erf(Math.abs(mean)), 
@@ -43,16 +43,37 @@ authenticitySchema.statics.updateAuthenticity = (ldap, kPoint) => {
   });
 };
 
-authenticitySchema.statics.getAuthenticityOf = (ldap) => {
-  return new Promise ((resolve, reject) => { 
-    this.model('Authenticity').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, auth)=>{
+authenticitySchema.statics.correctAuthenticity = (ldap, kPointCorrect, kPointPrevious) => {
+  return new Promise ((resolve, reject) => {
+    this.model('Authenticity').findOne({ldap: ldap},{},{sort: {"createdAt" : -1}}).exec((err, auth)=>{
       if(err) reject(err);
-      resolve(auth.mean);
+      
+      let mean = auth.mean + (kPointCorrect - kPointPrevious) / auth.n; 
+      let std = Math.sqrt((kPointCorrect * kPointCorrect - kPointPrevious * kPointPrevious + auth.n * (auth.mean*auth.mean - mean*mean)) / (auth.n - 1) + auth.std*auth.std); 
+      this.model('Authenticity').create({ 
+        ldap: ldap,
+        auth: 1 - erf(Math.abs(mean)), 
+        mean: mean,
+        std: std,
+        n: auth.n
+      }, (err, aut)=>{
+        if(err) reject(err);
+        resolve("corrected");
+      });
     });
   });
 };
 
-authenticitySchema.statics.getAuthenticityStdOf = (ldap) => {
+authenticitySchema.statics.getAuthenticity = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('Authenticity').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, auth)=>{
+      if(err) reject(err);
+      resolve(auth.auth);
+    });
+  });
+};
+
+authenticitySchema.statics.getAuthenticityStd = (ldap) => {
   return new Promise ((resolve, reject) => { 
     this.model('Authenticity').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, auth)=>{
       if(err) reject(err);

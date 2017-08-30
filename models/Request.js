@@ -11,7 +11,7 @@ const requestSchema = new mongoose.Schema({
 
 requestSchema.statics.createRequest = (ldap, from) => {
   return new Promise ((resolve, reject) => {
-    this.model('request').create({ 
+    this.model('Request').create({ 
       ldap: ldap, 
       from: from,
       seen: false,
@@ -27,7 +27,7 @@ requestSchema.statics.createRequest = (ldap, from) => {
 
 requestSchema.statics.getRequests = (ldap, no) => {
   return new Promise ((resolve, reject) => { 
-    this.model('request').find({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, requ)=>{
+    this.model('Request').find({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, requ)=>{
       if(err) reject(err);
       resolve(requ);
     });
@@ -36,7 +36,7 @@ requestSchema.statics.getRequests = (ldap, no) => {
 
 requestSchema.statics.seen = (id) => {
   return new Promise ((resolve, reject) => { 
-    this.model('request').find({ _id : id }, (err, requ)=>{
+    this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);
       requ.seen = true;
       requ.save((err)=>{

@@ -32,7 +32,7 @@ requestSchema.statics.getRequests = (ldap, no) => {
       resolve(requ);
     });
   });
-}
+};
 
 requestSchema.statics.seen = (id) => {
   return new Promise ((resolve, reject) => { 

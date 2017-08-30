@@ -3,11 +3,82 @@ const Currentstat = require('./Currentstat');
 
 const salarySchema = new mongoose.Schema({
   ldap: String,
-  salary: Number,
-  mean: Number,
-  sigma: Number,
-  n: Number
+  salary: Number, // Not pure
+  mean: Number, // Pure mean of all the predictions till now
+  std: Number, // Pure standard deviation of all the predictions till now
+  n: Number // one more than no of people who have predicted till now
 }, { timestamps: true });
+
+salarySchema.statics.createSalary = (ldap, salary, std) => {
+  return new Promise ((resolve, reject) => {
+      this.model('Salary').create({ 
+      ldap: ldap, 
+      salary: salary,
+      mean: salary,
+      std: std,
+      n: 1
+    }, (err, pred)=>{
+      if(err) reject(err);
+      resolve("created"); 
+    });
+  });
+};
+
+salarySchema.statics.updateSalary = (ldap, prediction) => {
+  return new Promise ((resolve, reject) => {
+    this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
+      let mean = (sal.mean*sal.n + prediction) / (sal.n + 1)
+      let std = (1 - 1/sal.n) * sal.std * sal.std + (sal.n + 1)*(mean - sal.mean)*(mean - sal.mean);
+      let salary = 
+      this.model('Salary').create({ 
+        ldap: ldap, 
+        salary: salary,
+        mean: salary,
+        std: std,
+        n: 1
+      }, (err, pred)=>{
+        if(err) reject(err);
+        resolve("created"); 
+      });
+    });
+  });
+};
+
+salarySchema.statics.getSalary = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
+      if(err) reject(err);
+      resolve(sal.salary);
+    });
+  });
+};
+
+salarySchema.statics.getMean = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
+      if(err) reject(err);
+      resolve(sal.mean);
+    });
+  });
+};
+
+salarySchema.statics.getStd = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
+      if(err) reject(err);
+      resolve(sal.std);
+    });
+  });
+};
+
+salarySchema.statics.getNoOfPredictionsFor = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
+      if(err) reject(err);
+      resolve(sal.n);
+    });
+  });
+};
 
 salarySchema.pre('save', function save(next) {
   

@@ -4,8 +4,13 @@ const request = require('request');
 const Relation = require('../models/Relation');
 const Prediction = require('../models/Prediction');
 const Authenticity = require('../models/Authenticity');
+const AuthenticityPoint = require('../models/AuthenticityPoint');
 const Salary = require('../models/Salary');
 const winston = require('winston');
+const standard = require('../config/standard');
+
+/// Mark the difference between res.render and return res.render
+
 
 const logger = new (winston.Logger)({
   transports: [
@@ -129,42 +134,12 @@ exports.getPredict = async (req, res, next) => {
   if (!req.user) {
     logger.info("IP " + req.ip + " /predict without login");
     return res.redirect('/');
-  }  
-
-  let users = [];
-  console.log(req.user.ldap);
-  let newPeopleToPredict  = new Promise(function(resolve, reject) {
-    Relation.find({ldap1 : req.user.ldap}).sort({relation: -1}).limit(20).exec((err, relations)=>{
-      if (err) { return next(err); }
-      console.log(relations);
-      let FoundAll = [];
-      for(rel of relations){
-        console.log(rel);
-        FoundAll.push(new Promise(function(resolved, reject) {
-          User.findOne({ldap: rel.ldap2}, (err, usr)=>{
-            if (err) { return next(err); reject(err);}
-            users.push(usr);
-            resolved("Found one");
-          });
-        }));
-      }
-      Promise.all(FoundAll).then(() =>{resolve("Done");}).catch((e)=>{console.log(e)}); 
-    });
-  });
-
-  newPeopleToPredict.then((result)=>{
-    console.log("Users :");
-    console.log(users);
-    res.render('account/predict', {
-      title: 'Predict',
-      users : await service.newPeopleToPredict(req.user.ldap, 20)
-    });
-  },(err)=>{
-    console.log("not found any user");
-    res.render('account/predict', {
-      title: 'Predict',
-      users : null
-    });
+  }
+  let [users, navbarItems] = await Promise.all([service.getNewPeopleToPredict(req.user.ldap, standard.notifications), service.getNavItems(req.user.ldap, standard.requests)]).catch(err => { next(err); });
+  res.render('account/predict', {
+    title: 'Predict',
+    users : users,
+    navbarItems : navbarItems
   });
 };
 
@@ -189,59 +164,36 @@ exports.postPredict = (req, res, next) => {
  */
 exports.getProfile = (req, res) => {
   if (!req.user) {
+    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
     return res.redirect('/login');
   }
 
-  var user_q;
-  var rel_q;
-  var salary;
-  var notifications;
-
-  let getUserProfile  = new Promise(function(resolve, reject) {
-    console.log(req.params.ldap);
-    User.findOne({ldap: req.params.ldap}, (err, usr)=>{
-      if (err) { return next(err); reject(err); }
-      user_q = usr;
-      console.log("Resolving host");
-      resolve("Done");
-    });
-  });
-
-  let getRelation  = new Promise(function(resolve, reject) {
-    Relation.findOne({ldap1: req.params.ldap, ldap2:req.user.ldap}, (err, rel)=>{
-      if (err) { return next(err); reject(err); }
-      rel_q = rel.predicted;
-      resolve("Done");
-    });
-  });
-
-  let getSalary  = new Promise(function(resolve, reject) {
-    Salary.findOne({ldap: req.params.ldap},{},{sort:{'createdAt': -1}}, (err, sal)=>{
-      if (err) { return next(err); reject(err); }
-      salary = sal.salary;
-      resolve("Done");
-    });
-  }); 
-
-  let getNotifications = new Promise(function(resolve, reject) {
-    Notifications.find({ldap: req.params.ldap},{},{sort:{'createdAt': -1}}).limit(20).exec((err, noti)=>{
-      if (err) { return next(err); reject(err); }
-      notifications = noti;
-      resolve("Done");
-    });
-  }); 
-
-  Promise.all([getRelation, getUserProfile, getSalary, getNotifications]).then((result)=>{
-    res.render('profile', {
-      title: user_q.profile.first_name,
-      user_q : user_q,
-      predicted : rel_q,
-      salary : salary
-    });
-  },(err)=>{
-    res.render('home', {
-      title: 'Home'
-    });
+  let user = User.getUser(req.params.ldap).catch(err => { next(err); });
+  let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let navbarItems = service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  
+  alreadyPredicted.then(bool=>{
+    if(bool) {
+      let salary = Salary.getSalary(ldap).catch(err => { next(err); });
+      Promise.all([user, salary, navbarItems]).then(values => { 
+        res.render('profile', {
+          title: values[0].profile.first_name,
+          user : values[0],
+          predicted : bool,
+          salary : salary,
+          navbarItems : values[1]
+        });
+      }).catch(err=>{ next(err); });
+    } else {
+      Promise.all([user, navbarItems]).then(values => { 
+        res.render('profile', {
+          title: values[0].profile.first_name,
+          user : values[0],
+          predicted : bool,
+          navbarItems :values[1]
+        });
+      }).catch(err=>{ next(err); });
+    }
   });
 };
 
@@ -249,14 +201,41 @@ exports.getProfile = (req, res) => {
  * POST /profile/:ladp
  * Save predictions
  */
-exports.postProfile = (req, res, next) => {
-  req.assert('salary', 'Salary cannot be blank').notEmpty();
+exports.postProfile = async (req, res, next) => {
+  req.assert('salary', 'Prediction cannot be blank').notEmpty();
   const errors = req.validationErrors();
 
   if (errors) {
     req.flash('errors', errors);
+    return res.redirect('/' || req.session.returnTo);
+  }
+
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
     return res.redirect('/login');
   }
+
+  let savePrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });
+  let changeRelation = await Relation.predicted(req.params.ldap, req.user.ldap).catch(err=>{ next(err); });
+  
+  req.flash('success', { msg: 'Predicted!' });
+  res.redirect('/' || req.session.returnTo);
+
+  // create auth 1,2 point
+  let salaryMean = Salary.getMean(req.params.ldap);
+  let salaryStd = Salary.getStd(req.params.ldap);
+  // Can promisify this too
+  let kPoint = Math.abs((await salaryMean) - req.body.salary) / (await salaryStd);
+  let authPoint = 1 - erf( Math.abs( (await salaryMean) - req.body.salary) / (await salaryStd) );
+  let createNewAuthPoint = kPoint.createKPoint(req.params.ldap, req.user.ldap, kPoint);
+  
+  // update avg auth of person
+  let updateAuthenticity = Authenticity.updateAuthenticity(req.user.ldap, kPoint);
+  
+  // change salary
+  let createSalary = 
+
+  // change the remaing auths because of the change in auth
 
   let savePrediction = new Promise(function(resolve, reject) {
     Prediction.create({ldap1: req.params.ldap, ldap2: req.user.ldap, salary: req.body.salary}, function(err){
@@ -403,20 +382,6 @@ exports.gotCallback = (req, res, next) => {
                 user.save((err) => {
                     console.log("saved s");
                     if (err) { console.log("saved");return next(err); }
-                    User.find({}, (err, Users) => {  
-                      console.log(Users);
-                      if (err) { return next(err);}
-                      for (u of Users){
-                        let rel_coff = 0;
-                        if(user.profile.deg_type == u.profile.deg_type) {
-                          rel_coff = rel_coff + 10;
-                          rel_coff = rel_coff + 6 - Math.abs(user.profile.program.join_year - u.profile.program.join_year);  
-                        }
-                        else rel_coff++;
-                        if(user.profile.program.department == u.profile.program.department) rel_coff = rel_coff + 4;
-                        if(user.profile.insti_address.hostel == u.profile.insti_address.hostel) rel_coff = rel_coff + 3;
-                        if(user.profile.sex != u.profile.sex) rel_coff = rel_coff + 2;
-
                         Relation.create({ ldap1: user.ldap , ldap2: u.ldap, relation: rel_coff, predicted: false, friends: false  }, function (err, small) {
                           if (err) {return next(err);reject(err);}
                           console.log("Relation1 created");

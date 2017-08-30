@@ -87,6 +87,24 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
+userSchema.statics.getUser = (ldap) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('user').findOne({ ldap: ldap }).exec((err, user)=>{
+      if(err) reject(err);
+      resolve(user);
+    });
+  });
+};
+
+userSchema.statics.getUser = (ldaps) => {
+  return new Promise ((resolve, reject) => { 
+    this.model('user').find({ ldap: {$in: ldaps} },{},{sort:{ "createdAt" : -1} }).exec((err, users)=>{
+      if(err) reject(err);
+      resolve(users);
+    });
+  });
+};
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

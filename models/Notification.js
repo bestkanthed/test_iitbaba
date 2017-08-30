@@ -32,9 +32,9 @@ notificationSchema.statics.getNotifications = (ldap, no) => {
       resolve(noti);
     });
   });
-}
+};
 
-notificationSchema.statics.seen = (id) => {
+notificationSchema.statics.markSeen = (id) => {
   return new Promise ((resolve, reject) => { 
     this.model('Notifiaction').find({ _id : id }, (err, noti)=>{
       if(err) reject(err);
@@ -47,7 +47,7 @@ notificationSchema.statics.seen = (id) => {
   });
 };
 
-notificationSchema.statics.clicked = (id) => {
+notificationSchema.statics.markClicked = (id) => {
   return new Promise ((resolve, reject) => { 
     this.model('Notifiaction').find({ _id : id }, (err, noti)=>{
       if(err) reject(err);

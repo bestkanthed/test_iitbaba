@@ -41,7 +41,7 @@ passport.use(new LocalStrategy((username, password, done) => {
  */
 
 passport.use('oauth2', new OAuth2Strategy({
-    authorizationURL: ' https://gymkhana.iitb.ac.in/sso/oauth/authorize',
+    authorizationURL: 'https://gymkhana.iitb.ac.in/sso/oauth/authorize',
     tokenURL: 'https://gymkhana.iitb.ac.in/sso/oauth/token',
     clientID: process.env.IITB_SSO_CLIENT_ID,
     clientSecret: process.env.IITB_SSO_CLIENT_SECRET,

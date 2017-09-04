@@ -6,7 +6,7 @@ const kPointSchema = new mongoose.Schema({
   k: Number
 }, { timestamps: true });
 
-kPointSchema.statics.createKPoint = (ldap, predictor, k) => {
+kPointSchema.statics.createKPoint = function createKPoint(ldap, predictor, k) {
   return new Promise ((resolve, reject) => {
       this.model('KPoint').create({ 
       ldap1: ldap, 
@@ -19,5 +19,14 @@ kPointSchema.statics.createKPoint = (ldap, predictor, k) => {
   });
 };
 
-const KPoint = mongoose.model('kPoint', kPointSchema);
+kPointSchema.statics.getKPoint = function getPrediction(ldap, predictor) {
+  return new Promise ((resolve, reject) => {
+    this.model('KPoint').findOne({ldap1:ldap, ldap2:predictor}, {},{sort:{ "createdAt" : -1} }).exec((err, kp)=>{
+      if(err) reject(err);
+      resolve(kp.k);
+    });
+  });
+};
+
+const KPoint = mongoose.model('KPoint', kPointSchema);
 module.exports = KPoint;

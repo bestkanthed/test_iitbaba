@@ -6,7 +6,7 @@ const salaryStatSchema = new mongoose.Schema({ // This the mean and sigma of the
   n : Number
 }, { timestamps: true });
 
-salaryStatSchema.statics.createSalaryStat = (salary) => {
+salaryStatSchema.statics.createSalaryStat = function createSalaryStat(salary) {
   return new Promise ((resolve, reject) => {
       this.model('SalaryStat').create({ 
       mean: salary,
@@ -19,12 +19,16 @@ salaryStatSchema.statics.createSalaryStat = (salary) => {
   });
 };
 
-salaryStatSchema.statics.updateSalaryStatChangeEntry = (salaryOld, salaryNew) => {
+salaryStatSchema.statics.updateSalaryStatChangeEntry = function updateSalaryStatChangeEntry(salaryNew, salaryOld) {
   return new Promise ((resolve, reject) => {
     this.model('SalaryStat').findOne({},{},{sort:{ "createdAt" : -1} }).exec((err, salstat)=>{
       if(err) reject(err);
-
       let mean = salstat.mean + (salaryNew - salaryOld) / salstat.n; 
+      console.log("Logging mean");
+      console.log(mean);
+      console.log("Log salatat");
+      console.log(salstat);
+      console.log((salaryNew * salaryNew - salaryOld * salaryOld + salstat.n * (salstat.mean*salstat.mean - mean*mean)) / (salstat.n - 1) + salstat.std*salstat.std);
       let std = Math.sqrt((salaryNew * salaryNew - salaryOld * salaryOld + salstat.n * (salstat.mean*salstat.mean - mean*mean)) / (salstat.n - 1) + salstat.std*salstat.std); 
       this.model('SalaryStat').create({ 
         mean: mean,
@@ -38,7 +42,7 @@ salaryStatSchema.statics.updateSalaryStatChangeEntry = (salaryOld, salaryNew) =>
   });
 };
 
-salaryStatSchema.statics.updateSalaryStatNewEntry = (salary) => {
+salaryStatSchema.statics.updateSalaryStatNewEntry = function updateSalaryStatNewEntry(salary) {
   return new Promise ((resolve, reject) => {
     this.model('SalaryStat').findOne({},{},{sort:{ "createdAt" : -1} }).exec((err, salstat)=>{
       if(err) reject(err);
@@ -51,31 +55,36 @@ salaryStatSchema.statics.updateSalaryStatNewEntry = (salary) => {
           if(err) reject(err);
           resolve("created"); 
         });
-      }  
-      let mean = (salstat.mean*salstat.n + salary) / (salstat.n + 1); 
-      let std = Math.sqrt((1 - 1/salstat.n) * salstat.std * salstat.std + (salstat.n + 1)*(mean - salstat.mean)*(mean - salstat.mean)); 
-      this.model('SalaryStat').create({ 
-        mean: mean,
-        std: std,
-        n: salstat.n + 1
-      }, (err, pred)=>{
-        if(err) reject(err);
-        resolve("updated"); 
-      });
+      } else {
+        let mean = (salstat.mean*salstat.n + salary) / (salstat.n + 1); 
+        let std = Math.sqrt((1 - 1/salstat.n) * salstat.std * salstat.std + (salstat.n + 1)*(mean - salstat.mean)*(mean - salstat.mean)); 
+        this.model('SalaryStat').create({ 
+          mean: mean,
+          std: std,
+          n: salstat.n + 1
+        }, (err, pred)=>{
+          if(err) reject(err);
+          resolve("updated"); 
+        });
+      }
     });
   });
 };
 
-salaryStatSchema.statics.getSalaryWeight = (salary) => {
+salaryStatSchema.statics.getSalaryWeight = function getSalaryWeight(salary) {
   return new Promise ((resolve, reject) => { 
     this.model('SalaryStat').findOne({},{},{sort:{ "createdAt" : -1} }).exec((err, salstat)=>{
       if(err) reject(err);
-      let weight =  (1 + erf((salary - salstat.mean) / salstat.std)) / 2;
+      console.log("Salstat");
+      let weight;
+      if(salstat.std) weight =  (1 + erf((salary - salstat.mean) / salstat.std)) / 2;
+      else weight = 0.5;
+      console.log(weight);
       resolve(weight);
     });
   });
 };
 
 
-const SalarytStat = mongoose.model('SalaryStat', salaryStatSchema);
+const SalaryStat = mongoose.model('SalaryStat', salaryStatSchema);
 module.exports = SalaryStat;

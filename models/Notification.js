@@ -9,9 +9,9 @@ const notificationSchema = new mongoose.Schema({
   clicked: Boolean
 }, { timestamps: true });
 
-notificationSchema.statics.createNotifiaction = (ldap, from, notifiction) => {
+notificationSchema.statics.createNotification = function createNotification(ldap, from, notifiction) {
   return new Promise ((resolve, reject) => {
-      this.model('Notifiaction').create({ 
+      this.model('Notification').create({ 
       ldap: ldap, 
       from: from, 
       notifiction: notifiction, 
@@ -25,18 +25,18 @@ notificationSchema.statics.createNotifiaction = (ldap, from, notifiction) => {
   });
 };
 
-notificationSchema.statics.getNotifications = (ldap, no) => {
+notificationSchema.statics.getNotifications = function getNotifications(ldap, no) {
   return new Promise ((resolve, reject) => { 
-    this.model('Notifiaction').find({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, noti)=>{
+    this.model('Notification').find({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, noti)=>{
       if(err) reject(err);
       resolve(noti);
     });
   });
 };
 
-notificationSchema.statics.markSeen = (id) => {
+notificationSchema.statics.markSeen = function markSeen(id) {
   return new Promise ((resolve, reject) => { 
-    this.model('Notifiaction').find({ _id : id }, (err, noti)=>{
+    this.model('Notification').find({ _id : id }, (err, noti)=>{
       if(err) reject(err);
       noti.seen = true;
       noti.save((err)=>{
@@ -47,9 +47,9 @@ notificationSchema.statics.markSeen = (id) => {
   });
 };
 
-notificationSchema.statics.markClicked = (id) => {
+notificationSchema.statics.markClicked = function markClicked(id) {
   return new Promise ((resolve, reject) => { 
-    this.model('Notifiaction').find({ _id : id }, (err, noti)=>{
+    this.model('Notification').find({ _id : id }, (err, noti)=>{
       if(err) reject(err);
       noti.clicked = true;
       noti.save((err)=>{

@@ -8,7 +8,7 @@
         span.icon-bar
       a.navbar-brand(href='/')
         i.fa.fa-cube
-        | IIT Baba
+        | IITbaba
     .collapse.navbar-collapse
       ul.nav.navbar-nav
         li(class=(title == 'Home') ? 'active' : undefined)
@@ -30,10 +30,14 @@
                 a(href='/account') My Account
               li.divider
               li
-                a(href='/logout') Logout
+                a(href='/predict') Predict
               li.divider
               li
-                a(href='/predict') Predict
+                a(href='/search') Predict
+              li.divider
+              li
+                a(href='/logout') Logout
+              
         else
           li.sso
             a(href='/auth/iitbsso') Register

@@ -1,12 +1,12 @@
 extends layout
 
 block content
-  if user.ldap == user_q.ldap
+  if user.ldap == userp.ldap
     p= user.profile.first_name
     p Your own profile
 
   else  
-    p= user_q.profile.first_name
+    p= userp.profile.first_name
     
     if !predicted
       .col-sm-8.col-sm-offset-2
@@ -21,4 +21,4 @@ block content
               i.fa.fa-keyboard-o
               | Predict
     else
-      p="Income of "+user_q.profile.first_name+" will be INR " + Math.round(salary) + " after graduation"
+      p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salary) + " after graduation"

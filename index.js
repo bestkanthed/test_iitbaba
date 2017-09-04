@@ -103,6 +103,8 @@ app.post('/predict', userController.postPredict);
 app.get('/profile/:ldap', userController.getProfile);
 app.post('/profile/:ldap', userController.postProfile);
 
+app.get('/search', userController.getSearch);
+
 app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile ldap picture sex phone program insti_address' }));
 app.get('/auth/iitbsso/callback', userController.gotCallback);
 

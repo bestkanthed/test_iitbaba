@@ -9,7 +9,7 @@ const requestSchema = new mongoose.Schema({
   rejected: Boolean
 }, { timestamps: true });
 
-requestSchema.statics.createRequest = (ldap, from) => {
+requestSchema.statics.createRequest = function createRequest(ldap, from) {
   return new Promise ((resolve, reject) => {
     this.model('Request').create({ 
       ldap: ldap, 
@@ -25,7 +25,7 @@ requestSchema.statics.createRequest = (ldap, from) => {
   });
 };
 
-requestSchema.statics.getRequests = (ldap, no) => {
+requestSchema.statics.getRequests = function getRequests(ldap, no) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, requ)=>{
       if(err) reject(err);
@@ -34,7 +34,7 @@ requestSchema.statics.getRequests = (ldap, no) => {
   });
 };
 
-requestSchema.statics.seen = (id) => {
+requestSchema.statics.seen = function seen(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);
@@ -47,7 +47,7 @@ requestSchema.statics.seen = (id) => {
   });
 };
 
-requestSchema.statics.clicked = (id) => {
+requestSchema.statics.clicked = function clicked(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);
@@ -60,7 +60,7 @@ requestSchema.statics.clicked = (id) => {
   });
 };
 
-requestSchema.statics.accepted = (id) => {
+requestSchema.statics.accepted = function accepted(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);
@@ -73,7 +73,7 @@ requestSchema.statics.accepted = (id) => {
   });
 };
 
-requestSchema.statics.rejected = (id) => {
+requestSchema.statics.rejected = function rejected(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);

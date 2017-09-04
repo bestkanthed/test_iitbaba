@@ -8,7 +8,7 @@ const predictionSchema = new mongoose.Schema({
   prediction: Number
 }, { timestamps: true });
 
-predictionSchema.statics.createPrediction = (ldap, predictor, salary) => {
+predictionSchema.statics.createPrediction = function createPrediction(ldap, predictor, salary) {
   return new Promise ((resolve, reject) => {
       this.model('Prediction').create({ 
       ldap1: ldap, 
@@ -20,6 +20,16 @@ predictionSchema.statics.createPrediction = (ldap, predictor, salary) => {
     });
   });
 };
+
+predictionSchema.statics.getPrediction = function getPrediction(ldap, predictor) {
+  return new Promise ((resolve, reject) => {
+    this.model('Prediction').findOne({ldap1:ldap, ldap2:predictor}, {},{sort:{ "createdAt" : -1} }).exec((err, pred)=>{
+      if(err) reject(err);
+      resolve(pred.prediction);
+    });
+  });
+};
+
 /*
 
 predictionSchema.post('save', function save(next) {

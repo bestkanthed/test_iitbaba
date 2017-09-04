@@ -11,7 +11,7 @@ const relationSchema = new mongoose.Schema({
   relation: Number // this is a number to capture the relation
 }, { timestamps: true });
 
-relationSchema.statics.createRelation = (ldap1, ldap2) => {
+relationSchema.statics.createRelation = function createRelation(ldap1, ldap2) {
   return new Promise (async (resolve, reject) => {
     this.model('Relation').create({ 
       ldap1: ldap1, 
@@ -26,7 +26,7 @@ relationSchema.statics.createRelation = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.getRelation = (ldap1, ldap2) => {
+relationSchema.statics.getRelation = function getRelation(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
@@ -35,7 +35,7 @@ relationSchema.statics.getRelation = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.areFriends = (ldap1, ldap2) => {
+relationSchema.statics.areFriends = function areFriends(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
@@ -44,7 +44,7 @@ relationSchema.statics.areFriends = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.getPredictied = (ldap1, ldap2) => {
+relationSchema.statics.getPredicted = function getPredicted(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
@@ -53,7 +53,7 @@ relationSchema.statics.getPredictied = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.updateRelation = (ldap1, ldap2) => {
+relationSchema.statics.updateRelation = function updateRelation(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
@@ -66,7 +66,7 @@ relationSchema.statics.updateRelation = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.predicted = (ldap1, ldap2) => {
+relationSchema.statics.predicted = function predicted(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
@@ -79,7 +79,7 @@ relationSchema.statics.predicted = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.makeFriends = (ldap1, ldap2) => {
+relationSchema.statics.makeFriends = function makeFriends(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
@@ -92,7 +92,7 @@ relationSchema.statics.makeFriends = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.unfriend = (ldap1, ldap2) => {
+relationSchema.statics.unfriend = function unfriend(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
@@ -105,22 +105,31 @@ relationSchema.statics.unfriend = (ldap1, ldap2) => {
   });
 };
 
-relationSchema.statics.findMostRelatedUsers = (ldap1, ldap2) => {
+relationSchema.statics.findMostRelatedUsers = function findMostRelatedUsers(ldap) {
   return new Promise ((resolve, reject) => { 
-    this.model('Relation').find({ ldap1: ldap1},{},{sort:{ "relation" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
+    this.model('Relation').find({ ldap1: ldap},{},{sort:{ "relation" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
       if(err) reject(err);
-      resolve(rel);
+      let result = [];
+      for(ldp of rel) result.push(ldp.ldap2);
+      resolve(result);
     });
   });
 };
 
-Realtion.getLdapsOfPeopleWhoPredicted = (ldap) => {
+relationSchema.statics.getLdapsOfPeopleWhoPredicted = function getLdapsOfPeopleWhoPredicted(ldap) {
   return new Promise ((resolve, reject) => { 
-    this.model('Relation').findOne({ ldap1: ldap, predicted:true },{},{sort:{ "createdAt" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
+    this.model('Relation').find({ ldap1: ldap, predicted:true },{},{sort:{ "createdAt" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
       if(err) reject(err);
-      resolve(rel);
+      console.log("Logging predicted people");
+      console.log(rel);
+      if(rel!=null){
+        let result = [];
+        for(ldp of rel) result.push(ldp.ldap2);
+        resolve(result);
+      } else resolve(false); 
     });
   });
 };
+
 const Relation = mongoose.model('Relation', relationSchema);
 module.exports = Relation;

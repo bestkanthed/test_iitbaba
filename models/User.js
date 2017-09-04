@@ -1,12 +1,18 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
+const _ = require('lodash');
 
 const userSchema = new mongoose.Schema({
   ldap: { type: String, unique: true },
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
+
+  img: {
+    filename: String,
+    mimetype: String
+  },
 
   tokens: {
     access_token: String,
@@ -87,7 +93,7 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
-userSchema.statics.initializeUsers = (user, info) => {
+userSchema.statics.initializeUser = function initializeUser(user, info){
   return new Promise ((resolve, reject) => { 
     user.profile.id =  info.id;
     user.profile.first_name =  info.first_name;
@@ -100,54 +106,87 @@ userSchema.statics.initializeUsers = (user, info) => {
     user.profile.mobile = info.mobile;
     user.profile.roll_number = info.roll_number;
     user.profile.contacts = info.contacts;
-    user.profile.insti_address.id = info.insti_address.id;
-    user.profile.insti_address.room = info.insti_address.room;
-    user.profile.insti_address.hostel = info.insti_address.hostel;
-    user.profile.insti_address.hostel_name = info.insti_address.hostel_name;
-    user.profile.program.id = info.program.id;
-    user.profile.program.department = info.program.department;
-    user.profile.program.department_name = info.program.department_name;
-    user.profile.program.join_year = info.program.join_year;
-    user.profile.program.graduation_year = info.program.graduation_year;
-    user.profile.program.degree = info.program.degree;
-    user.profile.program.degree_name = info.program.degree_name;
+    if(info.insti_address){
+      user.profile.insti_address.id = info.insti_address.id;
+      user.profile.insti_address.room = info.insti_address.room;
+      user.profile.insti_address.hostel = info.insti_address.hostel;
+      user.profile.insti_address.hostel_name = info.insti_address.hostel_name;
+    }
+    if(info.program){    
+      user.profile.program.id = info.program.id;
+      user.profile.program.department = info.program.department;
+      user.profile.program.department_name = info.program.department_name;
+      user.profile.program.join_year = info.program.join_year;
+      user.profile.program.graduation_year = info.program.graduation_year;
+      user.profile.program.degree = info.program.degree;
+      user.profile.program.degree_name = info.program.degree_name;
+    }
     user.profile.secondary_emails = info.secondary_emails;
-    user.save(err=>{if(err) reject(err);});
-        
-    this.model('user').find({ ldap: {$in: ldaps} },{},{sort:{ "createdAt" : -1} }).exec((err, users)=>{
+    user.save(err=>{
       if(err) reject(err);
-      resolve(users);
+      resolve("created");
     });
   });
 };
 
-userSchema.statics.getUser = (ldap) => {
+userSchema.statics.getUser = function getUser(ldap){
   return new Promise ((resolve, reject) => { 
-    this.model('user').findOne({ ldap: ldap }).exec((err, user)=>{
+    this.model('User').findOne({ ldap: ldap }).exec((err, user)=>{
+      console.log("Logging from get user");
+      console.log(user);
       if(err) reject(err);
       resolve(user);
     });
   });
 };
 
-userSchema.statics.getUsers = (ldaps) => {
-  return new Promise ((resolve, reject) => { 
-    this.model('user').find({ ldap: {$in: ldaps} },{},{sort:{ "createdAt" : -1} }).exec((err, users)=>{
+userSchema.statics.getUsers = function getUsers(ldaps) { // This is getting passed in a wrong way
+  return new Promise ((resolve, reject) => {
+    console.log("logging ldaps");
+    console.log(ldaps);
+    this.model('User').find({ ldap: {$in: ldaps} },{},{sort:{ "createdAt" : -1} }).exec((err, users)=>{
       if(err) reject(err);
       resolve(users);
     });
   });
 };
 
-userSchema.statics.getAllLdaps = () => {
+userSchema.statics.getAllLdaps = function getAllLdaps(){
   return new Promise ((resolve, reject) => { 
-    this.model('user').find({},{},{sort:{ "createdAt" : -1} }).select('ldap -_id').exec((err, ldaps)=>{
+    this.model('User').find({},{},{sort:{ "createdAt" : -1} }).select('ldap -_id').exec((err, ldaps)=>{
       if(err) reject(err);
       resolve(ldaps);
     });
   });
 };
 
-const User = mongoose.model('User', userSchema);
+userSchema.statics.ifExists = function ifExists(ldap) {
+  return new Promise ((resolve, reject) => { 
+    this.model('User').findOne({ldap: ldap},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
+      if(err) reject(err);
+      if(ldap) resolve(true);
+      else resolve(false);
+    });
+  });
+};
 
+
+userSchema.statics.getSearchResult = function getSearchResult(query) {
+  return new Promise ((resolve, reject) => { 
+    
+    var built_query = {};
+
+    if (query.degree) built_query.program.degree = { $in: _.isArray(query.degree) ? query.degree : [query.degree] };
+    if (query.year_of_joining) built_query.program.join_year = { $in: _.isArray(query.year_of_joining) ? query.year_of_joining : [query.year_of_joining] };
+    if (query.department) built_query.program.department = { $in: _.isArray(query.department) ? query.department : [query.department] };
+    if (query.hostel) built_query.insti_address.hostel = { $in: _.isArray(query.hostel) ? query.hostel : [query.hostel] };
+    
+    this.model('User').find({built_query},{},{sort:{ "createdAt" : -1} }).exec((err, results)=>{
+      if(err) reject(err);
+      resolve(results);
+    });
+  });
+};
+
+const User = mongoose.model('User', userSchema);
 module.exports = User;

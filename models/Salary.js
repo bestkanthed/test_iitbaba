@@ -1,6 +1,5 @@
 const stagnationConstant = 1; // k in your formula
 const mongoose = require('mongoose');
-const Currentstat = require('./Currentstat');
 
 const salarySchema = new mongoose.Schema({
   ldap: String,
@@ -11,14 +10,14 @@ const salarySchema = new mongoose.Schema({
   n: Number // one more than no of people who have predicted till now
 }, { timestamps: true });
 
-salarySchema.statics.createSalary = (ldap, salary, stdmap) => {
+salarySchema.statics.createSalary = function createSalary(ldap, salary, stdmap) {
   return new Promise ((resolve, reject) => {
       this.model('Salary').create({ 
       ldap: ldap, 
       salary: salary,
       mean: salary,
       std: 0,
-      stdmap: Number,
+      stdmap: stdmap,
       n: 1
     }, (err, pred)=>{
       if(err) reject(err);
@@ -27,12 +26,18 @@ salarySchema.statics.createSalary = (ldap, salary, stdmap) => {
   });
 };
 
-salarySchema.statics.updateSalary = (ldap, prediction, salWeight, authWeight) => {
+salarySchema.statics.updateSalary = function updateSalary(ldap, prediction, salWeight, authWeight) {
   return new Promise ((resolve, reject) => {
     this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
       if(err) reject(err);
-      let mean = (sal.mean*sal.n + prediction) / (sal.n + 1)
+      console.log(prediction);
+      console.log("Logging salary form the previous time");
+      console.log(sal);
+      console.log(sal.mean);console.log(sal.n + 1); console.log(sal.mean * sal.n + prediction); 
+      let mean = (sal.mean * sal.n + prediction) / (sal.n + 1);
+      console.log("Logging salary mean");console.log(mean);
       let std = Math.sqrt((1 - 1/sal.n) * sal.std * sal.std + (sal.n + 1)*(mean - sal.mean)*(mean - sal.mean));
+      console.log("SalaryWeigth :");console.log(salWeight);console.log("authWeigth :");console.log(authWeight);
       let weight = salWeight * authWeight * stagnationConstant * stagnationConstant * sal.stdmap * sal.stdmap;
       let salary = (sal.salary + prediction * weight) / (1 + weight);
       let stdmap = sal.stdmap / (Math.sqrt(1 + weight));
@@ -51,7 +56,7 @@ salarySchema.statics.updateSalary = (ldap, prediction, salWeight, authWeight) =>
   });
 };
 
-salarySchema.statics.getSalary = (ldap) => {
+salarySchema.statics.getSalary = function getSalary(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
       if(err) reject(err);
@@ -60,7 +65,7 @@ salarySchema.statics.getSalary = (ldap) => {
   });
 };
 
-salarySchema.statics.getMean = (ldap) => {
+salarySchema.statics.getMean = function getMean(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
       if(err) reject(err);
@@ -69,7 +74,7 @@ salarySchema.statics.getMean = (ldap) => {
   });
 };
 
-salarySchema.statics.getStd = (ldap) => {
+salarySchema.statics.getStd = function getStd(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
       if(err) reject(err);
@@ -78,7 +83,7 @@ salarySchema.statics.getStd = (ldap) => {
   });
 };
 
-salarySchema.statics.getNoOfPredictionsFor = (ldap) => {
+salarySchema.statics.getNoOfPredictionsFor = function getNoOfPredictionsFor(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Salary').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, sal)=>{
       if(err) reject(err);

@@ -13,6 +13,8 @@ const Salary = require('../models/Salary');
 const SalaryStat = require('../models/SalaryStat');
 const Notification = require('../models/Notification');
 
+const service = require('../services/service');
+
 /// Mark the difference between res.render and return res.render
 /// Function format : <operation><returnParam><ReltionWithTheFunctionInput>
 /// Example         : getLdapsOf();
@@ -31,10 +33,10 @@ const logger = new (winston.Logger)({
   ]
 });
 
-exports.home = async (req,res) =>{
+exports.home = async (req, res, next) =>{
     if (req.user) {
       let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
-      return res.render('account/predict', {
+      return res.render('home', {
         title: 'Home',
         navbarItems : navbarItems
       });
@@ -143,7 +145,10 @@ exports.getPredict = async (req, res, next) => {
     logger.info("IP " + req.ip + " /predict without login");
     return res.redirect('/');
   }
-  let [usersToShow, navbarItems] = await Promise.all([service.getNewPeopleToPredict(req.user.ldap, standard.notifications), service.getNavItems(req.user.ldap, standard.requests)]).catch(err => { next(err); });
+  let usersToShow = await service.getNewPeopleToPredict(req.user.ldap, standard.notifications).catch(err => { next(err); });;
+  console.log(usersToShow);
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  console.log(navbarItems);
   res.render('account/predict', {
     title: 'Predict',
     users : usersToShow,
@@ -171,6 +176,8 @@ exports.postPredict = (req, res, next) => {
  * Profile page.
  */
 exports.getProfile = (req, res) => {
+  // here if the req.user.ldap is same as the 
+  
   if (!req.user) {
     logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
     return res.redirect('/login');
@@ -184,19 +191,26 @@ exports.getProfile = (req, res) => {
     if(bool) {
       let salary = Salary.getSalary(req.params.ldap).catch(err => { next(err); });
       Promise.all([user, salary, navbarItems]).then(values => { 
+        console.log("Logging first_name");
+        console.log(values[0].profile.first_name);
+
         res.render('profile', {
           title: values[0].profile.first_name,
-          user : values[0],
+          userp : values[0],
           predicted : bool,
-          salary : salary,
-          navbarItems : values[1]
+          salary : values[1],
+          navbarItems : values[2]
         });
       }).catch(err=>{ next(err); });
     } else {
       Promise.all([user, navbarItems]).then(values => { 
+        
+        console.log("Logging first_name");
+        console.log(values[0].profile.first_name);
+        
         res.render('profile', {
           title: values[0].profile.first_name,
-          user : values[0],
+          userp : values[0],
           predicted : bool,
           navbarItems :values[1]
         });
@@ -224,81 +238,70 @@ exports.postProfile = async (req, res, next) => {
   }
 
   let createPrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });  
-  
+
+  let success = await service.UpdateDatabasePostPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err => { next(err); });
+
   req.flash('success', { msg: 'Predicted!' });
   res.redirect('/' || req.session.returnTo);
-
-  let success = service.UpdateDatabasePostPrediction(req.params.ldap, req.user.ldap, req.body.salary);
-  success.then(out=>{console.log("Out");})
-/*
-  // create auth 1,2 point
-  let salaryMean = Salary.getMean(req.params.ldap);
-  let salaryStd = Salary.getStd(req.params.ldap);
-  
-  let userSalary = Salary.getSalary(req.user.ldap);
-  let salWeight = SalaryStat.getSalaryWeight(userSalary);
-  let authWeight = Authenticity.getAuthenticity(req.user.ldap);
-  
-  // change salary and salary stats
-  let previousSalary = Salary.getSalary(req.params.ldap);
-  let updatedSalary = Salary.updateSalary(req.params.ldap, req.body.salary, salWeight, authWeight);
-  let updateSalaryStats = SalarySchema.updateSalaryStatChangeEntry(updatedSalary, previousSalary);
-  
-  // change the all auths because of the change in salary
-  let newSalaryMean = Salary.getMean(req.params.ldap);
-  let newSalaryStd = Salary.getStd(req.params.ldap);
-
-  let peopleWhoPredictedAlready = Realtion.getLdapsOfPeopleWhoPredicted(req.params.ldap);
-  for(person of peopleWhoPredictedAlready){
-
-    let alreadyDonePrediction = Prediction.getPrediction(req.params.ldap, person);
-    let corretedKPoint = Math.abs((await newSalaryMean) - alreadyDonePrediction) / (await newSalaryStd);
-    //let authPoint = 1 - erf( Math.abs( (await salaryMean) - req.body.salary) / (await salaryStd) );
-    let previousKPoint = kPoint.getKPoint(req.params.ldap, person);
-    let createCorrectedKPoint = kPoint.createKPoint(req.params.ldap, person, corretedkPoint);
-    let corretedAuthenticity = Authenticity.corretedAuthenticity(person, corretedKPoint, previousKPoint);
-  }
-
-  // Can promisify this too
-  let kPoint = Math.abs((await salaryMean) - req.body.salary) / (await salaryStd);
-  //let authPoint = 1 - erf( Math.abs( (await salaryMean) - req.body.salary) / (await salaryStd) );
-  let createKPoint = kPoint.createKPoint(req.params.ldap, req.user.ldap, kPoint);
-  // update avg auth of person
-  let updateAuthenticity = Authenticity.updateAuthenticity(req.user.ldap, kPoint);
-  //Change relation after auth update of all the people
-  let changeRelation = Relation.predicted(req.params.ldap, req.user.ldap).catch(err=>{ next(err); });
-  let salaryChangeNotification = Notification.createNotifiaction(req.params.ldap, req.user.ldap, "Your income has been changed by " +(updatedSalary-previousSalary));  
-  
-  // All the lkpoints will be updatede forst
-  // then because of the change in the kpoinst there is a resutatnt change in auth
-
-  let savePrediction = new Promise(function(resolve, reject) {
-    Prediction.create({ldap1: req.params.ldap, ldap2: req.user.ldap, salary: req.body.salary}, function(err){
-      if (err) { console.log(err);return next(err); reject(err); }
-      resolve("Done");
-    });
-  });
-
-  let changeRelation  = new Promise(function(resolve, reject) {
-    Relation.findOne({ldap1: req.params.ldap, ldap2:req.user.ldap}, (err, rel)=>{
-      console.log("found relations");
-      if (err) { console.log(err); return next(err); reject(err); }
-      rel.predicted = true;
-      rel.save((err)=>{resolve("Done");});
-    });
-  });
-
-  Promise.all([changeRelation, savePrediction]).then((result)=>{
-    req.flash('success', { msg: 'Predicted!' });
-    return res.redirect(req.session.returnTo || '/');
-  },(err)=>{
-    res.render('home', {
-      title: 'Home'
-    });
-  });
-*/
 };
 
+/**
+ * GET /search
+ * Prediction page.
+ */
+exports.getSearch = async (req, res, next) => {
+  console.log("search");
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /search without login");
+    return res.redirect('/');
+  }
+
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+
+  if(req.query == null){
+    res.render('search', {
+      title: 'Search',
+      navbarItems : navbarItems,
+      results : null
+    });
+  }
+  else{
+    results = await service.getSearchResults(req.query);
+    console.log(req.query);
+  }
+
+
+  res.render('search', {
+    title: 'Search',
+    navbarItems : navbarItems
+  });
+};
+
+/**
+ * POST /search
+ * Save predictions
+ */
+exports.postSearch = async (req, res, next) => {
+  req.assert('salary', 'Prediction cannot be blank').notEmpty();
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/' || req.session.returnTo);
+  }
+
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
+    return res.redirect('/login');
+  }
+
+  let createPrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });  
+
+  let success = await service.UpdateDatabasePostPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err => { next(err); });
+
+  req.flash('success', { msg: 'Predicted!' });
+  res.redirect('/' || req.session.returnTo);
+};
 
 /**
  * GET /logout
@@ -327,7 +330,7 @@ exports.gotCallback = async (req, res, next) => {
         form: {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://10.8.100.123:8080/auth/iitbsso/callback'
+            'redirect_uri': 'http://localhost:8080/auth/iitbsso/callback'
         }
     }, function(err, resf) {
 
@@ -351,7 +354,7 @@ exports.gotCallback = async (req, res, next) => {
               user.ldap = info.username;
 
               //
-            exestingUser = User.ifExists(info.username);
+            let exestingUser = await User.ifExists(info.username).catch(err=>{console.log(err);});
             if(exestingUser){
               req.logIn(existingUser, (err) => {
                 if (err) { return next(err); }
@@ -359,14 +362,19 @@ exports.gotCallback = async (req, res, next) => {
                 return res.redirect('/');         
               });
             } else {
-              await User.initialize(user, info);
-              await Salary.createSalary(user.ldap, 100000, 10000);
-              await Authenticity.createAuthenticity(user.ldap, 0); // 0 is the k value // it means max auth
-              allUsers = await User.getAllLdaps();
+              console.log("Inside else");
+              await User.initializeUser(user, info).catch(err=>{console.log(err);});
+              await Salary.createSalary(user.ldap, 100000, 10000).catch(err=>{console.log(err);});
+              await SalaryStat.updateSalaryStatNewEntry(100000).catch(err=>{console.log(err);});
+              await Authenticity.createAuthenticity(user.ldap, 0).catch(err=>{console.log(err);}); // 0 is the k value // it means max auth
+              let allUsers = await User.getAllLdaps().catch(err=>{console.log(err);});
+              //console.log(allUsers);
               for(one of allUsers){
-                Relation.createRelation(ldap, one);
-                Relation.createRelation(one, ldap);
+                console.log(one.ldap);
+                await Relation.createRelation(user.ldap, one.ldap);
+                await Relation.createRelation(one.ldap, user.ldap);
               }
+              await Notification.createNotification(user.ldap, user.ldap, "Welcome to IITBaba").catch(err=>{console.log(err);});
               req.logIn(user, (err) => {
                 if (err) { return next(err); }         
                 req.flash('success', { msg: 'Success! Registered.' });

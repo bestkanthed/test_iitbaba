@@ -3,6 +3,7 @@ const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const request = require('request');
 const User = require('../models/User');
+const standard = require('./standard');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -45,7 +46,7 @@ passport.use('oauth2', new OAuth2Strategy({
     tokenURL: 'https://gymkhana.iitb.ac.in/sso/oauth/token',
     clientID: process.env.IITB_SSO_CLIENT_ID,
     clientSecret: process.env.IITB_SSO_CLIENT_SECRET,
-    callbackURL: "http://10.8.100.123:8080/auth/iitbsso/callback",
+    callbackURL: "http://localhost:8080/auth/iitbsso/callback",
     passReqToCallback: true
   },
   function(req, accessToken, refreshToken, profile, done) {

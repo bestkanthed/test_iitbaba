@@ -9,12 +9,12 @@ const notificationSchema = new mongoose.Schema({
   clicked: Boolean
 }, { timestamps: true });
 
-notificationSchema.statics.createNotification = function createNotification(ldap, from, notifiction) {
+notificationSchema.statics.createNotification = function createNotification(ldap, from, notification) {
   return new Promise ((resolve, reject) => {
       this.model('Notification').create({ 
       ldap: ldap, 
       from: from, 
-      notifiction: notifiction, 
+      notification: notification,
       link: '/profile/'+from,
       seen: false,
       clicked: false

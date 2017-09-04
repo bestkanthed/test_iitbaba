@@ -5,7 +5,7 @@ block content
     .form-group
       label(for='degree') Degree :
       select(name='degree', multiple)#degree.form-control
-        option(value=0) All
+        option(value='') All
         option(value='BTECH') Bachelor of Technology 
         option(value='MTECH') Master of Technology
         option(value='DD') B.Tech. + M.Tech. Dual Degree
@@ -21,7 +21,7 @@ block content
       br
       label(for='year_of_joining') Year of Joining :
       select(name='year_of_joining', multiple)#year_of_joining.form-control
-        option(value=0) All
+        option(value='') All
         option(value=2017) 2017 
         option(value=2016) 2016
         option(value=2015) 2015
@@ -31,7 +31,7 @@ block content
       br
       label(for='department') Department :
       select(name='department', multiple)#department.form-control
-        option(value=0) All
+        option(value='') All
         option(value='AE') Aerospace Engineering
         option(value='BB') Biosciences and Bioengineering
         option(value='CHE') Chemical Engineering
@@ -50,7 +50,7 @@ block content
       br
       label(for='hostel') Hostel :
       select(name='hostel', multiple)#hostel.form-control
-        option(value=0) All
+        option(value='') All
         option(value=1) 1
         option(value=2) 2
         option(value=3) 3
@@ -69,6 +69,4 @@ block content
         option(value=16) 16
       br
     .form-group
-        button.btn.btn-primary.btn-reset(type='submit')
-            i.fa.fa-keyboard-o
-              | Search
+        button.btn.btn-primary.btn-reset(type='submit') Search

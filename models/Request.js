@@ -16,11 +16,30 @@ requestSchema.statics.createRequest = function createRequest(ldap, from) {
       from: from,
       seen: false,
       clicked: false,
-      accepted: null,
-      rejected: null
+      accepted: false,
+      rejected: false
     }, (err, requ)=>{
       if(err) reject(err);
       resolve("created"); 
+    });
+  });
+};
+
+requestSchema.statics.deleteRequest = function deleteRequest(ldap, from) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Request').remove({ ldap: ldap, from:from }, (err)=>{
+      if(err) reject(err);
+      resolve("removed");
+    });
+  });
+};
+
+requestSchema.statics.getRequest = function getRequest(ldap, from) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Request').findOne({ ldap: ldap, from:from },{},{sort:{ "createdAt" : -1} }).exec((err, requ)=>{
+      if(err) reject(err);
+      if(requ) resolve(requ.accepted);
+      else resolve(null);
     });
   });
 };

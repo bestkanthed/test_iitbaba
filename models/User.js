@@ -174,14 +174,15 @@ userSchema.statics.ifExists = function ifExists(ldap) {
 userSchema.statics.getSearchResult = function getSearchResult(query) {
   return new Promise ((resolve, reject) => { 
     
-    var built_query = {};
-
-    if (query.degree) built_query.program.degree = { $in: _.isArray(query.degree) ? query.degree : [query.degree] };
-    if (query.year_of_joining) built_query.program.join_year = { $in: _.isArray(query.year_of_joining) ? query.year_of_joining : [query.year_of_joining] };
-    if (query.department) built_query.program.department = { $in: _.isArray(query.department) ? query.department : [query.department] };
-    if (query.hostel) built_query.insti_address.hostel = { $in: _.isArray(query.hostel) ? query.hostel : [query.hostel] };
+    console.log(query);
+    let built_query = {};
+    if (query.degree) built_query['profile.program.degree'] = { $in: _.isArray(query.degree) ? query.degree : [query.degree] };
+    if (query.year_of_joining) built_query['profile.program.join_year'] = { $in: _.isArray(query.year_of_joining) ? query.year_of_joining : [query.year_of_joining] };
+    if (query.department) built_query['profile.program.department'] = { $in: _.isArray(query.department) ? query.department : [query.department] };
+    if (query.hostel) built_query['profile.insti_address.hostel'] = { $in: _.isArray(query.hostel) ? query.hostel : [query.hostel] };
+    console.log(built_query);
     
-    this.model('User').find({built_query},{},{sort:{ "createdAt" : -1} }).exec((err, results)=>{
+    this.model('User').find(built_query,{},{sort:{ "createdAt" : -1} }).exec((err, results)=>{
       if(err) reject(err);
       resolve(results);
     });

@@ -1,11 +1,19 @@
 extends layout
-
 block content
+
   if user.ldap == userp.ldap
     p= user.profile.first_name
     p Your own profile
 
   else  
+    if friends
+      p Friends
+    else
+      if requestSent
+        p Request Sent
+      else
+        button#sendfr(sent='false') Send Friend Request
+    
     p= userp.profile.first_name
     
     if !predicted
@@ -22,3 +30,22 @@ block content
               | Predict
     else
       p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salary) + " after graduation"
+  script.
+    const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
+    const ldp2 = !{JSON.stringify(user.ldap).replace(/<\//g, '<\\/')};
+
+    $("#sendfr").click(function() {
+        if($("#sendfr").attr("sent")=='false'){
+            console.log("clicked");
+            $.post("/addFriendRequest", { ldap1: ldp1, ldap2: ldp2 }).done(function( data ) {
+                $("#sendfr").attr("sent", 'true');
+                $("#sendfr").text("Friend Request Sent");
+            });
+        } else {
+            console.log("clicked else");
+            $.post("/deleteFriendRequest", { ldap1: ldp1, ldap2: ldp2 }).done(function( data ) {
+                $("#sendfr").attr("sent", 'false');
+                $("#sendfr").text("Send Friend Request");
+            });
+        } 
+    });

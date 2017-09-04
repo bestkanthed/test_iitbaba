@@ -183,14 +183,16 @@ exports.getProfile = (req, res) => {
     return res.redirect('/login');
   }
 
+  let friends = Relation.areFriends(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let requestSent = Request.getRequest(req.params.ldap, req.user.ldap).catch(err => { next(err); });
   let user = User.getUser(req.params.ldap).catch(err => { next(err); });
   let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
   let navbarItems = service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
-  
+
   alreadyPredicted.then(bool=>{
     if(bool) {
       let salary = Salary.getSalary(req.params.ldap).catch(err => { next(err); });
-      Promise.all([user, salary, navbarItems]).then(values => { 
+      Promise.all([user, salary, navbarItems, friends, requestSent]).then(values => { 
         console.log("Logging first_name");
         console.log(values[0].profile.first_name);
 
@@ -198,12 +200,14 @@ exports.getProfile = (req, res) => {
           title: values[0].profile.first_name,
           userp : values[0],
           predicted : bool,
+          friends: values[3],
           salary : values[1],
-          navbarItems : values[2]
+          navbarItems : values[2],
+          requestSent: values[4]
         });
       }).catch(err=>{ next(err); });
     } else {
-      Promise.all([user, navbarItems]).then(values => { 
+      Promise.all([user, navbarItems, friends, requestSent]).then(values => { 
         
         console.log("Logging first_name");
         console.log(values[0].profile.first_name);
@@ -212,7 +216,9 @@ exports.getProfile = (req, res) => {
           title: values[0].profile.first_name,
           userp : values[0],
           predicted : bool,
-          navbarItems :values[1]
+          friends: values[2],
+          navbarItems :values[1],
+          requestSent: values[3]
         });
       }).catch(err=>{ next(err); });
     }
@@ -261,20 +267,17 @@ exports.getSearch = async (req, res, next) => {
   if(req.query == null){
     res.render('search', {
       title: 'Search',
-      navbarItems : navbarItems,
-      results : null
+      navbarItems : navbarItems
     });
   }
   else{
-    results = await service.getSearchResults(req.query);
-    console.log(req.query);
-  }
-
-
-  res.render('search', {
-    title: 'Search',
-    navbarItems : navbarItems
-  });
+    results = await service.getSearchResults(req.query).catch(err => { next(err); });
+    res.render('results', {
+      title: 'Results',
+      navbarItems : navbarItems,
+      users : results
+    });
+  } 
 };
 
 /**
@@ -302,6 +305,40 @@ exports.postSearch = async (req, res, next) => {
   req.flash('success', { msg: 'Predicted!' });
   res.redirect('/' || req.session.returnTo);
 };
+
+/**
+ * POST /addFriends
+ * Save predictions
+ */
+exports.postAddFriendRequest = async (req, res, next) => {
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /addFriends" + req.params.ldap +"without login");
+    return res.redirect('/login');
+  }
+  console.log(req.body);
+  let createRequest = await Request.createRequest(req.body.ldap1, req.body.ldap2).catch(err=>{ next(err); });  
+  console.log(createRequest);
+  req.flash('success', { msg: 'Friend Request Sent!' });
+  res.send(createRequest);
+};
+
+/**
+ * POST /removeFriends
+ * Save predictions
+ */
+exports.postDeleteFriendRequest = async (req, res, next) => {
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /removeFriends" + req.params.ldap +"without login");
+    return res.redirect('/login');
+  }
+  console.log(req.body);
+  let deleteRequest = await Request.deleteRequest(req.body.ldap1, req.body.ldap2).catch(err=>{ next(err); });  
+
+  console.log(deleteRequest);
+  req.flash('success', { msg: 'Friend Request Deleted!' });
+  res.send(deleteRequest);
+};
+
 
 /**
  * GET /logout

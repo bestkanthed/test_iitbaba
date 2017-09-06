@@ -18,21 +18,22 @@ block content
     
     if !predicted
       .col-sm-8.col-sm-offset-2
-        form(method='POST')
+        form#prediction(method='POST')
           legend Predict Salary
           input(type='hidden', name='_csrf', value=_csrf)
           .form-group
-            label(for='salary') Salary
+            label(for='salary') Salary in INR/year
             input.form-control(type='number', name='salary', id='salary', autofocus, required)
           .form-group
             button.btn.btn-primary.btn-reset(type='submit')
               i.fa.fa-keyboard-o
               | Predict
     else
-      p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salary) + " after graduation"
+      p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salaryCheck) + " after graduation"
   script.
     const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
     const ldp2 = !{JSON.stringify(user.ldap).replace(/<\//g, '<\\/')};
+    const sal = !{JSON.stringify(salaryCheck).replace(/<\//g, '<\\/')};
 
     $("#sendfr").click(function() {
         if($("#sendfr").attr("sent")=='false'){
@@ -48,4 +49,19 @@ block content
                 $("#sendfr").text("Send Friend Request");
             });
         } 
+    });
+
+    $("#prediction").submit(function() {
+        console.log("This");
+        console.log(sal);
+        console.log("That");
+        if($("#salary").val()>sal*2.5){
+            alert("Are you high? Try something else.");
+            return false;
+        } 
+        if($("#salary").val()<sal/2.5){
+            alert("Do yo do cheap durgs? Try something else.");
+            return false;
+        }
+        return true;
     });

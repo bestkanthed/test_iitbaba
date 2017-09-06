@@ -25,7 +25,7 @@ passport.use(new LocalStrategy((username, password, done) => {
   User.findOne({ ldap : username.toLowerCase() }, (err, user) => {
     if (err) { return done(err); }
     if (!user) {
-      return done(null, false, { msg: `LDAP ${ldap} not found.` });
+      return done(null, false, { msg: `LDAP ${username} not found.` });
     }
     user.comparePassword(password, (err, isMatch) => {
       if (err) { return done(err); }

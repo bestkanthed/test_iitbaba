@@ -180,6 +180,14 @@ userSchema.statics.getSearchResult = function getSearchResult(query) {
     if (query.year_of_joining) built_query['profile.program.join_year'] = { $in: _.isArray(query.year_of_joining) ? query.year_of_joining : [query.year_of_joining] };
     if (query.department) built_query['profile.program.department'] = { $in: _.isArray(query.department) ? query.department : [query.department] };
     if (query.hostel) built_query['profile.insti_address.hostel'] = { $in: _.isArray(query.hostel) ? query.hostel : [query.hostel] };
+    if (query.sex) built_query['profile.sex'] = { $in: _.isArray(query.sex) ? query.sex : [query.sex] };
+    if (query.rollno) built_query['profile.roll_number'] = query.rollno;
+    if (query.mobile) built_query['profile.contacts'] = { $elemMatch: {number:query.mobile} };
+    if (query.first_name) built_query['profile.first_name'] = query.first_name;
+    if (query.last_name) built_query['profile.last_name'] = query.last_name;
+    if (query.ldap) built_query['ldap'] = query.ldap;
+    
+    console.log("Logging query form get search results in users");
     console.log(built_query);
     
     this.model('User').find(built_query,{},{sort:{ "createdAt" : -1} }).exec((err, results)=>{

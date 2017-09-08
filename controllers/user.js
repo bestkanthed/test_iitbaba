@@ -240,126 +240,30 @@ exports.postProfile = async (req, res, next) => {
  * Prediction page.
  */
 exports.getSearch = async (req, res, next) => {
+  
   console.log("search");
+  
   if (!req.user) {
     logger.info("IP " + req.ip + " /search without login");
     return res.redirect('/');
   }
 
+// Move these down with promises as they are not required here
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
   console.log("Logging query");
   console.log(req.query);
+ 
+  // if search from box
   if(req.query.box){
-    // built query
-    let bq = {};
-    queries = req.query.box.split(" "); 
-    for(q of queries){
-      let c = q.toUpperCase();  
-      if(c == "B.TECH." || c == "B.TECH" || c == "BTECH" || c == "BACHELOR" || c == "BACHELORS" || c == "UG" || c == "UNDERGRADUATE" || c =="UNDERGRAD" || c == "UNDER"){ 
-        if(bq.degree) bq.degree.push("BTECH"); else {bq.degree=[]; bq.degree.push("BTECH");}
-      }
-      if(c == "M.TECH." || c == "M.TECH" || c == "MTECH" || c == "MASTER" || c == "MASTERS" || c == "PG" || c == "POSTGRADUATE" || c =="POSTGRAD" || c == "POST"){ 
-        if(bq.degree) bq.degree.push("MTECH"); else {bq.degree=[]; bq.degree.push("MTECH");}
-      }
-      if(c == "PH.D." || c == "PH.D" || c == "PHD" || c == "DOCTRATE" || c == "DOC"){ 
-        if(bq.degree) bq.degree.push("PHD"); else {bq.degree=[]; bq.degree.push("PHD");}
-      }
-      if(c=="MBA" || c=="BUSSINESS" || c=="ADMINISTRATION" || c=="MASTER" || c =="MANAGEMENT" || c=="PG" || c == "POSTGRADUATE" || c =="POSTGRAD" || c == "POST"){ 
-        if(bq.degree) bq.degree.push("EMBA"); else {bq.degree=[]; bq.degree.push("EMBA");}
-      }
-      if(c == "M.SC." || c == "M.SC" || c == "MSC" || c == "MASTER" || c == "MASTERS" || c == "PG" || c == "POSTGRADUATE" || c =="POSTGRAD" || c == "POST"){ 
-        if(bq.degree) bq.degree.push("MSC"); else {bq.degree=[]; bq.degree.push("MSC");}
-      }
-      if(c=="DD" || c=="DUAL" || c=="INTEGRATED"){ 
-        if(bq.degree) bq.degree.push("DD"); else {bq.degree=[]; bq.degree.push("DD");}
-      }
-      if(c == "B.DES." || c == "B.DES" || c == "BDES" || c == "BACHELOR" || c == "BACHELORS" || c == "UG" || c == "UNDERGRADUATE" || c =="UNDERGRAD" || c == "UNDER"){ 
-        if(bq.degree) bq.degree.push("BDES"); else {bq.degree=[]; bq.degree.push("BDES");}
-      }
-      if(c == "M.DES." || c == "M.DES" || c == "MDES" || c == "MASTER" || c == "MASTERS" || c == "PG" || c == "POSTGRADUATE" || c =="POSTGRAD" || c == "POST"){ 
-        if(bq.degree) bq.degree.push("MDES"); else {bq.degree=[]; bq.degree.push("MDES");}
-      }
-      if(c == "M.PHIL." || c == "M.PHIL" || c == "MPHIL" || c == "MASTER" || c == "MASTERS" || c == "PG" || c == "POSTGRADUATE" || c =="POSTGRAD" || c == "POST"){ 
-        if(bq.degree) bq.degree.push("MPHIL"); else {bq.degree=[]; bq.degree.push("MPHIL");}
-      }
-      if(c == "M.MG." || c == "M.MG" || c == "MMG" || c == "MASTER" || c == "MASTERS" || c == "PG" || c == "POSTGRADUATE" || c =="POSTGRAD" || c == "POST" || c =="MANAGEMENT"){ 
-        if(bq.degree) bq.degree.push("MMG"); else {bq.degree=[]; bq.degree.push("MMG");}
-      }
-      if(c=="17" || c=="2017" || c=="1ST" || c=="FIRST" || c=="FRESHI" || c=="FRESHIE" || c=="FRESHIES"){ 
-        if(bq.year_of_joining) bq.year_of_joining.push("2017"); else {bq.year_of_joining=[]; bq.year_of_joining.push("2017");}
-      }
-      if(c=="16" || c=="2016" || c=="2ND" || c=="SECOND" || c=="SOPHI" || c=="SOPHIE" || c=="SOPHIES"){ 
-        if(bq.year_of_joining) bq.year_of_joining.push("2016"); else {bq.year_of_joining=[]; bq.year_of_joining.push("2016");}
-      }
-      if(c=="15" || c=="2015" || c=="3RD" || c=="THIRD" || c=="THIRDI" || c=="THIRDIE" || c=="THIRDIES"){ 
-        if(bq.year_of_joining) bq.year_of_joining.push("2015"); else {bq.year_of_joining=[]; bq.year_of_joining.push("2015");}
-      }
-      if(c=="14" || c=="2014" || c=="4TH" || c=="FOURTH" || c=="FOURTHI" || c=="FOURTHIE" || c=="FOURTHIES"){ 
-        if(bq.year_of_joining) bq.year_of_joining.push("2014"); else {bq.year_of_joining=[]; bq.year_of_joining.push("2014");}
-      }
-      if(c=="13" || c=="2013" || c=="5TH" || c=="FIFTH" || c=="FIFTHI" || c=="FIFTHIE" || c=="FIFTHIES"){ 
-        if(bq.year_of_joining) bq.year_of_joining.push("2013"); else {bq.year_of_joining=[]; bq.year_of_joining.push("2013");}
-      }
-      if(c=="12" || c=="2012" || c=="PASS" || c=="OUT" || c=="ALUM" || c=="ALUMNUS" || c=="ALUMNI"){ 
-        if(bq.year_of_joining) bq.year_of_joining.push("2012"); else {bq.year_of_joining=[]; bq.year_of_joining.push("2012");}
-      }
-      if(c=="AE" || c=="AERO" || c=="AEROSPACE"){ 
-        if(bq.department) bq.department.push("AE"); else {bq.department=[]; bq.department.push("AE");}
-      }
-      if(c=="BB" || c=="BIO" || c=="BIOSCIENCE" || c=="BIOSCIENCES" || c=="BOIENGINEERING"){ 
-        if(bq.department) bq.department.push("BB"); else {bq.department=[]; bq.department.push("BB");}
-      }
-      if(c=="CL" || c=="CHE" || c=="CHEMICAL"){ 
-        if(bq.department) bq.department.push("CHE"); else {bq.department=[]; bq.department.push("CHE");}
-      }
-      if(c=="CH" || c=="CHEM" || c=="CHEMISTRY"){ 
-        if(bq.department) bq.department.push("CH"); else {bq.department=[]; bq.department.push("CH");}
-      }
-      if(c=="CLE" ||c=="CE" || c=="CIVIL"){ 
-        if(bq.department) bq.department.push("CLE"); else {bq.department=[]; bq.department.push("CLE");}
-      }
-      if(c=="CSE" || c=="CS" || c=="COMPUTER" || c=="COMP"){ 
-        if(bq.department) bq.department.push("CSE"); else {bq.department=[]; bq.department.push("CSE");}
-      }
-      if(c=="EE" || c=="ELECTRICAL" || c=="ELEC"){ 
-        if(bq.department) bq.department.push("EE"); else {bq.department=[]; bq.department.push("EE");}
-      }
-      if(c=="EE" || c=="ELECTRICAL" || c=="ELEC"){ 
-        if(bq.department) bq.department.push("EE"); else {bq.department=[]; bq.department.push("EE");}
-      }
-      if(c=="ESE" || c=="ENERGY" || c=="EN"){ 
-        if(bq.department) bq.department.push("ESE"); else {bq.department=[]; bq.department.push("ESE");}
-      }
-      if(c=="HSS" || c=="HUMANITY" || c=="HUMANITIES" || c=="SOCIAL" || c=="HS"){ 
-        if(bq.department) bq.department.push("HSS"); else {bq.department=[]; bq.department.push("HSS");}
-      }
-      if(c=="IDC" || c=="INDUSTRIAL" || c=="DESIGN"){ 
-        if(bq.department) bq.department.push("IDC"); else {bq.department=[]; bq.department.push("IDC");}
-      }
-      if(c=="MATH" || c=="MATHS" || c=="MATHEMATICS" || c=="MA" || c=="MM"){ 
-        if(bq.department) bq.department.push("MM"); else {bq.department=[]; bq.department.push("MM");}
-      }
-      if(c=="MECH" || c=="ME" || c=="MECHANICAL"){ 
-        if(bq.department) bq.department.push("ME"); else {bq.department=[]; bq.department.push("ME");}
-      }
-      if(c=="META" || c=="MEMS" || c=="METALLURGY" || c=="METALLURGICAL" || c=="MATERIALS" || c=="MATERIAL"){ 
-        if(bq.department) bq.department.push("MEMS"); else {bq.department=[]; bq.department.push("MEMS");}
-      }
-      if(c == "PHY" || c=="PH" || c=="PHYSICS"){ 
-        if(bq.department) bq.department.push("PH"); else {bq.department=[]; bq.department.push("PH");}
-      }
-      if(c[0]=="H" && !isNaN(c.substring(1))){ 
-        if(bq.hostel) bq.hostel.push(c.substring(1)); else {bq.hostel=[]; bq.hostel.push(c.substring(1));}
-      }
-    }
+    // If empty search same as /predict
+    if(_.isEmpty(req.query.box)) return res.render('/predict');
+    let finalResults = await service.getBoxSearchResults(req.query.box);
+    finalResults = _.uniq(finalResults);
 
-    console.log(bq);
-
-    results = await service.getSearchResults(bq).catch(err => { next(err); });
     return res.render('results', {
       title: 'Results',
       navbarItems : navbarItems,
-      users : results
+      users : finalResults
     });
   }
   

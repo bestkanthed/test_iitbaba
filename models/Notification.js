@@ -34,22 +34,24 @@ notificationSchema.statics.getNotifications = function getNotifications(ldap, no
   });
 };
 
-notificationSchema.statics.markSeen = function markSeen(id) {
+notificationSchema.statics.markSeen = function markSeen(ldap) {
   return new Promise ((resolve, reject) => { 
-    this.model('Notification').find({ _id : id }, (err, noti)=>{
+    this.model('Notification').find({ ldap : ldap, seen : false}, (err, notis)=>{
       if(err) reject(err);
-      noti.seen = true;
-      noti.save((err)=>{
-        if(err) reject(err);
-        resolve("seen");
-      });
+      for(noti of notis){
+        noti.seen = true;
+        noti.save((err)=>{
+          if(err) reject(err);
+        });
+      }
+      resolve("seen");  
     });
   });
 };
 
 notificationSchema.statics.markClicked = function markClicked(id) {
   return new Promise ((resolve, reject) => { 
-    this.model('Notification').find({ _id : id }, (err, noti)=>{
+    this.model('Notification').findOne({ _id : id }, (err, noti)=>{
       if(err) reject(err);
       noti.clicked = true;
       noti.save((err)=>{

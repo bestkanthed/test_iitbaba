@@ -22,9 +22,31 @@ exports.getNavItems = (ldap, no) =>{
   return new Promise(async (resolve, reject) => {
     let notifications = await Notification.getNotifications(ldap, no).catch(err => { reject(err);});     
     let requests = await Request.getRequests(ldap, no).catch(err => { reject(err); });
+    let unseen_notifications=0;
+    let unseen_requests=0;
+
+    // can be implemented faster with a fulfilled Promise calling this 
+
+
+    for(notification of notifications){
+      if(!notification.seen) unseen_notifications++;
+    }
+    for(request of requests){
+      if(!request.seen) unseen_requests++;
+    }
+
+    
+    // Send seen unseen
+    
     resolve({
-      notifications : notifications,
-      requests : requests
+      notifications : {
+        notifications : notifications,
+        unseen : unseen_notifications
+      },
+      requests : {
+        requests : requests,
+        unseen : unseen_requests
+      }
     });
   });
 };

@@ -108,6 +108,9 @@ app.get('/search', userController.getSearch);
 app.post('/addFriendRequest', userController.postAddFriendRequest);
 app.post('/deleteFriendRequest', userController.postDeleteFriendRequest);
 
+app.post('/notifications/seen', userController.postNotificationsSeen);
+app.post('/notification/clicked', userController.postNotificationClicked);
+
 app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile ldap picture sex phone program insti_address' }));
 app.get('/auth/iitbsso/callback', userController.gotCallback);
 

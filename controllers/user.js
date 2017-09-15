@@ -341,6 +341,31 @@ exports.postDeleteFriendRequest = async (req, res, next) => {
   res.send(deleteRequest);
 };
 
+exports.postNotificationClicked = async (req, res, next) => {
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /clicked notification" + req.params.ldap +"without login");
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+  let clicked = await Notification.markClicked(req.body.notification_id).catch(err=>{ next(err); });  
+
+  console.log(clicked);
+  res.send(clicked);
+};
+
+exports.postNotificationsSeen = async (req, res, next) => {
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /sent seen notification req" + req.params.ldap +"without login");
+    return res.redirect('/login');
+  }
+
+  console.log(req.body);
+  let seen = await Notification.markSeen(req.user.ldap).catch(err=>{ next(err); });  
+
+  console.log(seen);
+  res.send(seen);
+};
 
 /**
  * GET /logout

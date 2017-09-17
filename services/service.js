@@ -306,7 +306,7 @@ exports.UpdateDatabasePostPrediction = (profile, predictor, guess) =>{
     //Change relation after auth update of all the people
     let changeRelation = await Relation.predicted(profile, predictor).catch(err => { reject(err); });
     console.log("changeRelation :");console.log(changeRelation);
-    let salaryChangeNotification = await Notification.createNotification(profile, predictor, "Your income has been changed by " +(updatedSalary - previousSalary)).catch(err => { reject(err); }); 
+    let salaryChangeNotification = await Notification.createNotification(profile, predictor, (updatedSalary - previousSalary)).catch(err => { reject(err); }); 
     console.log("salaryChangeNotification :");console.log(salaryChangeNotification); 
     resolve("database updation complete");
   });

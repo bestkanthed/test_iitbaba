@@ -9,11 +9,12 @@ const requestSchema = new mongoose.Schema({
   rejected: Boolean
 }, { timestamps: true });
 
-requestSchema.statics.createRequest = function createRequest(ldap, from) {
+requestSchema.statics.createRequest = function createRequest(ldap, from, name) {
   return new Promise ((resolve, reject) => {
     this.model('Request').create({ 
       ldap: ldap, 
       from: from,
+      name: name,
       seen: false,
       clicked: false,
       accepted: false,
@@ -53,20 +54,22 @@ requestSchema.statics.getRequests = function getRequests(ldap, no) {
   });
 };
 
-requestSchema.statics.seen = function seen(id) {
+requestSchema.statics.seeRequests = function seeRequests(ldap) {
   return new Promise ((resolve, reject) => { 
-    this.model('Request').find({ _id : id }, (err, requ)=>{
+    this.model('Notification').find({ ldap : ldap, seen : false}, (err, reqs)=>{
       if(err) reject(err);
-      requ.seen = true;
-      requ.save((err)=>{
-        if(err) reject(err);
-        resolve("seen");
-      });
+      for(req of reqs){
+        req.seen = true;
+        req.save((err)=>{
+          if(err) reject(err);
+        });
+      }
+      resolve("seen");  
     });
   });
 };
 
-requestSchema.statics.clicked = function clicked(id) {
+requestSchema.statics.clickRequest = function clickRequest(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);
@@ -79,7 +82,7 @@ requestSchema.statics.clicked = function clicked(id) {
   });
 };
 
-requestSchema.statics.accepted = function accepted(id) {
+requestSchema.statics.acceptRequest = function acceptRequest(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);
@@ -92,7 +95,7 @@ requestSchema.statics.accepted = function accepted(id) {
   });
 };
 
-requestSchema.statics.rejected = function rejected(id) {
+requestSchema.statics.rejectRequest = function rejectRequest(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ _id : id }, (err, requ)=>{
       if(err) reject(err);

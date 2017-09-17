@@ -90,8 +90,10 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
 
 app.get('/', userController.home);
+
 app.get('/login', userController.getLogin);
 app.post('/login', userController.postLogin);
+
 app.get('/logout', userController.logout);
 
 app.get('/set', userController.getSet);
@@ -105,11 +107,9 @@ app.post('/profile/:ldap', userController.postProfile);
 
 app.get('/search', userController.getSearch);
 
-app.post('/addFriendRequest', userController.postAddFriendRequest);
-app.post('/deleteFriendRequest', userController.postDeleteFriendRequest);
+app.post('/request', userController.postRequest);
 
-app.post('/notifications/seen', userController.postNotificationsSeen);
-app.post('/notification/clicked', userController.postNotificationClicked);
+app.post('/notification', userController.postNotification);
 
 app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile ldap picture sex phone program insti_address' }));
 app.get('/auth/iitbsso/callback', userController.gotCallback);

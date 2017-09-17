@@ -34,7 +34,7 @@ notificationSchema.statics.getNotifications = function getNotifications(ldap, no
   });
 };
 
-notificationSchema.statics.markSeen = function markSeen(ldap) {
+notificationSchema.statics.seeNotifications = function seeNotifications(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Notification').find({ ldap : ldap, seen : false}, (err, notis)=>{
       if(err) reject(err);
@@ -49,7 +49,7 @@ notificationSchema.statics.markSeen = function markSeen(ldap) {
   });
 };
 
-notificationSchema.statics.markClicked = function markClicked(id) {
+notificationSchema.statics.clickNotification = function clickNotification(id) {
   return new Promise ((resolve, reject) => { 
     this.model('Notification').findOne({ _id : id }, (err, noti)=>{
       if(err) reject(err);

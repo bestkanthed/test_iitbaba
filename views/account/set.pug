@@ -3,8 +3,14 @@ extends ../layout
 block content
   .col-sm-8.col-sm-offset-2
     form(method='POST')
-      legend Set Password
+      legend Set Credentials
       input(type='hidden', name='_csrf', value=_csrf)
+      .form-group
+        label(for='first') First Name
+        input.form-control(type='text', name='first', id='first', placeholder='Name', autofocus, required)
+      .form-group
+        label(for='Last') Last Name
+        input.form-control(type='text', name='last', id='last', placeholder='Sirname', autofocus, required)
       .form-group
         label(for='password') New Password
         input.form-control(type='password', name='password', id='password', placeholder='New password', autofocus, required)

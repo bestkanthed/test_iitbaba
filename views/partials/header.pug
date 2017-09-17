@@ -23,26 +23,85 @@
             form.navbar-form(role='search', method='get', action='/search')
               input#srch-term.form-control(placeholder='Search', name='box', type='text')
           
-          li.dropdown.notifications
             
-            a.dropdown-toggle(href='#', data-toggle='dropdown' onclick='$("#unseen_notifictions").html("");$.post("/notifications/seen");')
-                i.material-icons(style='font-size:14px') notifications
-                if navbarItems.notifications.unseen
-                  span.badge#unseen_notifictions=navbarItems.notifications.unseen
+          li.nav-icon-btn.nav-icon-btn-success.dropdown
+            a.dropdown-toggle(href='#notifications', data-toggle='dropdown', onclick='$.post("/notifications/seen");')
+              if navbarItems.notifications.unseen
+                span.label=navbarItems.notifications.unseen
+              i.nav-icon.fa.fa-globe
+              span.small-screen-text Notifications
+          
+            .dropdown-menu.widget-messages-alt.no-padding(style='width: 300px;')
+              .slimScrollDiv(style='position: relative; overflow: hidden; width: auto; height: 250px;')
+                #main-navbar-messages.messages-list(style='overflow: hidden; width: auto; height: 250px;')
+                  - for(var n=0; n<navbarItems.notifications.notifications.length; n++)            
+                    .message
+                      img.message-avatar(src='css/images/baba.jpg', alt='')
+                      - var nt = navbarItems.notifications.notifications[n].notification
+                      a.message-subject(href=navbarItems.notifications.notifications[n].link, id=navbarItems.notifications.notifications[n].id, onclick='$.post("/notification/clicked", {notification_id : this.id})')                      
+                        if isNaN(nt)
+                          =nt
+                        else
+                          if nt<0
+                            .text-danger Worth change #{nt}                      
+                          else
+                            .text-success Worth change #{nt}                                                
+                      .message-description
+                        | prediction from 
+                        strong=navbarItems.notifications.notifications[n].from
+                        |
+                        - var dateObj = navbarItems.notifications.notifications[n].createdAt
+                        - var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]; 
+                        - var timeToShow = dateObj.getDate()+ " "+ months[dateObj.getMonth()]+ " at " + dateObj.toLocaleTimeString()  
+                        | </br>												#{timeToShow}
+                    // / .message
+                .slimScrollBar(style='background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 109.842px;')
+                .slimScrollRail(style='width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;')
+              // / .messages-list
+              a.messages-link(href='#notifications') MORE NOTIFICATIONS
+
+          li.nav-icon-btn.nav-icon-btn-danger.dropdown
+            a.dropdown-toggle(href='#requests', data-toggle='dropdown')
+              if navbarItems.requests.unseen
+                span.label=navbarItems.requests.unseen
+              i.nav-icon.fa.fa-group
+              span.small-screen-text Friend Requests
+              // NOTIFICATIONS
+            .dropdown-menu.widget-messages-alt.no-padding(style='width: 300px')
+              .slimScrollDiv(style='position: relative; overflow: hidden; width: auto; height: 250px;')
+                #main-navbar-requests.messages-list(style='overflow: hidden; width: auto; height: 250px;')
+                  - for(var n=0; n<navbarItems.requests.requests.length+1; n++)                                
+                    .message                      
+                      img.message-avatar(src='css/images/baba.jpg', alt='')
+                      a.message-subject(href='/profile/'+navbarItems.requests.requests[n].from)
+                      button.btn.btn-success.btn-sm.request(id=navbarItems.requests.requests[n].id, onclick='$.post("/request/action", {request_id : this.id, action: "accepted"})') Accept
+                      button.btn.btn-danger.btn-sm.request(id=navbarItems.requests.requests[n].id, onclick='$.post("/request", {request_id : this.id, action: "rejected"})') Accept
+                    // / .notification
+                .slimScrollBar(style='background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: block; border-radius: 7px; z-index: 99; right: 1px;')
+                .slimScrollRail(style='width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;')
+                // / .notifications-list
+              a.messages-link(href='#') MORE REQUESTS
+          //-
+            li.dropdown.notifications
             
-            ul.dropdown-menu
-              - for(var n=0; n<navbarItems.notifications.notifications.length; n++)
+              a.dropdown-toggle(href='#', data-toggle='dropdown' onclick='$("#unseen_notifictions").html("");$.post("/notifications/seen");')
+                  i.material-icons(style='font-size:14px') notifications
+                  if navbarItems.notifications.unseen
+                    span.badge#unseen_notifictions=navbarItems.notifications.unseen
+              
+              ul.dropdown-menu
+                - for(var n=0; n<navbarItems.notifications.notifications.length; n++)
+                  li
+                    a(href=navbarItems.notifications.notifications[n].link, id=navbarItems.notifications.notifications[n].id, onclick='$.post("/notification/clicked", {notification_id : this.id});')=navbarItems.notifications.notifications[n].notification
+                  li.divider
                 li
-                  a(href=navbarItems.notifications.notifications[n].link, id=navbarItems.notifications.notifications[n].id, onclick='$.post("/notification/clicked", {notification_id : this.id});')=navbarItems.notifications.notifications[n].notification
-                li.divider
-              li
-                a(href='/notifications') See All Notifications
-    
-          li.dropdown.requests
-            a.dropdown-toggle(href='#', data-toggle='dropdown' onclick='$("#unseen_requests").html("");$.post("/notifications/seen");')
-                i.material-icons(style='font-size:14px') group
-                if navbarItems.requests.unseen
-                  span.badge#unseen_requests=navbarItems.requests.unseen
+                  a(href='/notifications') See All Notifications
+
+            li.dropdown.requests
+              a.dropdown-toggle(href='#', data-toggle='dropdown' onclick='$("#unseen_requests").html("");$.post("/notifications/seen");')
+                  i.material-icons(style='font-size:14px') group
+                  if navbarItems.requests.unseen
+                    span.badge#unseen_requests=navbarItems.requests.unseen
 
           li.dropdown(class=(title == 'Account Management') ? 'active' : undefined)
             a.dropdown-toggle(href='#', data-toggle='dropdown')

@@ -33,18 +33,19 @@ block content
   script.
     const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
     const ldp2 = !{JSON.stringify(user.ldap).replace(/<\//g, '<\\/')};
+    const ldp2_name = !{JSON.stringify(user.profile.username).replace(/<\//g, '<\\/')};
     const sal = !{JSON.stringify(salaryCheck).replace(/<\//g, '<\\/')};
 
     $("#sendfr").click(function() {
         if($("#sendfr").attr("sent")=='false'){
             console.log("clicked");
-            $.post("/addFriendRequest", { ldap1: ldp1, ldap2: ldp2 }).done(function( data ) {
+            $.post("/request", {action:"create" ,ldap1: ldp1, ldap2: ldp2, name:ldp2_name}).done(function( data ) {
                 $("#sendfr").attr("sent", 'true');
                 $("#sendfr").text("Friend Request Sent");
             });
         } else {
             console.log("clicked else");
-            $.post("/deleteFriendRequest", { ldap1: ldp1, ldap2: ldp2 }).done(function( data ) {
+            $.post("/reuest", {action:"delete" , ldap1: ldp1, ldap2: ldp2 }).done(function( data ) {
                 $("#sendfr").attr("sent", 'false');
                 $("#sendfr").text("Send Friend Request");
             });

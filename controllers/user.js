@@ -109,6 +109,8 @@ exports.getSet = (req, res) => {
  */
 exports.postSet = (req, res, next) => {
   console.log(req.body);
+  req.assert('first', 'First name cannot be blank').notEmpty();  
+  req.assert('last', 'Last name cannot be blank').notEmpty();  
   req.assert('password', 'Password cannot be blank').notEmpty();
   req.assert('confirm', 'Passwords do not match').equals(req.body.password);
   const errors = req.validationErrors();
@@ -124,6 +126,8 @@ exports.postSet = (req, res, next) => {
       return next(err); }
     if (existingUser) {
       existingUser.password = req.body.password;
+      existingUser.first_name = req.body.first;
+      existingUser.last_name = req.body.last;
       existingUser.save((err) => {
         if (err) { 
           logger.error(err);
@@ -156,21 +160,6 @@ exports.getPredict = async (req, res, next) => {
     navbarItems : navbarItems
   });
 };
-
-/**
- * POST /predict
- * Save predictions
- */
-exports.postPredict = (req, res, next) => {
-  req.assert('password', 'Password cannot be blank').notEmpty();
-  const errors = req.validationErrors();
-
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/login');
-  }
-};
-
 
 /**
  * GET /profile/:ldap
@@ -283,88 +272,46 @@ exports.getSearch = async (req, res, next) => {
 };
 
 /**
- * POST /search
- * Save predictions
+ * POST /request
+ * action on request
  */
-exports.postSearch = async (req, res, next) => {
-  req.assert('salary', 'Prediction cannot be blank').notEmpty();
-  const errors = req.validationErrors();
 
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/' || req.session.returnTo);
-  }
-
+exports.postRequest = async (req, res, next) => {
   if (!req.user) {
-    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
+    logger.info("IP " + req.ip + " /request " + req.body.action +" without login");
     return res.redirect('/login');
   }
 
-  let createPrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });  
+  console.log(req.body);
 
-  let success = await service.UpdateDatabasePostPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err => { next(err); });
-
-  req.flash('success', { msg: 'Predicted!' });
-  res.redirect('/' || req.session.returnTo);
+  switch(req.body.action){
+    case 'create': return res.send(await Request.createRequest(req.body.ldap1, req.body.ldap2, req.body.name).catch(err=>{ next(err); }));
+    case 'delete': return res.send(await Request.deleteRequest(req.body.ldap1, req.body.ldap2).catch(err=>{ next(err); }));    
+    case 'see': return res.send(await Request.seeRequests(req.body.ldap).catch(err=>{ next(err); }));        
+    case 'accept': return res.send(await Request.acceptRequest(req.body.id).catch(err=>{ next(err); }));    
+    case 'reject': return res.send(await Request.rejectRequest(req.body.id).catch(err=>{ next(err); }));        
+  }
 };
+
 
 /**
- * POST /addFriends
- * Save predictions
+ * POST /notification
+ * action on notification
  */
-exports.postAddFriendRequest = async (req, res, next) => {
-  if (!req.user) {
-    logger.info("IP " + req.ip + " /addFriends" + req.params.ldap +"without login");
-    return res.redirect('/login');
-  }
-  console.log(req.body);
-  let createRequest = await Request.createRequest(req.body.ldap1, req.body.ldap2).catch(err=>{ next(err); });  
-  console.log(createRequest);
-  req.flash('success', { msg: 'Friend Request Sent!' });
-  res.send(createRequest);
-};
 
-/**
- * POST /removeFriends
- * Save predictions
- */
-exports.postDeleteFriendRequest = async (req, res, next) => {
+exports.postNotification = async (req, res, next) => {
   if (!req.user) {
-    logger.info("IP " + req.ip + " /removeFriends" + req.params.ldap +"without login");
-    return res.redirect('/login');
-  }
-  console.log(req.body);
-  let deleteRequest = await Request.deleteRequest(req.body.ldap1, req.body.ldap2).catch(err=>{ next(err); });  
-
-  console.log(deleteRequest);
-  req.flash('success', { msg: 'Friend Request Deleted!' });
-  res.send(deleteRequest);
-};
-
-exports.postNotificationClicked = async (req, res, next) => {
-  if (!req.user) {
-    logger.info("IP " + req.ip + " /clicked notification" + req.params.ldap +"without login");
+    logger.info("IP " + req.ip + " /notification " + req.body.action +" without login");
     return res.redirect('/login');
   }
 
   console.log(req.body);
-  let clicked = await Notification.markClicked(req.body.notification_id).catch(err=>{ next(err); });  
 
-  console.log(clicked);
-  res.send(clicked);
-};
-
-exports.postNotificationsSeen = async (req, res, next) => {
-  if (!req.user) {
-    logger.info("IP " + req.ip + " /sent seen notification req" + req.params.ldap +"without login");
-    return res.redirect('/login');
+  switch(req.body.action){
+    case 'create': return res.send(await Notification.createNotification(req.body.ldap1, req.body.ldap2, req.body.notification).catch(err=>{ next(err); }));
+    case 'see': return res.send(await Notification.seeNotifications(req.body.ldap).catch(err=>{ next(err); }));        
+    case 'click': return res.send(await Notification.clickNotification(req.body.id).catch(err=>{ next(err); }));
   }
-
-  console.log(req.body);
-  let seen = await Notification.markSeen(req.user.ldap).catch(err=>{ next(err); });  
-
-  console.log(seen);
-  res.send(seen);
 };
 
 /**
@@ -439,7 +386,7 @@ exports.gotCallback = async (req, res, next) => {
                 await Relation.createRelation(user.ldap, one.ldap);
                 await Relation.createRelation(one.ldap, user.ldap);
               }
-              await Notification.createNotification(user.ldap, user.ldap, "Welcome to IITBaba").catch(err=>{console.log(err);});
+              await Notification.createNotification(user.ldap, user.ldap, "Welcome to IITbaba").catch(err=>{console.log(err);});
               req.logIn(user, (err) => {
                 if (err) { return next(err); }         
                 req.flash('success', { msg: 'Success! Registered.' });
@@ -449,94 +396,3 @@ exports.gotCallback = async (req, res, next) => {
           });
     });
 };
-/*
-              var promise = new Promise(function(resolve, reject) {
-                User.findOne({ ldap : info.username }, (err, existingUser) => {
-                  if (err) { return next(err); }
-                  if (existingUser) {
-                      existingUser.save((err) => {
-                      if (err) { return next(err); }
-                    });
-                    req.logIn(existingUser, (err) => {
-                      if (err) { return next(err); }         
-                    });
-                    resolve("Found");
-                  }else {
-                    reject("Not Found");
-                  }
-                });
-              });
-              promise.then(function(result) {
-                req.flash('success', { msg: 'Success! You are logged in.' });
-                return res.redirect(req.session.returnTo || '/');
-                console.log(result); // "Stuff worked!"
-              }, function(err) {
-                console.log('I fonud none');
-                console.log(user);
-                  user.profile.id =  info.id;
-                  user.profile.first_name =  info.first_name;
-                  user.profile.last_name = info.last_name;
-                  user.profile.username = info.username;
-                  user.profile.deg_type = info.type;
-                  user.profile.profile_picture = info.profile_picture;
-                  user.profile.sex = info.sex;
-                  user.profile.email = info.email;
-                  user.profile.mobile = info.mobile;
-                  user.profile.roll_number = info.roll_number;
-                  user.profile.contacts = info.contacts;
-                  user.profile.insti_address.id = info.insti_address.id;
-                  user.profile.insti_address.room = info.insti_address.room;
-                  user.profile.insti_address.hostel = info.insti_address.hostel;
-                  user.profile.insti_address.hostel_name = info.insti_address.hostel_name;
-                  user.profile.program.id = info.program.id;
-                  user.profile.program.department = info.program.department;
-                  user.profile.program.department_name = info.program.department_name;
-                  user.profile.program.join_year = info.program.join_year;
-                  user.profile.program.graduation_year = info.program.graduation_year;
-                  user.profile.program.degree = info.program.degree;
-                  user.profile.program.degree_name = info.program.degree_name;
-                  user.profile.secondary_emails = info.secondary_emails;
-
-                user.save((err) => {
-                    console.log("saved s");
-                    if (err) { console.log("saved");return next(err); }
-                        Relation.create({ ldap1: user.ldap , ldap2: u.ldap, relation: rel_coff, predicted: false, friends: false  }, function (err, small) {
-                          if (err) {return next(err);reject(err);}
-                          console.log("Relation1 created");
-                        });
-                        Relation.create({ ldap1: u.ldap , ldap2: user.ldap, relation: rel_coff, predicted: false, friends: false  }, function (err, small) {
-                          if (err) {return next(err);reject(err);}
-                          console.log("Relation2 created");
-                        });
-                      }
-                    });
-
-                    Authenticity.create({ ldap: user.ldap , auth: 0.95}, function (err, small) {
-                      if (err) {return next(err);}
-                    });
-                    
-                    Salary.create({ ldap: user.ldap , salary: 100000, mean:100000, sigma:0, n:1}, function (err, small) {
-                      if (err) {console.log(err); return next(err);}
-                      console.log("User initialized");
-                    });
-                });
-                req.logIn(user, (err) => {
-                  if (err) { return next(err); }         
-                  req.flash('success', { msg: 'Success! Registered.' });
-                  return res.redirect('/set');
-                });
-                console.log(err); // Error: "It broke"
-              });
-              /*
-              console.log('I fonud none');
-              user.save((err) => {
-                  if (err) { return next(err); }
-              });
-              req.logIn(user, (err) => {
-                if (err) { return next(err); }         
-                req.flash('success', { msg: 'Success! Registered.' });
-                return res.redirect('/set');
-              });
-        });
-  });
-};*/

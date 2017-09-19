@@ -135,8 +135,8 @@ userSchema.statics.initializeUser = function initializeUser(user, info){
 userSchema.statics.getUser = function getUser(ldap){
   return new Promise ((resolve, reject) => { 
     this.model('User').findOne({ ldap: ldap }).exec((err, user)=>{
-      console.log("Logging from get user");
-      console.log(user);
+      //console.log("Logging from get user");
+      //console.log(user);
       if(err) reject(err);
       resolve(user);
     });
@@ -145,8 +145,8 @@ userSchema.statics.getUser = function getUser(ldap){
 
 userSchema.statics.getUsers = function getUsers(ldaps) { // This is getting passed in a wrong way
   return new Promise ((resolve, reject) => {
-    console.log("logging ldaps");
-    console.log(ldaps);
+    //console.log("logging ldaps");
+    //console.log(ldaps);
     this.model('User').find({ ldap: {$in: ldaps} },{},{sort:{ "createdAt" : -1} }).exec((err, users)=>{
       if(err) reject(err);
       resolve(users);

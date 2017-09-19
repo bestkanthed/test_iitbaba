@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const requestSchema = new mongoose.Schema({
   ldap: String, // The one 
   from: String,
+  name: String,
   seen: Boolean,
   clicked: Boolean,
   accepted: Boolean,
@@ -39,15 +40,14 @@ requestSchema.statics.getRequest = function getRequest(ldap, from) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').findOne({ ldap: ldap, from:from },{},{sort:{ "createdAt" : -1} }).exec((err, requ)=>{
       if(err) reject(err);
-      if(requ) resolve(requ.accepted);
-      else resolve(null);
+      resolve(requ);
     });
   });
 };
 
 requestSchema.statics.getRequests = function getRequests(ldap, no) {
   return new Promise ((resolve, reject) => { 
-    this.model('Request').find({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, requ)=>{
+    this.model('Request').find({ ldap: ldap, accepted:false, rejected:false },{},{sort:{ "createdAt" : -1} }).limit(no).exec((err, requ)=>{
       if(err) reject(err);
       resolve(requ);
     });
@@ -56,7 +56,11 @@ requestSchema.statics.getRequests = function getRequests(ldap, no) {
 
 requestSchema.statics.seeRequests = function seeRequests(ldap) {
   return new Promise ((resolve, reject) => { 
-    this.model('Notification').find({ ldap : ldap, seen : false}, (err, reqs)=>{
+    this.model('Request').find({ ldap : ldap, seen : false}, (err, reqs)=>{
+      console.log("logging ldap from seeRequests");
+      console.log(ldap);
+      console.log("logging reqs from seeRequests");
+      console.log(reqs);
       if(err) reject(err);
       for(req of reqs){
         req.seen = true;
@@ -71,7 +75,7 @@ requestSchema.statics.seeRequests = function seeRequests(ldap) {
 
 requestSchema.statics.clickRequest = function clickRequest(id) {
   return new Promise ((resolve, reject) => { 
-    this.model('Request').find({ _id : id }, (err, requ)=>{
+    this.model('Request').findOne({ _id : id }, (err, requ)=>{
       if(err) reject(err);
       requ.clicked = true;
       requ.save((err)=>{
@@ -84,7 +88,8 @@ requestSchema.statics.clickRequest = function clickRequest(id) {
 
 requestSchema.statics.acceptRequest = function acceptRequest(id) {
   return new Promise ((resolve, reject) => { 
-    this.model('Request').find({ _id : id }, (err, requ)=>{
+    console.log(id);
+    this.model('Request').findOne({ _id : id }, (err, requ)=>{
       if(err) reject(err);
       requ.accepted = true;
       requ.save((err)=>{
@@ -97,7 +102,7 @@ requestSchema.statics.acceptRequest = function acceptRequest(id) {
 
 requestSchema.statics.rejectRequest = function rejectRequest(id) {
   return new Promise ((resolve, reject) => { 
-    this.model('Request').find({ _id : id }, (err, requ)=>{
+    this.model('Request').findOne({ _id : id }, (err, requ)=>{
       if(err) reject(err);
       requ.rejected = true;
       requ.save((err)=>{

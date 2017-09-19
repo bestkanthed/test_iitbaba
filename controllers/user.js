@@ -74,7 +74,7 @@ exports.postLogin = (req, res, next) => {
   }
 
   passport.authenticate('local', (err, user, info) => {
-    console.log(user);
+    //console.log(user);
     if (err) {return next(err);}
     if (!user) {
       logger.info(req.body.username+" : username was entered but doesn't exist "+info);
@@ -93,13 +93,16 @@ exports.postLogin = (req, res, next) => {
  * GET /set
  * Set page.
  */
-exports.getSet = (req, res) => {
+exports.getSet = async (req, res) => {
   if (!req.user) {
     logger.info(req.ip + " opened /set without login");
     return res.redirect('/');
   }
-  res.render('account/set', {
-    title: 'Set Password'
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  console.log(navbarItems);
+  return res.render('account/set', {
+    title: 'Set Password',
+    navbarItems: navbarItems
   });
 };
 
@@ -108,7 +111,7 @@ exports.getSet = (req, res) => {
  * Set usermane and password.
  */
 exports.postSet = (req, res, next) => {
-  console.log(req.body);
+  //console.log(req.body);
   req.assert('first', 'First name cannot be blank').notEmpty();  
   req.assert('last', 'Last name cannot be blank').notEmpty();  
   req.assert('password', 'Password cannot be blank').notEmpty();
@@ -151,7 +154,7 @@ exports.getPredict = async (req, res, next) => {
     return res.redirect('/');
   }
   let usersToShow = await service.getNewPeopleToPredict(req.user.ldap, standard.notifications).catch(err => { next(err); });;
-  console.log(usersToShow);
+  //console.log(usersToShow);
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
   console.log(navbarItems);
   res.render('account/predict', {
@@ -173,27 +176,34 @@ exports.getProfile = (req, res, next) => {
     return res.redirect('/login');
   }
 
-  let friends = Relation.areFriends(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  let requestSent = Request.getRequest(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let relation = Relation.getRelation(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  //let friends = Relation.areFriends(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let requestReceived = Request.getRequest(req.user.ldap, req.params.ldap).catch(err => { next(err); }); // can be only true
+  // Send ID of the request else send null
   let user = User.getUser(req.params.ldap).catch(err => { next(err); });
-  let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  //let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
   let navbarItems = service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
   let salary = Salary.getSalary(req.params.ldap).catch(err => { next(err); });
 
-
-  Promise.all([user, salary, navbarItems, friends, requestSent, alreadyPredicted]).then(values => { 
+  Promise.all([user, salary, navbarItems, relation, requestReceived]).then(values => { 
       console.log("Logging first_name");
       console.log(values[0].profile.first_name);
-      console.log(values[5]);
+      
+      console.log("Logging if request recieved from the profiled person");
+      console.log(values[4]);
+      
+      console.log("Logging relations");
+      console.log(values[3]);
 
       res.render('profile', {
         title: values[0].profile.first_name,
         userp : values[0],
-        predicted : values[5],
-        friends: values[3],
+        predicted : values[3].predicted,
+        friends: values[3].friends,
         salaryCheck : values[1],
         navbarItems : values[2],
-        requestSent: values[4]
+        requestSent: values[3].request,
+        requestReceived: values[4]==null ? null : values[4].id
       });
     }).catch(err=>{ next(err); });
 };
@@ -216,8 +226,7 @@ exports.postProfile = async (req, res, next) => {
     return res.redirect('/login');
   }
 
-  let createPrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });  
-
+  let createPrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });
   let success = await service.UpdateDatabasePostPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err => { next(err); });
 
   req.flash('success', { msg: 'Predicted!' });
@@ -283,14 +292,38 @@ exports.postRequest = async (req, res, next) => {
   }
 
   console.log(req.body);
-
   switch(req.body.action){
-    case 'create': return res.send(await Request.createRequest(req.body.ldap1, req.body.ldap2, req.body.name).catch(err=>{ next(err); }));
-    case 'delete': return res.send(await Request.deleteRequest(req.body.ldap1, req.body.ldap2).catch(err=>{ next(err); }));    
-    case 'see': return res.send(await Request.seeRequests(req.body.ldap).catch(err=>{ next(err); }));        
-    case 'accept': return res.send(await Request.acceptRequest(req.body.id).catch(err=>{ next(err); }));    
-    case 'reject': return res.send(await Request.rejectRequest(req.body.id).catch(err=>{ next(err); }));        
-  }
+    case 'create':
+      await Relation.requestSent(req.body.ldap, req.user.ldap);
+      let requ = await Request.getRequest(req.user.ldap, req.body.ldap);
+      if(requ){
+        await Relation.makeFriends(req.user.ldap, req.body.ldap);
+        await Relation.makeFriends(req.body.ldap, req.user.ldap);
+        await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.profile.username);
+        await Notification.createNotification(req.user.ldap, req.body.ldap, "You are now friends with "+req.body.ldap);// Make name here
+        // accept also the request sent by the other person
+        return res.send(await Request.acceptRequest(requ.id).catch(err=>{ next(err); }));  
+      }
+      return res.send(await Request.createRequest(req.body.ldap, req.user.ldap, req.user.profile.username).catch(err=>{ next(err); }));
+    case 'delete':
+      await Relation.requestDelete(req.body.ldap, req.user.ldap);      
+      return res.send(await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); }));    
+    case 'see': return res.send(await Request.seeRequests(req.user.ldap).catch(err=>{ next(err); }));        
+    case 'click': return res.send(await Request.clickRequest(req.body.id).catch(err=>{ next(err); }));        
+    case 'accept':
+      await Relation.makeFriends(req.user.ldap, req.body.ldap);
+      await Relation.makeFriends(req.body.ldap, req.user.ldap);
+      await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.profile.username);
+      await Notification.createNotification(req.user.ldap, req.body.ldap, "You are now friends with "+req.body.ldap);// Make name here
+      return res.send(await Request.acceptRequest(req.body.id).catch(err=>{ next(err); }));
+    case 'reject': 
+      await Relation.requestDelete(req.user.ldap, req.body.ldap);
+      return res.send(await Request.rejectRequest(req.body.id).catch(err=>{ next(err); }));
+    case 'unfriend':
+      await Relation.unfriend(req.user.ldap, req.body.ldap);
+      await Relation.unfriend(req.body.ldap, req.user.ldap);
+      return res.send("unfriend");
+  } 
 };
 
 
@@ -309,7 +342,7 @@ exports.postNotification = async (req, res, next) => {
 
   switch(req.body.action){
     case 'create': return res.send(await Notification.createNotification(req.body.ldap1, req.body.ldap2, req.body.notification).catch(err=>{ next(err); }));
-    case 'see': return res.send(await Notification.seeNotifications(req.body.ldap).catch(err=>{ next(err); }));        
+    case 'see': return res.send(await Notification.seeNotifications(req.user.ldap).catch(err=>{ next(err); }));        
     case 'click': return res.send(await Notification.clickNotification(req.body.id).catch(err=>{ next(err); }));
   }
 };
@@ -346,8 +379,8 @@ exports.gotCallback = async (req, res, next) => {
     }, function(err, resf) {
 
         var tokens = JSON.parse(resf.body);
-        console.log("Token:", tokens);
-        console.log(user);
+        //console.log("Token:", tokens);
+        //console.log(user);
         user.tokens.access_token = tokens.access_token;
         user.tokens.token_type = tokens.token_type;
         user.tokens.expires_in = tokens.expires_in;
@@ -361,7 +394,7 @@ exports.gotCallback = async (req, res, next) => {
               }
           }, async (err1, res1)=> {
               var info = JSON.parse(res1.body);
-              console.log("User Info:", info);
+              //console.log("User Info:", info);
               user.ldap = info.username;
 
               //

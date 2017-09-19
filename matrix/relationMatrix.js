@@ -8,9 +8,9 @@ exports.getRelation = (ldap1, ldap2) =>{
           user1 = await User.getUser(ldap1).catch(err => { reject(err); });
           user2 = await User.getUser(ldap2).catch(err => { reject(err); });
             let rel_coff = 0;
-            console.log("loggingfromrealtionmatrix");
-            console.log(user1);
-            console.log(user2);
+            //console.log("loggingfromrealtionmatrix");
+            //console.log(user1);
+            //console.log(user2);
             if(user1.profile.deg_type === user2.profile.deg_type) {
                 rel_coff = rel_coff + 10;
                 rel_coff = rel_coff + 6 - Math.abs(user1.profile.program.join_year - user2.profile.program.join_year);  

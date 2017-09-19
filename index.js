@@ -100,7 +100,6 @@ app.get('/set', userController.getSet);
 app.post('/set', userController.postSet);
 
 app.get('/predict', userController.getPredict);
-app.post('/predict', userController.postPredict);
 
 app.get('/profile/:ldap', userController.getProfile);
 app.post('/profile/:ldap', userController.postProfile);

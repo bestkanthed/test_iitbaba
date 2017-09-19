@@ -7,13 +7,18 @@ block content
 
   else  
     if friends
-      p Friends
+      button#unfriend Already Friends. Unfriend? 
     else
-      if requestSent
-        p Request Sent
+      if requestSent=='pending'
+        button#deleteRequest Freind Request Sent. Delete?        
+      if requestSent=='rejected'
+        button#sendRequest Send Friend Request
       else
-        button#sendfr(sent='false') Send Friend Request
-    
+        if requestReceived
+          button#acceptRequest Respond Accept
+          button#rejectRequest Respond Reject
+        else
+          button#sendRequest Send Friend Request        
     p= userp.profile.first_name
     
     if !predicted
@@ -32,24 +37,53 @@ block content
       p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salaryCheck) + " after graduation"
   script.
     const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
-    const ldp2 = !{JSON.stringify(user.ldap).replace(/<\//g, '<\\/')};
-    const ldp2_name = !{JSON.stringify(user.profile.username).replace(/<\//g, '<\\/')};
     const sal = !{JSON.stringify(salaryCheck).replace(/<\//g, '<\\/')};
+    const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
 
-    $("#sendfr").click(function() {
-        if($("#sendfr").attr("sent")=='false'){
-            console.log("clicked");
-            $.post("/request", {action:"create" ,ldap1: ldp1, ldap2: ldp2, name:ldp2_name}).done(function( data ) {
-                $("#sendfr").attr("sent", 'true');
-                $("#sendfr").text("Friend Request Sent");
-            });
-        } else {
-            console.log("clicked else");
-            $.post("/reuest", {action:"delete" , ldap1: ldp1, ldap2: ldp2 }).done(function( data ) {
-                $("#sendfr").attr("sent", 'false');
-                $("#sendfr").text("Send Friend Request");
-            });
-        } 
+    $("#unfriend").click(function() {
+      console.log(this.id);
+      $.post("/request", {action:"unfriend" , ldap: ldp1}).done(function( data ) {
+          $("#unfriend").attr("id", "sendRequest");
+          $("#sendRequest").text("Send Friend Request");
+      });
+    });
+
+    $("#deleteRequest").click(function() {
+      console.log(this.id);      
+      console.log("delete request");
+      $.post("/request", {action:"delete" , ldap: ldp1}).done(function( data ) {
+          $("#deleteRequest").attr("id", "sendRequest");
+          $("#sendRequest").text("Send Friend Request");
+      });
+    });
+
+    $("#acceptRequest").click(function() {
+      console.log(this.id);      
+      console.log("accept request");
+      $.post("/request", {action:"accept", id: id, ldap: ldp1}).done(function( data ) {
+          $("#acceptRequest").attr("id", "unfriend");
+          $("#unfriend").text("Unfriend");
+          $("#rejectRequest").remove();
+      });
+    });
+
+    $("#rejectRequest").click(function() {
+      console.log(this.id);      
+      console.log("reject request");
+      $.post("/request", {action:"reject", id: id, ldap: ldp1}).done(function( data ) {
+          $("#acceptRequest").attr("id", "sendRequest");
+          $("#rejectRequest").remove();
+          $("#sendRequest").text("Send Friend Request");
+      });
+    });
+
+    $("#sendRequest").click(function() {
+      console.log(this.id);      
+      console.log("send request");
+      $.post("/request", {action:"create", ldap: ldp1}).done(function( data ) {
+          $("#sendRequest").attr("id", "deleteRequest");
+          $("#deleteRequest").text("Delete Sent Request");
+      });
     });
 
     $("#prediction").submit(function() {

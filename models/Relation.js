@@ -7,21 +7,38 @@ const relationSchema = new mongoose.Schema({
   ldap1: String, //
   ldap2: String, // if here predicted is true means 2 predicted for 1
   predicted: Boolean,
+  request:Boolean,
   friends: Boolean,
   relation: Number // this is a number to capture the relation
 }, { timestamps: true });
 
 relationSchema.statics.createRelation = function createRelation(ldap1, ldap2) {
   return new Promise (async (resolve, reject) => {
-    this.model('Relation').create({ 
-      ldap1: ldap1, 
-      ldap2: ldap2,
-      predicted: false,
-      friends: false,
-      relation: await relationMatrix.getRelation(ldap1, ldap2).catch(err=>{ reject(err); })
-    }, (err, rel)=>{
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
-      resolve("created"); 
+      if(!rel){
+        this.model('Relation').create({ 
+          ldap1: ldap1, 
+          ldap2: ldap2,
+          predicted: false,
+          request: false,
+          friends: false,
+          relation: await relationMatrix.getRelation(ldap1, ldap2).catch(err=>{ reject(err); })
+        }, (err, rel)=>{
+          if(err) reject(err);
+          resolve("created"); 
+        });
+      }
+      else resolve("already exists");
+    });
+  });
+};
+
+relationSchema.statics.getRelationCoff = function getRelation(ldap1, ldap2) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+      if(err) reject(err);
+      resolve(rel.relation);
     });
   });
 };
@@ -30,7 +47,7 @@ relationSchema.statics.getRelation = function getRelation(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
-      resolve(rel.relation);
+      resolve(rel);
     });
   });
 };
@@ -74,6 +91,41 @@ relationSchema.statics.predicted = function predicted(ldap1, ldap2) {
       rel.save((err) => {
         if(err) reject(err);
         resolve("predicted");
+      });
+    });
+  });
+};
+
+relationSchema.statics.requestSent = function request(ldap1, ldap2) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+      if(err) reject(err);
+      rel.request = true;
+      rel.save((err) => {
+        if(err) reject(err);
+        resolve("request sent");
+      });
+    });
+  });
+};
+
+relationSchema.statics.getRequestSent = function request(ldap1, ldap2) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+      if(err) reject(err);
+      resolve(rel.request);
+    });
+  });
+};
+
+relationSchema.statics.requestDelete = function request(ldap1, ldap2) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+      if(err) reject(err);
+      rel.request = false;
+      rel.save((err) => {
+        if(err) reject(err);
+        resolve("request deleted");
       });
     });
   });

@@ -25,7 +25,7 @@
           
             
           li.nav-icon-btn.nav-icon-btn-success.dropdown
-            a.dropdown-toggle(href='#notifications', data-toggle='dropdown', onclick='$.post("/notifications/seen");')
+            a.dropdown-toggle(href='#notifications', data-toggle='dropdown', onclick='$.post("/notification",{action:"see"});')
               if navbarItems.notifications.unseen
                 span.label=navbarItems.notifications.unseen
               i.nav-icon.fa.fa-globe
@@ -38,7 +38,7 @@
                     .message
                       img.message-avatar(src='css/images/baba.jpg', alt='')
                       - var nt = navbarItems.notifications.notifications[n].notification
-                      a.message-subject(href=navbarItems.notifications.notifications[n].link, id=navbarItems.notifications.notifications[n].id, onclick='$.post("/notification/clicked", {notification_id : this.id})')                      
+                      a.message-subject(href=navbarItems.notifications.notifications[n].link, id=navbarItems.notifications.notifications[n].id, onclick='$.post("/notification", {action:"click", id : this.id})')
                         if isNaN(nt)
                           =nt
                         else
@@ -52,7 +52,7 @@
                         |
                         - var dateObj = navbarItems.notifications.notifications[n].createdAt
                         - var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]; 
-                        - var timeToShow = dateObj.getDate()+ " "+ months[dateObj.getMonth()]+ " at " + dateObj.toLocaleTimeString()  
+                        - var timeToShow = dateObj.getDate()+ " "+ months[dateObj.getMonth()]+ " at " + dateObj.toLocaleTimeString()
                         | </br>												#{timeToShow}
                     // / .message
                 .slimScrollBar(style='background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 109.842px;')
@@ -61,7 +61,7 @@
               a.messages-link(href='#notifications') MORE NOTIFICATIONS
 
           li.nav-icon-btn.nav-icon-btn-danger.dropdown
-            a.dropdown-toggle(href='#requests', data-toggle='dropdown')
+            a.dropdown-toggle(href='#requests', data-toggle='dropdown', onclick='$.post("/request",{action:"see"});')
               if navbarItems.requests.unseen
                 span.label=navbarItems.requests.unseen
               i.nav-icon.fa.fa-group
@@ -70,12 +70,12 @@
             .dropdown-menu.widget-messages-alt.no-padding(style='width: 300px')
               .slimScrollDiv(style='position: relative; overflow: hidden; width: auto; height: 250px;')
                 #main-navbar-requests.messages-list(style='overflow: hidden; width: auto; height: 250px;')
-                  - for(var n=0; n<navbarItems.requests.requests.length+1; n++)                                
-                    .message                      
+                  - for(var n=0; n<navbarItems.requests.requests.length; n++)                                
+                    .message(id=navbarItems.requests.requests[n].id)
                       img.message-avatar(src='css/images/baba.jpg', alt='')
-                      a.message-subject(href='/profile/'+navbarItems.requests.requests[n].from)
-                      button.btn.btn-success.btn-sm.request(id=navbarItems.requests.requests[n].id, onclick='$.post("/request/action", {request_id : this.id, action: "accepted"})') Accept
-                      button.btn.btn-danger.btn-sm.request(id=navbarItems.requests.requests[n].id, onclick='$.post("/request", {request_id : this.id, action: "rejected"})') Accept
+                      a.message-subject(href='/profile/'+navbarItems.requests.requests[n].from, onclick='$.post("/request", {id : $(this).parent().attr("id"), action: "click"})')=navbarItems.requests.requests[n].name
+                      button.btn.btn-success.btn-sm.request(from=navbarItems.requests.requests[n].from, onclick='$.post("/request", {id : $(this).parent().attr("id"), action: "accept", ldap: $(this).attr("from")}); $(this).parent().remove();') Accept
+                      button.btn.btn-danger.btn-sm.request(from=navbarItems.requests.requests[n].from, onclick='$.post("/request", {id : $(this).parent().attr("id"), action: "reject", ldap: $(this).attr("from")}); $(this).parent().remove();') Reject
                     // / .notification
                 .slimScrollBar(style='background: rgb(0, 0, 0); width: 7px; position: absolute; top: 0px; opacity: 0.4; display: block; border-radius: 7px; z-index: 99; right: 1px;')
                 .slimScrollRail(style='width: 7px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;')

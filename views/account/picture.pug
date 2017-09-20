@@ -1,0 +1,58 @@
+extends ../layout
+
+block content
+  script(src='js/lib/jquery.cropit.js')
+  .col-sm-8.col-sm-offset-2
+    style.
+      .cropit-preview {
+      background-color: #f8f8f8;
+      background-size: cover;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      margin-top: 7px;
+      width: 480px;
+      height: 480px;
+      }
+      .cropit-preview-image-container {
+      cursor: move;
+      }
+      .image-size-label {
+      margin-top: 10px;
+      }
+      input {
+      display: block;
+      }
+      button[type="submit"] {
+      margin-top: 10px;
+      }
+      #result {
+      margin-top: 10px;
+      width: 900px;
+      }
+      #result-data {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      word-wrap: break-word;
+      }
+
+    form(method='POST')
+      .image-editor
+        input.cropit-image-input(type='file')
+        .cropit-preview
+        .image-size-label
+          | Resize image
+        input.cropit-image-zoom-input(type='range')
+        input.hidden-image-data(type='hidden', name='image_data')
+        button(type='submit') Submit
+    script.
+      $(function() {
+      $('.image-editor').cropit();
+      $('form').submit(function() {
+      // Move cropped image data to hidden input
+      var imageData = $('.image-editor').cropit('export');
+      $('.hidden-image-data').val(imageData);
+      return true;
+      });
+      });

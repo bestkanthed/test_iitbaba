@@ -3,6 +3,7 @@ const User = require('../models/User');
 const request = require('request');
 const winston = require('winston');
 const standard = require('../config/standard');
+const fs = require('fs'); 
 
 const Request = require('../models/Request');
 const KPoint = require('../models/KPoint');
@@ -93,7 +94,7 @@ exports.postLogin = (req, res, next) => {
  * GET /set
  * Set page.
  */
-exports.getSet = async (req, res) => {
+exports.getSet = async (req, res, next) => {
   if (!req.user) {
     logger.info(req.ip + " opened /set without login");
     return res.redirect('/');
@@ -137,9 +138,51 @@ exports.postSet = (req, res, next) => {
           return next(err); 
         }
       });
-      req.flash({ msg: 'Password updated' });
-      return res.redirect('/');
+      req.flash({ msg: 'Profile updated' });
+      return res.redirect('/picture');
     }
+  });
+};
+
+/**
+ * GET /picture
+ * Set picture page.
+ */
+exports.getPicture = async (req, res, next) => {
+  if (!req.user) {
+    logger.info(req.ip + " opened /picture without login");
+    return res.redirect('/');
+  }
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  console.log(navbarItems);
+  return res.render('account/picture', {
+    title: 'Upload Profile Picture',
+    navbarItems: navbarItems
+  });
+};
+
+/**
+ * POST /picture
+ * posted picture .
+ */
+exports.postPicture = async (req, res, next)=>{
+  console.log("Posted");
+  let base64Data = req.body.image_data.replace(/^data:image\/png;base64,/, "");
+  filename = "./public/images/profile/"+req.user.ldap+".png";
+  fs.writeFile(filename, base64Data, 'base64', function(err) {
+    if(err) return next(err);
+    
+    User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
+      if (err) return next(err);
+      if (existingUser) {
+        existingUser.profile.upload_picture = true;
+        existingUser.save((err) => {
+          if (err) return next(err);
+          req.flash({ msg: 'Picture Saved' });
+          return res.redirect('/');
+        });
+      }
+    });
   });
 };
 

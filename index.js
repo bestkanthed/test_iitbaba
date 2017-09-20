@@ -48,8 +48,8 @@ app.set('view engine', 'pug');
 
 app.use(morgan('combined', {stream: accessLogStream}));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({limit:'50mb'}));
+app.use(bodyParser.urlencoded({ extended: true, limit:'50mb'}));
 app.use(expressValidator());
 
 app.use(session({
@@ -98,6 +98,9 @@ app.get('/logout', userController.logout);
 
 app.get('/set', userController.getSet);
 app.post('/set', userController.postSet);
+
+app.get('/picture', userController.getPicture);
+app.post('/picture', userController.postPicture);
 
 app.get('/predict', userController.getPredict);
 

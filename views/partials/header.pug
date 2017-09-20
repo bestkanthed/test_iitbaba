@@ -105,10 +105,13 @@
 
           li.dropdown(class=(title == 'Account Management') ? 'active' : undefined)
             a.dropdown-toggle(href='#', data-toggle='dropdown')
-              if user.profile.profile_picture
-                img(src='https://gymkhana.iitb.ac.in'+user.profile.profile_picture)
+              if user.profile.upload_picture
+                img(src='/images/profile/'+user.ldap+'.png')
               else
-                img(src=user.gravatar(60))
+                if user.profile.profile_picture
+                  img(src='https://gymkhana.iitb.ac.in'+user.profile.profile_picture)
+                else
+                  img(src=user.gravatar(60))
               span= user.profile.fisrt_name
               i.caret
             ul.dropdown-menu

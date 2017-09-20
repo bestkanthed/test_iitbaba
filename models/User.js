@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema({
     mobile: String,
     roll_number: String,
     contacts : Array,
+    upload_picture: Boolean,
     insti_address: {
       id: Number,
       room: String,

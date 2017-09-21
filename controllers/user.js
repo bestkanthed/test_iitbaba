@@ -161,6 +161,8 @@ exports.getPicture = async (req, res, next) => {
   });
 };
 
+// Add perdict for IITbaba
+
 /**
  * POST /picture
  * posted picture .

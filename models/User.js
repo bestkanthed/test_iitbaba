@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
   first_name: String,
   last_name: String,
 
+  mid: Number,
+
   img: {
     filename: String,
     mimetype: String
@@ -97,38 +99,48 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
+
+// mid zero for iitBaba
 userSchema.statics.initializeUser = function initializeUser(user, info){
-  return new Promise ((resolve, reject) => { 
-    user.profile.id =  info.id;
-    user.profile.first_name =  info.first_name;
-    user.profile.last_name = info.last_name;
-    user.profile.username = info.username;
-    user.profile.deg_type = info.type;
-    user.profile.profile_picture = info.profile_picture;
-    user.profile.sex = info.sex;
-    user.profile.email = info.email;
-    user.profile.mobile = info.mobile;
-    user.profile.roll_number = info.roll_number;
-    user.profile.contacts = info.contacts;
-    if(info.insti_address){
-      user.profile.insti_address.id = info.insti_address.id;
-      user.profile.insti_address.room = info.insti_address.room;
-      user.profile.insti_address.hostel = info.insti_address.hostel;
-      user.profile.insti_address.hostel_name = info.insti_address.hostel_name;
-    }
-    if(info.program){    
-      user.profile.program.id = info.program.id;
-      user.profile.program.department = info.program.department;
-      user.profile.program.department_name = info.program.department_name;
-      user.profile.program.join_year = info.program.join_year;
-      user.profile.program.graduation_year = info.program.graduation_year;
-      user.profile.program.degree = info.program.degree;
-      user.profile.program.degree_name = info.program.degree_name;
-    }
-    user.profile.secondary_emails = info.secondary_emails;
-    user.save(err=>{
+  return new Promise ((resolve, reject) => {
+    
+    this.model('User').findOne({},{},{sort:{ "mid" : -1} }).exec((err, lastUser)=>{
       if(err) reject(err);
-      resolve("created");
+      if(!lastUser) user.mid = 1;
+      else user.mid = lastUser.mid + 1;
+
+      user.profile.id =  info.id;
+      user.profile.first_name =  info.first_name;
+      user.profile.last_name = info.last_name;
+      user.profile.username = info.username;
+      user.profile.deg_type = info.type;
+      user.profile.profile_picture = info.profile_picture;
+      user.profile.sex = info.sex;
+      user.profile.email = info.email;
+      user.profile.mobile = info.mobile;
+      user.profile.roll_number = info.roll_number;
+      user.profile.contacts = info.contacts;
+      if(info.insti_address){
+        user.profile.insti_address.id = info.insti_address.id;
+        user.profile.insti_address.room = info.insti_address.room;
+        user.profile.insti_address.hostel = info.insti_address.hostel;
+        user.profile.insti_address.hostel_name = info.insti_address.hostel_name;
+      }
+      if(info.program){    
+        user.profile.program.id = info.program.id;
+        user.profile.program.department = info.program.department;
+        user.profile.program.department_name = info.program.department_name;
+        user.profile.program.join_year = info.program.join_year;
+        user.profile.program.graduation_year = info.program.graduation_year;
+        user.profile.program.degree = info.program.degree;
+        user.profile.program.degree_name = info.program.degree_name;
+      }
+      user.profile.secondary_emails = info.secondary_emails;
+      
+      user.save(err=>{
+        if(err) reject(err);
+        resolve("created");
+      });
     });
   });
 };

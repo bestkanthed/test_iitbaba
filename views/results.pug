@@ -11,7 +11,7 @@ block content
               .imgdiv
                 a(href="/profile/"+users[r].ldap, data-cap='')
                   if users[r].profile.profile_picture
-                    img(src="https://gymkhana.iitb.ac.in"+users[r].profile.profile_picture, alt='')
+                    img(src="/images/profile/"+users[r].ldap+".png", alt='')
                   else
                     img(src=user.gravatar(200))
               

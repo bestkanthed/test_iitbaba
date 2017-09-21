@@ -4,83 +4,100 @@ const math = require('mathjs');
 // Take care on where to find one and where to find many
 
 const matrixSchema = new mongoose.Schema({
-  mid: Number,
   predictionMatrix : Mixed,
   incomingEdges: Mixed,
   totalSum: Number
    // incomingEdges.length is the no of users in the matrix 
 }, { timestamps: true });
 
-matrixSchema.statics.createMatrix = function createMatrix() {
+matrixSchema.statics.addNewUserToMatrix = function addNewUserToMatrix(predictionBaba, predictionUser) {
     return new Promise((resolve, reject) => {
-        this.model('Matrix').count({}, function(err, count){
+        this.model('Matrix').findOne({},{},{sort:{ "createdAt" : -1}}, (err, mat)=>{
             if(err) reject(err);
-            this.model('Matrix').create({
-                mid: count,
-                predictionMatrix : [[0]],
-                incomingEdges: [0],
-                totalSum: 0
-            }, (err, mat) => {
-                if(err) reject(err);
-                resolve(mat.mid);
-            });
-        });
-    });
-};
-
-matrixSchema.statics.mergeMatrix = function mergeMatrix(m1, m2) {
-    return new Promise((resolve, reject) => {
-        if(m2==m1) return resolve("mids are same");
-        let mid1 = m2>m1?m1:m2;
-        let mid2 = m2>m1?m2:m1;
-        // make the smaller mid1
-        this.model('Matrix').findOne({mid: mid1}, (err, mat1)=>{
-            if(err) reject(err);
-            console.log(mat1);
-            let matrix1 = math.matrix(mat1.predictionMatrix);
-            this.model('Matrix').findOne({mid: mid2}, (err, mat2)=>{
-                if(err) reject(err);
-                console.log(mat2);
-                let newLength = mat1.incomingEdges.length + mat2.incomingEdges.length;
-                matrix1.resize([newLength, newLength]);
-                let setToReplace = matrix1.subset(math.index(math.range(mat1.incomingEdges.length, newLength), math.range(mat1.incomingEdges.length, newLength)));
-                let newMatrix = math.subset(matrix1, setToReplace, mat2.predictionMatrix);
-                mat1.predictionMatrix = newMatrix;
-                mat1.incomingEdges = mat1.incomingEdges.concat(mat2.incomingEdges);
-                mat1.totalSum = mat1.totalSum + mat2.totalSum; 
-                mat1.save(err=>{
+            if(!mat){
+               this.model('Matrix').create({
+                    predictionMatrix : [
+                        [0, predictionUser], 
+                        [predictionBaba, 0]
+                    ],
+                    incomingEdges: [1,1],
+                    totalSum: predictionBaba + predictionUser
+                }, (err, resultMat) => {
                     if(err) reject(err);
-                    this.model('Matrix').remove({mid: mid2}, err=>{if(err) reject(err); resolve("Combined");});
+                    let ev = numeric.eig(resultMat.predictionMatrix);
+                    k = resultMat.totalSum/(ev.E.x[0][0] + ev.E.x[0][1]);
+                    return resolve([k*evE.x[0][0], k*ev.E.x[0][1]]);
                 });
+            }
+            
+            let newIncomingEdges = mat.incomingEdges;
+            newIncomingEdges[0]++; 
+            newIncomingEdges.push(1);
+            
+            let newLength = mat.incomingEdges.length + 1;
+            
+            let newPredictionMatrix = mat.predictionMatrix;
+            
+            newPredictionMatrix[0].map(function(x) {return (x * (newIncomingEdges[0] - 1))/ newIncomingEdges[0] });
+            newPredictionMatrix[0].push(predictionUser/ newIncomingEdges[0]);
+            for(let i=1;i<mat.incomingEdges.length;i++) newPredictionMatrix[i].push(0);
+            
+            let newUserRow = [];
+            newUserRow.push(predictionBaba);
+            for(let i=0;i<mat.incomingEdges.length;i++) newUserRow.push(0);
+            
+            newPredictionMatrix.push(newUserRow);
+
+            this.model('Matrix').create({
+                predictionMatrix: newPredictionMatrix,
+                incomingEdges: newIncomingEdges,
+                totalSum: mat.totalSum + predictionBaba + predictionUser
+            }, (err, resultMat) => {
+                if(err) reject(err);
+                let ev = numeric.eig(resultMat.predictionMatrix);
+                let vectorTotal = 0;
+                
+                for(let i=0;i<ev.E.x.length;i++) vectorTotal = vectorTotal + ev.E.x[i][0];
+                let k = resultMat.totalSum / vectorTotal;
+                let resultSal = [];
+                for(let i=0;i<ev.E.x.length;i++) resultSal.push(ev.E.x[i][0]*k);                
+                return resolve(resultSal);
             });
-            //delete mat2
         });
     });
 };
 
-matrixSchema.statics.updatePredictionMatrix = function updatePredictionMatrix(mid, prediction, idfor, idby) {
+matrixSchema.statics.updateMatrix = function updateMatrix(prediction, idfor, idby) {
     return new Promise((resolve, reject) => {
-        this.model('Matrix').findOne({mid: mid}, (err, mat)=>{
+        this.model('Matrix').findOne({},{},{sort : { "createdAt" : -1}}, (err, mat)=>{
             if(err) reject(err);
             console.log(mat);
             //increment edges
             for(let i=0; i<mat.incomingEdges.length;i++)
             mat.predictionMatrix[idfor][i] = mat.predictionMatrix[idfor][i]*mat.incomingEdges[idfor]/(mat.incomingEdges[idfor] + 1); 
+            
             mat.incomingEdges[idfor] = mat.incomingEdges[idfor] + 1;
+            
             mat.predictionMatrix[idfor][idby] = prediction/mat.incomingEdges[idfor];
-            mat.totalSum = mat.totalSum + prediction;
-            mat.save(err=>{
+           
+            this.model('Matrix').create({
+                predictionMatrix: mat.predictionMatrix,
+                incomingEdges: mat.incomingEdges,
+                totalSum: mat.totalSum + prediction
+            }, (err, resultMat) => {
                 if(err) reject(err);
+                let ev = numeric.eig(resultMat.predictionMatrix);
+                let vectorTotal = 0;
+                
+                for(let i=0;i<ev.E.x.length;i++) vectorTotal = vectorTotal + ev.E.x[i][0];
+                let k = resultMat.totalSum / vectorTotal;
+                let resultSal = [];
+                for(let i=0;i<ev.E.x.length;i++) resultSal.push(ev.E.x[i][0]*k);                
+                return resolve(resultSal);
             });
-
-            // calculate the eigen values for the matrix formed 
-
-            // return array salaries for all the users
-
         });
     });
 };
 
-
-const Relation = mongoose.model('Relation', relationSchema);
-module.exports = Relation;
+const Matrix = mongoose.model('Matrix', matrixSchema);
+module.exports = Matrix;

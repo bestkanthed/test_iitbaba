@@ -4,30 +4,29 @@ html
     meta(charset='utf-8')
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    meta(name='theme-color' content='#4DA5F4')
     meta(name='csrf-token', content=_csrf)
-    title #{title} - IITbaba
-    link(rel='shortcut icon', href='/favicon.png')
+    title #{title} - IIT-baba
+    link(rel='shortcut icon', href='/baba.png')
     link(rel='stylesheet', href='coverflow/css/style.css')
     script(src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js')
-    link(rel='stylesheet', href='/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/css/pixel-admin.min.css')
-    link(rel='stylesheet', href='/css/themes.min.css')
-    link(rel='stylesheet', href='/css/widgets.min.css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+    script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+    link(href='https://fonts.googleapis.com/css?family=Amita|Barrio|Crafty+Girls|Dekko|Dr+Sugiyama|Eagle+Lake|Fondamento|Fredericka+the+Great|Fruktur|Gloria+Hallelujah|IM+Fell+English|Keania+One|Kranky|Leckerli+One|Macondo+Swash+Caps|Miltonian+Tattoo|Montez|Mystery+Quest|Over+the+Rainbow|Pacifico|Pirata+One|Rye|Snowburst+One|Vampiro+One|Vibur', rel='stylesheet')
     
   body
     include partials/header
-
+    
     .container
-      include partials/flash
+      //include partials/flash
       block content
 
     include partials/footer
 
     //script(src='/js/lib/jquery-3.1.1.min.js')
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/css/main.css')
-    script(src='/js/lib/bootstrap.min.js')
+    //link(rel='stylesheet', href='/css/main.css')
+    script(src='/js/script.js')
 
     // Google Analytics: change UA-XXXXX-X to be your site's ID
     script.

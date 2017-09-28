@@ -1,72 +1,73 @@
 extends layout
 
 block content
-  form(method='GET')
-    .form-group
-      label(for='degree') Degree :
-      select(name='degree', multiple)#degree.form-control
-        option(value='') All
-        option(value='BTECH') Bachelor of Technology 
-        option(value='MTECH') Master of Technology
-        option(value='DD') B.Tech. + M.Tech. Dual Degree
-        option(value='MSC') Master of Science
-        option(value='PHD') Doctor of Philosophy
-        option(value='BDES') Bachelor of Design
-        option(value='MDES') Master of Design 
-        option(value='MPHIL') Master of Philosophy
-        option(value='MMG') Master of Management
-        option(value='EMBA') Executive MBA
-        option(value='FYIMSC') Five Year Integrated M.Sc
-        option(value='VS') Visiting Student
-      br
-      label(for='year_of_joining') Year of Joining :
-      select(name='year_of_joining', multiple)#year_of_joining.form-control
-        option(value='') All
-        option(value=2017) 2017 
-        option(value=2016) 2016
-        option(value=2015) 2015
-        option(value=2014) 2014
-        option(value=2013) 2013
-        option(value=2012) 2012 or before
-      br
-      label(for='department') Department :
-      select(name='department', multiple)#department.form-control
-        option(value='') All
-        option(value='AE') Aerospace Engineering
-        option(value='BB') Biosciences and Bioengineering
-        option(value='CHE') Chemical Engineering
-        option(value='CH') Chemistry
-        option(value='CLE') Civil Engineering
-        option(value='CSE') Computer Science & Engineering
-        option(value='ES') Earth Sciences
-        option(value='EE') Electrical Engineering
-        option(value='ESE') Energy Science and Engineering
-        option(value='HSS') Humanities & Social Science
-        option(value='IDC') Industrial Design Centre
-        option(value='MM') Mathematics
-        option(value='ME') Mechanical Engineering
-        option(value='MEMS') Metallurgical Engineering & Materials Science
-        option(value='PH') Physics
-      br
-      label(for='hostel') Hostel :
-      select(name='hostel', multiple)#hostel.form-control
-        option(value='') All
-        option(value=1) 1
-        option(value=2) 2
-        option(value=3) 3
-        option(value=4) 4
-        option(value=5) 5
-        option(value=6) 6
-        option(value=7) 7
-        option(value=8) 8
-        option(value=9) 9
-        option(value=10) 10
-        option(value=11) 11
-        option(value=12) 12
-        option(value=13) 13
-        option(value=14) 14
-        option(value=15) 15
-        option(value=16) 16
-      br
-    .form-group
-        button.btn.btn-primary.btn-reset(type='submit') Search
+  .container.advanced
+    form(method='GET')
+      .form-group
+        label(for='degree') Degree :
+        select(name='degree', multiple)#degree.form-control
+          option(value='') All
+          option(value='BTECH') Bachelor of Technology 
+          option(value='MTECH') Master of Technology
+          option(value='DD') B.Tech. + M.Tech. Dual Degree
+          option(value='MSC') Master of Science
+          option(value='PHD') Doctor of Philosophy
+          option(value='BDES') Bachelor of Design
+          option(value='MDES') Master of Design 
+          option(value='MPHIL') Master of Philosophy
+          option(value='MMG') Master of Management
+          option(value='EMBA') Executive MBA
+          option(value='FYIMSC') Five Year Integrated M.Sc
+          option(value='VS') Visiting Student
+        br
+        label(for='year_of_joining') Year of Joining :
+        select(name='year_of_joining', multiple)#year_of_joining.form-control
+          option(value='') All
+          option(value=2017) 2017 
+          option(value=2016) 2016
+          option(value=2015) 2015
+          option(value=2014) 2014
+          option(value=2013) 2013
+          option(value=2012) 2012 or before
+        br
+        label(for='department') Department :
+        select(name='department', multiple)#department.form-control
+          option(value='') All
+          option(value='AE') Aerospace Engineering
+          option(value='BB') Biosciences and Bioengineering
+          option(value='CHE') Chemical Engineering
+          option(value='CH') Chemistry
+          option(value='CLE') Civil Engineering
+          option(value='CSE') Computer Science & Engineering
+          option(value='ES') Earth Sciences
+          option(value='EE') Electrical Engineering
+          option(value='ESE') Energy Science and Engineering
+          option(value='HSS') Humanities & Social Science
+          option(value='IDC') Industrial Design Centre
+          option(value='MM') Mathematics
+          option(value='ME') Mechanical Engineering
+          option(value='MEMS') Metallurgical Engineering & Materials Science
+          option(value='PH') Physics
+        br
+        label(for='hostel') Hostel :
+        select(name='hostel', multiple)#hostel.form-control
+          option(value='') All
+          option(value=1) 1
+          option(value=2) 2
+          option(value=3) 3
+          option(value=4) 4
+          option(value=5) 5
+          option(value=6) 6
+          option(value=7) 7
+          option(value=8) 8
+          option(value=9) 9
+          option(value=10) 10
+          option(value=11) 11
+          option(value=12) 12
+          option(value=13) 13
+          option(value=14) 14
+          option(value=15) 15
+          option(value=16) 16
+        br
+      .form-group
+          button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Search

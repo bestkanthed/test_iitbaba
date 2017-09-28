@@ -1,0 +1,510 @@
+.black-theme{
+    color:rgba(0,0,0,0.85) !important;
+}
+.black-theme-bg{
+    background-color:rgba(0,0,0,0.825) !important;
+    border-color:rgba(0,0,0,0.825) !important;
+}
+.black-theme-bg:hover{
+    background-color:rgba(0,0,0,0.7) !important;
+    border-color:rgba(0,0,0,0.7) !important;
+}
+
+strong.baba-logo{
+    color: white;   
+    font-size:24px;
+    font-family: 'Snowburst One', cursive;
+}
+strong.baba-logo:hover{
+    color: black;   
+}
+.container.home{
+    padding-top: 60px;
+    text-align:center;
+}
+.navbar.navbar-default.navbar-fixed-top.black-translucent-background{
+    background-color: rgba(0, 0, 0, 0.825);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-color: rgba(0, 0, 0, 0.825);
+}
+ul.navbar-nav>li.about>a, ul.navbar-nav>li.register>a, ul.navbar-nav>li.login>a{
+    font-weight: 500;
+    color:rgba(255,255,255,0.8);
+}
+ul.navbar-nav>li.about>a:hover, ul.navbar-nav>li.register>a:hover, ul.navbar-nav>li.login>a:hover{
+    color:rgba(255,255,255,1);
+}
+
+a.electric-blue-text-color{
+    color: rgba(255, 255, 255, 1) !important;
+}
+
+.active{
+    color: rgba(0, 210, 255, 1);
+}
+
+input[type=text].search-box {
+    width: 170px;
+    box-sizing: border-box;
+    border: 2px;
+    border-color: rgba(0, 0, 0, 0.87);
+    border-radius: 2px;
+    font-size: 8x;
+    background-color: white;
+    background-image: url('/css/images/searchicon.png');
+    background-position: 8px 6px; 
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text].search-box:focus {
+    width: 100%;
+}
+.navbar-header{
+    display: flex;
+}
+.navbar-header-left{
+    display: flex;
+    margin-right:auto;
+}
+.navbar-header-right{
+    display: flex;
+    margin-left:auto;    
+}
+.navbar-form.search{
+    border-top: 0px;
+    border-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-right: 4px;  
+}
+.number-label{
+    background: #5ebd5e;
+    font-size: 8px;
+    padding: 0 2px;
+    line-height: 10px;
+    position: absolute;
+    display: block;
+    right: 10px;
+    float: right;
+    top: 13px;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.nav-icon{
+    font-size: 16px;
+    display: none;
+}
+.nav-icon-text{
+    font-size: 16px;
+}
+
+@media (min-width: 768px) {
+    .nav-icon{
+        display: inline-block;
+    }
+    .nav-icon-text{
+        display: none;
+    }
+}
+
+.dropdown-item{
+    padding: 4px;
+}
+.notification-img{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 999999px;
+    margin: 4px;
+    vertical-align: baseline;
+}
+.notifiaction-content{
+    display: inline-block;
+    margin-top: 4px;
+    margin-left: 12px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+.dropdown-menu>a:hover, .more-notifications>a:hover, .more-requests>a:hover{
+    text-decoration: none;
+    color:rgba(0, 0, 0, 0.775);
+}
+.dropdown-menu>a, .more-notifications>a, .more-requests>a{
+    color: black;
+}
+.notification{
+    display: flex;
+}
+.notifiaction-from{
+    font-size: 10px;
+}
+.notification-time{
+    font-size: 10px;
+}
+.notification-dropdown{
+    width:360px;
+}
+.more-notifications, .more-requests{
+    text-align:center;
+}
+.request-img{
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 999999px;
+    margin: 4px;
+    vertical-align: baseline;
+}
+.request-content{
+    display: inline-block;
+    margin-top: 4px;
+    margin-left: 12px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+.request{
+    display: flex;
+}
+.request-from{
+    font-size: 16px;
+}
+.request-from-detail{
+    font-size: 12px;
+}
+.request-action{
+    display: flex;
+    margin-top: 4px;
+    margin-left: auto;
+    margin-right: 8px;
+    margin-bottom: 4px;
+}
+.request-dropdown{
+    width:400px;
+}
+
+.request-accept {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.975);
+  opacity: 0.925;
+  text-align: center;
+  cursor: pointer;
+  width: 80px;
+  font-size: 16px;
+}
+.request-accept:hover{
+    background-color: rgba(0, 0, 0, 0.9);
+}
+.request-reject:hover{
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.request-reject {
+  border-width: 1px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  border-color: black; 
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color:black;
+  background-color:white;
+  opacity: 0.925;
+  text-align: center;
+  cursor: pointer;
+  width: 80px;
+  font-size: 16px;
+}
+
+
+.dropdown-divider {
+    height: 0;
+    margin: .5rem 0;
+    overflow: hidden;
+    border-top: 1px solid #e9ecef;
+}
+.navbar-profile-img{
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 999999px;
+    margin: 4px;
+}
+a.dropdown-toggle.electric-blue-text-color.settings-dropdown{
+    padding-top: 5px;
+    padding-bottom: 6px;
+    padding-left: 5px;
+    padding-right: 0px; 
+}
+
+
+/* Profile parameters *//* without media queries for desktop */
+.card.profile {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);   
+  margin: auto;
+  text-align: center;
+  font-family: arial;
+}
+
+p.profile.name{
+  color:black;  
+}
+
+.known.profile {
+  color: black;
+  font-size: 20px;
+}
+
+.department.profile {
+  color: grey;
+  font-size: 18px;
+}
+
+.hostel.profile {
+  color: grey;
+  font-size: 18px;
+}
+
+.skills.profile {
+  color: grey;
+  font-size: 18px;
+}
+
+.hobbies.profile {
+  color: grey;
+  font-size: 18px;
+}
+
+.degree.profile {
+  color: grey;
+  font-size: 18px;
+}
+
+button.profile {
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.975);
+  opacity: 0.925;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+
+
+a.profile {
+  text-decoration: none;
+  font-size: 22px;
+  padding: 2px;
+  color: black;
+}
+
+button.profile:hover, a.profile:hover {
+  opacity: 0.7;
+}
+.container.profile{
+    padding-top: 60px;
+}
+img.profile{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    height: 400px;
+    width:100%;
+}
+
+input.salary.profile{
+    width: 100%;
+    height: 36px;
+    font-size: 24px;
+    text-align: center;
+}
+input.submit-salary{
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.95);
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+input.submit-salary:hover{
+  opacity: 0.7;
+}
+
+/* 
+Making prediction look easy
+*/
+
+.input-icon {
+  position: relative;
+}
+
+.input-icon > i {
+  position: absolute;
+  display: block;
+  transform: translate(0, -50%);
+  top: 50%;
+  pointer-events: none;
+  width: 25px;
+  text-align: center;
+  font-style: normal;
+  font-size: 36px;
+  padding-left: 8px;  
+}
+
+.input-icon > input {
+  padding-left: 0px;
+	padding-right: 0;
+}
+
+.input-icon-right > i {
+  right: 0;
+}
+
+.input-icon-right > input {
+  padding-left: 0;
+  padding-right: 25px;
+  text-align: right;
+}
+/*
+Card for relationship
+*/
+
+.card.relationship{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);   
+  margin: auto;
+  text-align: center;
+  font-family: arial;
+}
+.card.title{
+    padding: 16px;
+}
+
+
+/********
+login details
+********/
+.card.login {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.4);   
+  margin: auto;
+  text-align: center;
+  font-family: arial; 
+}
+
+.container.login{
+    padding-top: 100px;
+    margin:auto; 
+}
+
+.login-col{
+    margin: 0 auto;
+    float: none;
+}
+.card.login-title{
+    padding: 10px; 
+    color: white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background: rgba(0, 0, 0, 0.85) 
+}
+
+input.login{
+    width: 100%;
+    height: 36px;
+    font-size: 16px;
+    text-align: center;
+}
+.page-header.login{
+    margin:110px;
+    margin-bottom:40px;
+}
+
+/*
+Edit profile
+*/
+
+.row.edit>label{
+    font-size: 20px;
+}
+
+.submit-edit-info{
+  margin-top: 40px; 
+  border: none;
+  outline: 0;
+  display: inline-block;
+  padding: 8px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.975);
+  opacity: 0.925;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+
+.submit-edit-info:hover{
+    background-color: rgba(0, 0, 0, 0.9);
+}
+/*
+set
+*/
+.container.set{
+    padding-top:100px;
+}
+/* change the color of the focus of the text box */
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="username"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {   
+  border-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(0, 0, 0, 0.6);
+  outline: 0 none;
+}
+
+.container.picture{
+    padding-top: 70px;
+}
+.container.avg{
+    padding-top: 70px;
+}
+.container.result{
+    padding-top: 80px;
+}
+.container.advanced{
+    padding-top: 55px;    
+}
+p.salary-shown{
+    font-size: 24px;
+    font-weight: 800;
+}
+p.salary-shown>span.unit{
+    font-size: 18px;
+    font-weight: 700;
+}

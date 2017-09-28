@@ -46,7 +46,7 @@ passport.use('oauth2', new OAuth2Strategy({
     tokenURL: 'https://gymkhana.iitb.ac.in/sso/oauth/token',
     clientID: process.env.IITB_SSO_CLIENT_ID,
     clientSecret: process.env.IITB_SSO_CLIENT_SECRET,
-    callbackURL: "http://localhost:8080/auth/iitbsso/callback",
+    callbackURL: "http://10.8.100.130:8080/auth/iitbsso/callback",
     passReqToCallback: true
   },
   function(req, accessToken, refreshToken, profile, done) {

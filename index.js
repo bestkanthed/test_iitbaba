@@ -102,7 +102,11 @@ app.post('/set', userController.postSet);
 app.get('/picture', userController.getPicture);
 app.post('/picture', userController.postPicture);
 
+app.get('/avg', userController.getAverage);
+app.post('/avg', userController.postAverage);
+
 app.get('/predict', userController.getPredict);
+app.get('/predictions', userController.getPredictions);
 
 app.get('/profile/:ldap', userController.getProfile);
 app.post('/profile/:ldap', userController.postProfile);

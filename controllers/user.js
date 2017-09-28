@@ -11,6 +11,8 @@ const Relation = require('../models/Relation');
 const Prediction = require('../models/Prediction');
 const Authenticity = require('../models/Authenticity');
 const Salary = require('../models/Salary');
+const Mean = require('../models/Mean');
+const Matrix = require('../models/Matrix');
 const SalaryStat = require('../models/SalaryStat');
 const Notification = require('../models/Notification');
 
@@ -132,6 +134,9 @@ exports.postSet = (req, res, next) => {
       existingUser.password = req.body.password;
       existingUser.first_name = req.body.first;
       existingUser.last_name = req.body.last;
+      existingUser.known = req.body.known;
+      existingUser.skills = req.body.skills;
+      existingUser.hobbies = req.body.hobbies;
       existingUser.save((err) => {
         if (err) { 
           logger.error(err);
@@ -181,11 +186,52 @@ exports.postPicture = async (req, res, next)=>{
         existingUser.save((err) => {
           if (err) return next(err);
           req.flash({ msg: 'Picture Saved' });
-          return res.redirect('/');
+          return res.redirect('/avg');
         });
       }
     });
   });
+};
+
+
+/**
+ * GET /avg
+ * avg page.
+ */
+exports.getAverage = async (req, res, next) => {
+  if (!req.user) {
+    logger.info(req.ip + " opened /picture without login");
+    return res.redirect('/');
+  }
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  console.log(navbarItems);
+  return res.render('account/avg', {
+    title: 'IITbaba',
+    navbarItems: navbarItems
+  });
+};
+
+/**
+ * POST /avg
+ * posted avg.
+ */
+exports.postAverage = async (req, res, next)=>{
+  console.log("Posted");
+  let userPredictionForBaba = Number(req.body.babaSalary);
+  //let babaPredictionForUser = await Mean.getMean();
+  //babaPredictionForUser = Number(babaPredictionForUser?babaPredictionForUser:userPredictionForBaba);
+  let mean = await Mean.getMean(); 
+  let newMean = {
+    total : mean.total + userPredictionForBaba,
+    n: mean.n + 1
+  }
+  let createMean = Mean.newMean(newMean);
+  let salaries = await Matrix.addNewUserToMatrix(newMean.total/newMean.n, userPredictionForBaba);
+  let setMid = await User.setMID(req.user.ldap, salaries.length - 1);
+  let updateSalaries = await Salary.updateSalaries(salaries);
+  
+  req.flash({ msg: 'Saved' });
+  return res.redirect('/');
 };
 
 /**
@@ -210,10 +256,48 @@ exports.getPredict = async (req, res, next) => {
 };
 
 /**
+ * GET /predictons
+ * Previous Prediction page.
+ */
+exports.getPredictions = async (req, res, next) => {
+  console.log("previous predtions");
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /predict without login");
+    return res.redirect('/');
+  }
+  let op = [];
+  let ip = [];
+  let opredictions = await Predictions.getPredictionsBy(req.user.mid).catch(err => { next(err); });;
+  for(pred of opredictions){
+    op.push({
+      ldap: await User.getUserLdapByMID(pred.mid1),
+      name: await User.getUserNameByMID(pred.mid1),
+      perdiction: pred.prediction
+    });
+  }
+  let ipredictions = await Predictions.getPredictionsFor(req.user.mid).catch(err => { next(err); });;
+  for(pred of ipredictions){
+    ip.push({
+      ldap: await User.getUserLdapByMID(pred.mid2),
+      name: await User.getUserNameByMID(pred.mid2),
+      perdiction: pred.prediction
+    });
+  }
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  console.log(navbarItems);
+  res.render('account/prediction', {
+    title: 'Previous Predictions',
+    op : op,
+    ip: ip,
+    navbarItems : navbarItems
+  });
+};
+
+/**
  * GET /profile/:ldap
  * Profile page.
  */
-exports.getProfile = (req, res, next) => {
+exports.getProfile = async (req, res, next) => {
   // here if the req.user.ldap is same as the 
   
   if (!req.user) {
@@ -221,34 +305,39 @@ exports.getProfile = (req, res, next) => {
     return res.redirect('/login');
   }
 
-  let relation = Relation.getRelation(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  //let friends = Relation.areFriends(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let requestSent = Request.getRequest(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let friends = Relation.areFriends(req.params.ldap, req.user.ldap).catch(err => { next(err); });
   let requestReceived = Request.getRequest(req.user.ldap, req.params.ldap).catch(err => { next(err); }); // can be only true
+  let predicted = Relation.getPredicted(req.params.ldap, req.user.ldap);
   // Send ID of the request else send null
-  let user = User.getUser(req.params.ldap).catch(err => { next(err); });
+  let user =  await User.getUser(req.params.ldap).catch(err => { next(err); });
   //let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
   let navbarItems = service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
-  let salary = Salary.getSalary(req.params.ldap).catch(err => { next(err); });
+  let salary = Salary.getSalary(user.mid).catch(err => { next(err); });
 
-  Promise.all([user, salary, navbarItems, relation, requestReceived]).then(values => { 
+  Promise.all([user, salary, navbarItems, requestSent, requestReceived, friends, predicted]).then(values => { 
       console.log("Logging first_name");
       console.log(values[0].profile.first_name);
-      
+      if(req.params.ldap==req.user.ldap) values[6] = true;
       console.log("Logging if request recieved from the profiled person");
       console.log(values[4]);
       
-      console.log("Logging relations");
-      console.log(values[3]);
+      console.log("Logging notifications");
+      console.log(values[2].notifications);
+
+      console.log("Logging salary");
+      console.log(values[1].toFixed(2));
+      
 
       res.render('profile', {
         title: values[0].profile.first_name,
         userp : values[0],
-        predicted : values[3].predicted,
-        friends: values[3].friends,
-        salaryCheck : values[1],
+        predicted : values[6],
+        friends: values[5],
+        salary : values[1].toFixed(2),
         navbarItems : values[2],
-        requestSent: values[3].request,
-        requestReceived: values[4]==null ? null : values[4].id
+        requestSent: values[3],
+        requestReceived: values[4] == null ? null : values[4].id
       });
     }).catch(err=>{ next(err); });
 };
@@ -270,10 +359,12 @@ exports.postProfile = async (req, res, next) => {
     logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
     return res.redirect('/login');
   }
-
-  let createPrediction = await Prediction.createPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err=>{ next(err); });
-  let success = await service.UpdateDatabasePostPrediction(req.params.ldap, req.user.ldap, req.body.salary).catch(err => { next(err); });
-
+  
+  let updateRelation = await Relation.predicted(req.params.ldap, req.user.ldap);
+  let createPrediction = await Prediction.createPrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
+  let success = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });
+  console.log(success);
+  let notification = await Notification.createNotification(req.params.ldap, req.user.ldap, req.user.first_name+" predicted for you");
   req.flash('success', { msg: 'Predicted!' });
   res.redirect('/' || req.session.returnTo);
 };
@@ -287,6 +378,7 @@ exports.getSearch = async (req, res, next) => {
   console.log("search");
   
   if (!req.user) {
+    console.log("Here");
     logger.info("IP " + req.ip + " /search without login");
     return res.redirect('/');
   }
@@ -298,6 +390,7 @@ exports.getSearch = async (req, res, next) => {
  
   // if search from box
   if(req.query.box){
+    console.log("in query box");
     // If empty search same as /predict
     if(_.isEmpty(req.query.box)) return res.render('/predict');
     let finalResults = await service.getBoxSearchResults(req.query.box);
@@ -338,21 +431,20 @@ exports.postRequest = async (req, res, next) => {
 
   console.log(req.body);
   switch(req.body.action){
-    case 'create':
-      await Relation.requestSent(req.body.ldap, req.user.ldap);
+    case 'send':
       let requ = await Request.getRequest(req.user.ldap, req.body.ldap);
       if(requ){
         await Relation.makeFriends(req.user.ldap, req.body.ldap);
         await Relation.makeFriends(req.body.ldap, req.user.ldap);
-        await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.profile.username);
+        await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.first_name);
         await Notification.createNotification(req.user.ldap, req.body.ldap, "You are now friends with "+req.body.ldap);// Make name here
-        // accept also the request sent by the other person
-        return res.send(await Request.acceptRequest(requ.id).catch(err=>{ next(err); }));  
+        await Request.deleteRequest(req.user.ldap, req.body.ldap).catch(err=>{ next(err); });        
+        return res.send("Also request from other side");
       }
       return res.send(await Request.createRequest(req.body.ldap, req.user.ldap, req.user.profile.username).catch(err=>{ next(err); }));
     case 'delete':
-      await Relation.requestDelete(req.body.ldap, req.user.ldap);      
-      return res.send(await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); }));    
+      await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); });
+      return res.send("deleted");    
     case 'see': return res.send(await Request.seeRequests(req.user.ldap).catch(err=>{ next(err); }));        
     case 'click': return res.send(await Request.clickRequest(req.body.id).catch(err=>{ next(err); }));        
     case 'accept':
@@ -360,10 +452,11 @@ exports.postRequest = async (req, res, next) => {
       await Relation.makeFriends(req.body.ldap, req.user.ldap);
       await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.profile.username);
       await Notification.createNotification(req.user.ldap, req.body.ldap, "You are now friends with "+req.body.ldap);// Make name here
-      return res.send(await Request.acceptRequest(req.body.id).catch(err=>{ next(err); }));
+      await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); });
+      return res.send("accepted");
     case 'reject': 
-      await Relation.requestDelete(req.user.ldap, req.body.ldap);
-      return res.send(await Request.rejectRequest(req.body.id).catch(err=>{ next(err); }));
+      await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); });
+      return res.send("rejected");
     case 'unfriend':
       await Relation.unfriend(req.user.ldap, req.body.ldap);
       await Relation.unfriend(req.body.ldap, req.user.ldap);
@@ -419,7 +512,7 @@ exports.gotCallback = async (req, res, next) => {
         form: {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://localhost:8080/auth/iitbsso/callback'
+            'redirect_uri': 'http://10.8.100.130:8080/auth/iitbsso/callback'
         }
     }, function(err, resf) {
 
@@ -453,10 +546,13 @@ exports.gotCallback = async (req, res, next) => {
               });
             } else {
               console.log("Inside else");
+              
               await User.initializeUser(user, info).catch(err=>{console.log(err);});
+              /*
               await Salary.createSalary(user.ldap, 100000, 10000).catch(err=>{console.log(err);});
               await SalaryStat.updateSalaryStatNewEntry(100000).catch(err=>{console.log(err);});
               await Authenticity.createAuthenticity(user.ldap, 0).catch(err=>{console.log(err);}); // 0 is the k value // it means max auth
+              */
               let allUsers = await User.getAllLdaps().catch(err=>{console.log(err);});
               //console.log(allUsers);
               for(one of allUsers){
@@ -468,6 +564,7 @@ exports.gotCallback = async (req, res, next) => {
               req.logIn(user, (err) => {
                 if (err) { return next(err); }         
                 req.flash('success', { msg: 'Success! Registered.' });
+                console.log("send sending set");
                 return res.redirect('/set');
               });
             }

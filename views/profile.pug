@@ -1,102 +1,207 @@
 extends layout
+
 block content
+  .container.profile
+    .row.profile
+        .col-lg-3.col-sm-12.profile
+            .card
+                h1.profile.name=userp.first_name+" "+userp.last_name
+                p.profile.known=userp.known
+                p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
+                p.profile.hostel=userp.profile.insti_address.hostel_name+" | Room "+userp.profile.insti_address.room
+                p.profile.hobbies=userp.hobbies
+                p.profile.skills=userp.skills
+                div(style='margin: 20px 0;')
+                    a.profile(href='#')
+                        i.fa.fa-dribbble
+                    a.profile(href='#')
+                        i.fa.fa-twitter
+                    a.profile(href='#')
+                        i.fa.fa-linkedin
+                    a.profile(href='#')
+                        i.fa.fa-facebook
+        .col-lg-5.col-sm-12.profile
+            .card.profile
+                img.profile(src='/images/profile/'+userp.ldap+'.png')
+                if predicted
+                    p.salary-shown='₹ '+salary+' '
+                      span.unit lakh/yr
+                else
+                    form#prediction(method='POST')
+                        input(type='hidden', name='_csrf', value=_csrf)
+                        input(type='hidden', name='mid', value=userp.mid)
+                        .input-icon
+                            i ₹
+                            input.salary.profile(type='number', maxlength='4', step="0.1", name='salary', id='salary', autofocus, required)
+                        p
+                            input.submit-salary(type='submit', value='PREDICT')
+        .col-lg-3.col-sm-12.profile
+            .card.relationship
+                .card.title 
+                    h1 Relationship
+                .card.content
+                    p.relationship UNDER DEVELOPMENT
+                    p
+                        button.profile SEND FRIEND REQUEST
+    script.
+      const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
+      const sal = !{JSON.stringify(salary).replace(/<\//g, '<\\/')};
+      const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
 
-  if user.ldap == userp.ldap
-    p= user.profile.first_name
-    p Your own profile
+      $("#unfriend").click(function() {
+        console.log(this.id);
+        $.post("/request", {action:"unfriend" , ldap: ldp1}).done(function( data ) {
+            $("#unfriend").attr("id", "sendRequest");
+            $("#sendRequest").text("Send Friend Request");
+        });
+      });
 
-  else  
-    if friends
-      button#unfriend Already Friends. Unfriend? 
+      $("#deleteRequest").click(function() {
+        console.log(this.id);      
+        console.log("delete request");
+        $.post("/request", {action:"delete" , ldap: ldp1}).done(function( data ) {
+            $("#deleteRequest").attr("id", "sendRequest");
+            $("#sendRequest").text("Send Friend Request");
+        });
+      });
+
+      $("#acceptRequest").click(function() {
+        console.log(this.id);      
+        console.log("accept request");
+        $.post("/request", {action:"accept", id: id, ldap: ldp1}).done(function( data ) {
+            $("#acceptRequest").attr("id", "unfriend");
+            $("#unfriend").text("Unfriend");
+            $("#rejectRequest").remove();
+        });
+      });
+
+      $("#rejectRequest").click(function() {
+        console.log(this.id);      
+        console.log("reject request");
+        $.post("/request", {action:"reject", id: id, ldap: ldp1}).done(function( data ) {
+            $("#acceptRequest").attr("id", "sendRequest");
+            $("#rejectRequest").remove();
+            $("#sendRequest").text("Send Friend Request");
+        });
+      });
+
+      $("#sendRequest").click(function() {
+        console.log(this.id);      
+        console.log("send request");
+        $.post("/request", {action:"create", ldap: ldp1}).done(function( data ) {
+            $("#sendRequest").attr("id", "deleteRequest");
+            $("#deleteRequest").text("Delete Sent Request");
+        });
+      });
+
+      $("#prediction").submit(function() {
+          console.log("This");
+          console.log(sal);
+          console.log("That");
+          if($("#salary").val()>sal*2.5){
+              alert("Are you high? Try something else.");
+              return false;
+          } 
+          if($("#salary").val()<sal/2.5){
+              alert("Do yo do cheap durgs? Try something else.");
+              return false;
+          }
+          return true;
+      });
+//-
+  extends layout
+  block content
+
+    if user.ldap == userp.ldap
+      p= user.profile.first_name
+      p Your own profile
+
     else
-      if requestSent=='pending'
-        button#deleteRequest Freind Request Sent. Delete?        
-      if requestSent=='rejected'
-        button#sendRequest Send Friend Request
+      button(hidden=(friends==null))#unfriend Already Friends. Unfriend? 
+      button(hidden=(requestSent==null))#deleteRequest Freind Request Sent. Delete?
+      button(hidden=(requestReceived==null))#acceptRequest Respond Accept
+      button(hidden=(requestReceived==null))#rejectRequest Respond Reject
+      button(hidden= (friends==null || requestReceived==null || requestReceived==null))#sendRequest Send Friend Request        
+      
+      p= userp.profile.first_name
+      
+      if !predicted
+        .col-sm-8.col-sm-offset-2
+          form#prediction(method='POST')
+            legend Predict Salary
+            input(type='hidden', name='_csrf', value=_csrf)
+            input(type='hidden', name='mid', value=userp.mid)          
+            .form-group
+              label(for='salary') Salary in INR/year
+              input.form-control(type='number', name='salary', id='salary', autofocus, required)
+            .form-group
+              button.btn.btn-primary.btn-reset(type='submit')
+                i.fa.fa-keyboard-o
+                | Predict
       else
-        if requestReceived
-          button#acceptRequest Respond Accept
-          button#rejectRequest Respond Reject
-        else
-          button#sendRequest Send Friend Request        
-    p= userp.profile.first_name
-    
-    if !predicted
-      .col-sm-8.col-sm-offset-2
-        form#prediction(method='POST')
-          legend Predict Salary
-          input(type='hidden', name='_csrf', value=_csrf)
-          .form-group
-            label(for='salary') Salary in INR/year
-            input.form-control(type='number', name='salary', id='salary', autofocus, required)
-          .form-group
-            button.btn.btn-primary.btn-reset(type='submit')
-              i.fa.fa-keyboard-o
-              | Predict
-    else
-      p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salaryCheck) + " after graduation"
-  script.
-    const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
-    const sal = !{JSON.stringify(salaryCheck).replace(/<\//g, '<\\/')};
-    const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
+        p="Income of "+userp.profile.first_name+" will be INR " + Math.round(salaryCheck) + " after graduation"
+    script.
+      const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
+      const sal = !{JSON.stringify(salaryCheck).replace(/<\//g, '<\\/')};
+      const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
 
-    $("#unfriend").click(function() {
-      console.log(this.id);
-      $.post("/request", {action:"unfriend" , ldap: ldp1}).done(function( data ) {
-          $("#unfriend").attr("id", "sendRequest");
-          $("#sendRequest").text("Send Friend Request");
+      $("#unfriend").click(function() {
+        console.log(this.id);
+        $.post("/request", {action:"unfriend" , ldap: ldp1}).done(function( data ) {
+            $("#unfriend").attr("id", "sendRequest");
+            $("#sendRequest").text("Send Friend Request");
+        });
       });
-    });
 
-    $("#deleteRequest").click(function() {
-      console.log(this.id);      
-      console.log("delete request");
-      $.post("/request", {action:"delete" , ldap: ldp1}).done(function( data ) {
-          $("#deleteRequest").attr("id", "sendRequest");
-          $("#sendRequest").text("Send Friend Request");
+      $("#deleteRequest").click(function() {
+        console.log(this.id);      
+        console.log("delete request");
+        $.post("/request", {action:"delete" , ldap: ldp1}).done(function( data ) {
+            $("#deleteRequest").attr("id", "sendRequest");
+            $("#sendRequest").text("Send Friend Request");
+        });
       });
-    });
 
-    $("#acceptRequest").click(function() {
-      console.log(this.id);      
-      console.log("accept request");
-      $.post("/request", {action:"accept", id: id, ldap: ldp1}).done(function( data ) {
-          $("#acceptRequest").attr("id", "unfriend");
-          $("#unfriend").text("Unfriend");
-          $("#rejectRequest").remove();
+      $("#acceptRequest").click(function() {
+        console.log(this.id);      
+        console.log("accept request");
+        $.post("/request", {action:"accept", id: id, ldap: ldp1}).done(function( data ) {
+            $("#acceptRequest").attr("id", "unfriend");
+            $("#unfriend").text("Unfriend");
+            $("#rejectRequest").remove();
+        });
       });
-    });
 
-    $("#rejectRequest").click(function() {
-      console.log(this.id);      
-      console.log("reject request");
-      $.post("/request", {action:"reject", id: id, ldap: ldp1}).done(function( data ) {
-          $("#acceptRequest").attr("id", "sendRequest");
-          $("#rejectRequest").remove();
-          $("#sendRequest").text("Send Friend Request");
+      $("#rejectRequest").click(function() {
+        console.log(this.id);      
+        console.log("reject request");
+        $.post("/request", {action:"reject", id: id, ldap: ldp1}).done(function( data ) {
+            $("#acceptRequest").attr("id", "sendRequest");
+            $("#rejectRequest").remove();
+            $("#sendRequest").text("Send Friend Request");
+        });
       });
-    });
 
-    $("#sendRequest").click(function() {
-      console.log(this.id);      
-      console.log("send request");
-      $.post("/request", {action:"create", ldap: ldp1}).done(function( data ) {
-          $("#sendRequest").attr("id", "deleteRequest");
-          $("#deleteRequest").text("Delete Sent Request");
+      $("#sendRequest").click(function() {
+        console.log(this.id);      
+        console.log("send request");
+        $.post("/request", {action:"create", ldap: ldp1}).done(function( data ) {
+            $("#sendRequest").attr("id", "deleteRequest");
+            $("#deleteRequest").text("Delete Sent Request");
+        });
       });
-    });
 
-    $("#prediction").submit(function() {
-        console.log("This");
-        console.log(sal);
-        console.log("That");
-        if($("#salary").val()>sal*2.5){
-            alert("Are you high? Try something else.");
-            return false;
-        } 
-        if($("#salary").val()<sal/2.5){
-            alert("Do yo do cheap durgs? Try something else.");
-            return false;
-        }
-        return true;
-    });
+      $("#prediction").submit(function() {
+          console.log("This");
+          console.log(sal);
+          console.log("That");
+          if($("#salary").val()>sal*2.5){
+              alert("Are you high? Try something else.");
+              return false;
+          } 
+          if($("#salary").val()<sal/2.5){
+              alert("Do yo do cheap durgs? Try something else.");
+              return false;
+          }
+          return true;
+      });

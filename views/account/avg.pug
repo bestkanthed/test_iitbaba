@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  .container.avg
+    .col-sm-8.col-sm-offset-2
+      form#prediction(method='POST')
+        //- Average income different from income of average choose your words wisely
+        legend What do you think is the annual income of an average IIT-B graduate
+            input(type='hidden', name='_csrf', value=_csrf)
+            .form-group
+              label(for='salary') Lakh INR/year
+              input.form-control(type='number', step='0.01', name='babaSalary', id='babaSalary', autofocus, required)
+            .form-group
+              button.btn.btn-primary.btn-reset.black-theme-bg(type='submit')
+                i.fa.fa-keyboard-o
+                |  Predict
+    script.
+      $("#prediction").submit(function() {
+          console.log("This");
+          console.log(sal);
+          console.log("That");
+          if($("#salary").val()>20){
+              alert("Are you high? Give an aprropriate guess.");
+              return false;
+          } 
+          if($("#salary").val()<2){
+              alert("Do yo do cheap durgs? Try something else.");
+              return false;
+          }
+          return true;
+      });

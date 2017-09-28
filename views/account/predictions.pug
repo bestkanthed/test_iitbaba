@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+    .container.result
+      .outgoing 
+        p You Predictied 
+            - for (var r = 0; r < op.length; r++)
+              li
+                  p
+                    span= op[r].name
+                  p
+                    span= op[r].prediction
+      .incoming 
+        p Predictied You 
+            - for (var r = 0; r < ip.length; r++)
+              li
+                  p
+                    span= ip[r].name
+                  p
+                    span= ip[r].prediction
+      

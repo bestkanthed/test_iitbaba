@@ -1,31 +1,35 @@
 extends ../layout
 
 block content
-    style(type='text/css') li:nth-child(-n+ #{users.length} -1) .imgdiv, #coverflow ul li .leftItems { -webkit-transform: perspective(600px) rotateY(60deg); transform: perspective(600px) rotateY(60deg); }li:nth-child(n+ #{users.length} +1) .imgdiv,#coverflow ul li .rightItems {-webkit-transform: perspective(600px) rotateY(-60deg);transform: perspective(600px) rotateY(-60deg);}li:nth-child(#{users.length}) .imgdiv,#coverflow ul li .straight {-webkit-transform: rotateY(0deg) scale(1.5);transform: rotateY(0deg) scale(1.5);}#coverflow li:nth-child(-n + #{users.length} -1),#coverflow ul li.leftLI {-webkit-transform: translate3d(-140px, 0, 0);transform: translate3d(-140px, 0, 0);}#coverflow li:nth-child(n + #{users.length} + 1),#coverflow ul li.rightLI {-webkit-transform: translate3d(140px, 0, 0);transform: translate3d(140px, 0, 0);}
+    .container.result
+      style(type='text/css') li:nth-child(-n+ #{users.length} -1) .imgdiv, #coverflow ul li .leftItems { -webkit-transform: perspective(600px) rotateY(60deg); transform: perspective(600px) rotateY(60deg); }li:nth-child(n+ #{users.length} +1) .imgdiv,#coverflow ul li .rightItems {-webkit-transform: perspective(600px) rotateY(-60deg);transform: perspective(600px) rotateY(-60deg);}li:nth-child(#{users.length}) .imgdiv,#coverflow ul li .straight {-webkit-transform: rotateY(0deg) scale(1.5);transform: rotateY(0deg) scale(1.5);}#coverflow li:nth-child(-n + #{users.length} -1),#coverflow ul li.leftLI {-webkit-transform: translate3d(-140px, 0, 0);transform: translate3d(-140px, 0, 0);}#coverflow li:nth-child(n + #{users.length} + 1),#coverflow ul li.rightLI {-webkit-transform: translate3d(140px, 0, 0);transform: translate3d(140px, 0, 0);}
 
-    #coverflow
-      .covers
-        ul
-          - for (var r = 0; r < users.length; r++)
-            li
-              .imgdiv
-                a(href="/profile/"+users[r].ldap, data-cap='')
-                  if users[r].profile.profile_picture
-                    img(src="https://gymkhana.iitb.ac.in"+users[r].profile.profile_picture, alt='')
-                  else
-                    img(src=user.gravatar(200))
-              
-              .text
-                p
-                  span= users[r].profile.first_name+" "+users[r].profile.last_name
-                p
-                  span= users[r].profile.insti_address.hostel_name
-                p
-                  span= users[r].profile.program.department_name+" "+users[r].profile.program.join_year  
+      #coverflow
+        .covers
+          ul
+            - for (var r = 0; r < users.length; r++)
+              li
+                .imgdiv
+                  a(href="/profile/"+users[r].ldap, data-cap='')
+                    if users[r].profile.upload_picture
+                      img(src="/images/profile/"+users[r].ldap+".png", alt='')                   
+                    else
+                      if users[r].profile.profile_picture
+                        img(src="https://gymkhana.iitb.ac.in"+users[r].profile.profile_picture, alt='')
+                      else
+                        img(src=user.gravatar(200))
+                
+                .text
+                  p
+                    span= users[r].profile.first_name+" "+users[r].profile.last_name
+                  p
+                    span= users[r].profile.insti_address.hostel_name
+                  p
+                    span= users[r].profile.program.department_name+" "+users[r].profile.program.join_year  
 
-                    
-      .Controller
-      .ScrollBar
-    script(src='coverflow/js/coverflow.min.js')
-    script.
-      $coverflow = $("#coverflow").coverflow({"path":"coverflow/"});
+                      
+        .Controller
+        .ScrollBar
+      script(src='coverflow/js/coverflow.min.js')
+      script.
+        $coverflow = $("#coverflow").coverflow({"path":"coverflow/"});

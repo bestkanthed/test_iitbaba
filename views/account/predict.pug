@@ -11,14 +11,7 @@ block content
               li
                 .imgdiv
                   a(href="/profile/"+users[r].ldap, data-cap='')
-                    if users[r].profile.upload_picture
-                      img(src="/images/profile/"+users[r].ldap+".png", alt='')                   
-                    else
-                      if users[r].profile.profile_picture
-                        img(src="https://gymkhana.iitb.ac.in"+users[r].profile.profile_picture, alt='')
-                      else
-                        img(src=user.gravatar(200))
-                
+                    img(src="/images/profile/"+users[r].ldap+".png", alt=users[r].ldap)                   
                 .text
                   p
                     span= users[r].profile.first_name+" "+users[r].profile.last_name

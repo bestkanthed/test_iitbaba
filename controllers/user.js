@@ -3,7 +3,9 @@ const User = require('../models/User');
 const request = require('request');
 const winston = require('winston');
 const standard = require('../config/standard');
-const fs = require('fs'); 
+const fs = require('fs');
+const im = require('imagickal');
+
 
 const Request = require('../models/Request');
 const KPoint = require('../models/KPoint');
@@ -178,17 +180,22 @@ exports.postPicture = async (req, res, next)=>{
   filename = "./public/images/profile/"+req.user.ldap+".png";
   fs.writeFile(filename, base64Data, 'base64', function(err) {
     if(err) return next(err);
-    
-    User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
-      if (err) return next(err);
-      if (existingUser) {
-        existingUser.profile.upload_picture = true;
-        existingUser.save((err) => {
-          if (err) return next(err);
-          req.flash({ msg: 'Picture Saved' });
-          return res.redirect('/avg');
-        });
-      }
+    im.identify("./public/images/profile/"+req.user.ldap+".png", true).then(function (data) {
+	    console.log(data);
+      User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
+        if (err) return next(err);
+        if (existingUser) {
+          existingUser.profile.upload_picture = true;
+          existingUser.save((err) => {
+            if (err) return next(err);
+            req.flash({ msg: 'Picture Saved' });
+            return res.redirect('/avg');
+          });
+        }
+      });
+    }).catch(err=>{
+      console.log(err);
+      return res.redirect('/picture');
     });
   });
 };
@@ -267,25 +274,25 @@ exports.getPredictions = async (req, res, next) => {
   }
   let op = [];
   let ip = [];
-  let opredictions = await Predictions.getPredictionsBy(req.user.mid).catch(err => { next(err); });;
+  let opredictions = await Prediction.getPredictionsBy(req.user.mid).catch(err => { next(err); });;
   for(pred of opredictions){
     op.push({
       ldap: await User.getUserLdapByMID(pred.mid1),
       name: await User.getUserNameByMID(pred.mid1),
-      perdiction: pred.prediction
+      prediction: pred.prediction
     });
   }
-  let ipredictions = await Predictions.getPredictionsFor(req.user.mid).catch(err => { next(err); });;
+  let ipredictions = await Prediction.getPredictionsFor(req.user.mid).catch(err => { next(err); });;
   for(pred of ipredictions){
     ip.push({
       ldap: await User.getUserLdapByMID(pred.mid2),
       name: await User.getUserNameByMID(pred.mid2),
-      perdiction: pred.prediction
+      prediction: pred.prediction
     });
   }
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
-  console.log(navbarItems);
-  res.render('account/prediction', {
+  console.log('ip');console.log(ip);console.log("op");console.log(op);
+  res.render('account/predictions', {
     title: 'Previous Predictions',
     op : op,
     ip: ip,
@@ -512,7 +519,7 @@ exports.gotCallback = async (req, res, next) => {
         form: {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://10.8.100.130:8080/auth/iitbsso/callback'
+            'redirect_uri': 'http://10.8.100.130:3000/auth/iitbsso/callback'
         }
     }, function(err, resf) {
 

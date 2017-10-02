@@ -2,20 +2,32 @@ extends ../layout
 
 block content
     .container.result
-      .outgoing 
-        p You Predictied 
-            - for (var r = 0; r < op.length; r++)
-              li
-                  p
-                    span= op[r].name
-                  p
-                    span= op[r].prediction
-      .incoming 
-        p Predictied You 
-            - for (var r = 0; r < ip.length; r++)
-              li
-                  p
-                    span= ip[r].name
-                  p
-                    span= ip[r].prediction
-      
+      .row
+        .col-lg-6
+          .table-responsive
+              table.table-hover.outgoing
+                  caption You Predictied
+                  thead
+                    tr
+                      th Name
+                      th(align='right') Predictied
+                  tbody
+                    - for (var r = 0; r < op.length; r++)
+                      tr
+                        td=op[r].name
+                        td(align='right')='₹ '+op[r].prediction+' Lakh/yr'
+              
+        //-
+          .col-lg-6
+            .table-responsive
+              table.table-hover.incoming
+                caption Predictied for You
+                thead
+                  tr
+                    th Name
+                    th(align='right') Prediction
+                tbody
+                  - for (var r = 0; r < ip.length; r++)
+                    tr
+                      td=ip[r].name
+                      td(align='right')='₹ '+ip[r].prediction+' Lakh/yr'

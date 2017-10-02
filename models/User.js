@@ -229,7 +229,7 @@ userSchema.statics.getUserLdapByMID = function getUserLdapByMID(mid) {
   });
 };
 
-userSchema.statics.getUserLdapByMID = function getUserLdapByMID(mid) {
+userSchema.statics.getUserNameByMID = function getUserNameByMID(mid) {
   return new Promise ((resolve, reject) => { 
     this.model('User').findOne({mid: mid},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
       if(err) reject(err);

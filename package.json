@@ -19,6 +19,8 @@
     "express-session": "^1.15.5",
     "express-validator": "^4.1.1",
     "fs": "0.0.1-security",
+    "gm": "^1.23.0",
+    "imagickal": "^2.0.0",
     "lodash": "^4.17.4",
     "math-erf": "^1.0.0",
     "mathjs": "^3.16.3",

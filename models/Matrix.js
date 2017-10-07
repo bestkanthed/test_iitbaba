@@ -10,6 +10,15 @@ const matrixSchema = new mongoose.Schema({
    // incomingEdges.length is the no of users in the matrix 
 }, { timestamps: true });
 
+matrixSchema.statics.getLength = function getLength() {
+    return new Promise((resolve, reject) => {
+        this.model('Matrix').findOne({},{},{sort:{ "createdAt" : -1}}, (err, mat)=>{
+            if(err) reject(err);
+            resolve(mat.incomingEdges.length);
+        });
+    });
+};
+
 matrixSchema.statics.addNewUserToMatrix = function addNewUserToMatrix(predictionBaba, predictionUser) {
     return new Promise((resolve, reject) => {
         this.model('Matrix').findOne({},{},{sort:{ "createdAt" : -1}}, (err, mat)=>{
@@ -136,6 +145,66 @@ matrixSchema.statics.updateMatrix = function updateMatrix(idfor, idby, predictio
                 for(let i=0;i<ev.E.x.length;i++) resultSal.push(Math.abs(ev.E.x[i][0]*k));
                 return resolve(resultSal);
             });
+        });
+    });
+};
+
+matrixSchema.statics.updateMatrixRepredict = function updateRepredict(idfor, idby, prediction) {
+    return new Promise((resolve, reject) => {
+        this.model('Matrix').findOne({},{},{sort : { "createdAt" : -1}}, (err, mat)=>{
+            if(err) reject(err);
+            console.log("Logging Matrix");
+            console.log(mat);
+            console.log(idfor);
+            console.log(idby);
+            //increment edges
+            console.log(mat.incomingEdges.length);            
+            let previousPrediction = mat.predictionMatrix[idfor][idby] * mat.incomingEdges[idfor];
+            mat.predictionMatrix[idfor][idby] = prediction/mat.incomingEdges[idfor];
+                console.log("Logging new prediction matrix");
+                console.log(mat.predictionMatrix);
+                
+            this.model('Matrix').create({
+                predictionMatrix: mat.predictionMatrix,
+                incomingEdges: mat.incomingEdges,
+                totalSum: mat.totalSum + prediction - previousPrediction
+            }, (err, resultMat) => {
+                if(err) reject(err);
+                let ev = numeric.eig(resultMat.predictionMatrix);
+                let vectorTotal = 0;
+                
+                for(let i=0;i<ev.E.x.length;i++) vectorTotal =  vectorTotal + Math.abs(ev.E.x[i][0]) * resultMat.incomingEdges[i];
+                let k = resultMat.totalSum / vectorTotal;
+                let resultSal = [];
+                for(let i=0;i<ev.E.x.length;i++) resultSal.push(Math.abs(ev.E.x[i][0]*k));
+                return resolve(resultSal);
+            });
+        });
+    });
+};
+
+matrixSchema.statics.getGraph = function getGraph() {
+    return new Promise((resolve, reject) => {
+        this.model('Matrix').findOne({},{},{sort : { "createdAt" : -1}}, (err, mat)=>{
+            if(err) reject(err);
+            console.log("Logging Matrix");
+            console.log(mat);
+            let graph = {
+                nodes:[],
+                links:[]
+            }
+            
+            for(let i=0;i<mat.incomingEdges.length; i++){
+                for(let j=0; j<mat.incomingEdges.length; j++){
+                    if(mat.predictionMatrix[i][j]!=0 && i!=j){
+                        graph.links.push({
+                            source: j,
+                            target: i,
+                            value: mat.predictionMatrix[i][j]*mat.incomingEdges.length[i]
+                        });
+                    }  
+                }
+            }
         });
     });
 };

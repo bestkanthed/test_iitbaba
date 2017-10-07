@@ -63,3 +63,11 @@
 {"level":"info","message":"10.8.100.130 opened /picture without login","timestamp":"2017-09-30T08:55:59.474Z"}
 {"level":"error","message":"Error: Failed to lookup view \"account/prediction\" in views directory \"C:\\Users\\RISHABH KANTHED\\Desktop\\in.life\\IITbaba\\Exp2\\iitbaba\\views\"\n    at Function.render (C:\\Users\\RISHABH KANTHED\\Desktop\\in.life\\IITbaba\\Exp2\\iitbaba\\node_modules\\express\\lib\\application.js:580:17)\n    at ServerResponse.render (C:\\Users\\RISHABH KANTHED\\Desktop\\in.life\\IITbaba\\Exp2\\iitbaba\\node_modules\\express\\lib\\response.js:971:7)\n    at ServerResponse.res.render (C:\\Users\\RISHABH KANTHED\\Desktop\\in.life\\IITbaba\\Exp2\\iitbaba\\node_modules\\express-flash\\lib\\express-flash.js:29:16)\n    at exports.getPredictions (C:\\Users\\RISHABH KANTHED\\Desktop\\in.life\\IITbaba\\Exp2\\iitbaba\\controllers\\user.js:295:7)\n    at <anonymous>\n    at process._tickCallback (internal/process/next_tick.js:188:7)","timestamp":"2017-09-30T11:50:43.010Z"}
 {"level":"info","message":"10.8.40.120 opened /set without login","timestamp":"2017-09-30T14:31:29.667Z"}
+{"level":"info","message":"IP 10.8.100.130 /profile?150010032without login","timestamp":"2017-10-05T19:58:41.070Z"}
+{"level":"info","message":"IP 10.8.100.130 /profile?150010032without login","timestamp":"2017-10-05T20:00:27.594Z"}
+{"level":"info","message":"IP 10.8.100.130 /profile?150010013without login","timestamp":"2017-10-05T23:02:53.899Z"}
+{"level":"info","message":"IP 10.8.100.130 /profile?krishnaadiwithout login","timestamp":"2017-10-05T23:16:59.088Z"}
+{"level":"info","message":"IP 10.8.100.110 /profile?iitbabawithout login","timestamp":"2017-10-06T08:10:03.520Z"}
+{"level":"info","message":"IP 10.8.100.110 /profile?150110058without login","timestamp":"2017-10-06T08:10:40.691Z"}
+{"level":"info","message":"IP 10.8.100.110 /profile?techfest2015without login","timestamp":"2017-10-06T08:11:26.501Z"}
+{"level":"info","message":"IP 10.8.100.113 /profile?150010013without login","timestamp":"2017-10-06T21:15:16.546Z"}

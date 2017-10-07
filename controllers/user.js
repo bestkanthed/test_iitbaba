@@ -40,14 +40,20 @@ const logger = new (winston.Logger)({
 });
 
 exports.home = async (req, res, next) =>{
+    
+    let graph = await service.getGraph();
     if (req.user) {
       let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
       return res.render('home', {
         title: 'Home',
-        navbarItems : navbarItems
+        navbarItems : navbarItems,
+        graph: graph
       });
     }
-    res.render('home', { title : 'Home' });
+    res.render('home', { 
+      title : 'Home',
+      graph: graph
+    });
 };
 
 /**
@@ -134,11 +140,11 @@ exports.postSet = (req, res, next) => {
       return next(err); }
     if (existingUser) {
       existingUser.password = req.body.password;
-      existingUser.first_name = req.body.first;
-      existingUser.last_name = req.body.last;
-      existingUser.known = req.body.known;
-      existingUser.skills = req.body.skills;
-      existingUser.hobbies = req.body.hobbies;
+      existingUser.first_name = req.body.first.toUpperCase();;
+      existingUser.last_name = req.body.last.toUpperCase();
+      existingUser.known = req.body.known.toUpperCase();
+      existingUser.skills = req.body.skills.toUpperCase();
+      existingUser.hobbies = req.body.hobbies.toUpperCase();
       existingUser.save((err) => {
         if (err) { 
           logger.error(err);
@@ -313,7 +319,7 @@ exports.getProfile = async (req, res, next) => {
   }
 
   let requestSent = Request.getRequest(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  let friends = Relation.areFriends(req.params.ldap, req.user.ldap).catch(err => { next(err); });
+  let relationship = Relation.getRelationship(req.params.ldap, req.user.ldap).catch(err => { next(err); });
   let requestReceived = Request.getRequest(req.user.ldap, req.params.ldap).catch(err => { next(err); }); // can be only true
   let predicted = Relation.getPredicted(req.params.ldap, req.user.ldap);
   // Send ID of the request else send null
@@ -322,10 +328,16 @@ exports.getProfile = async (req, res, next) => {
   let navbarItems = service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
   let salary = Salary.getSalary(user.mid).catch(err => { next(err); });
 
-  Promise.all([user, salary, navbarItems, requestSent, requestReceived, friends, predicted]).then(values => { 
+  Promise.all([user, salary, navbarItems, requestSent, requestReceived, relationship, predicted]).then(values => { 
       console.log("Logging first_name");
       console.log(values[0].profile.first_name);
       if(req.params.ldap==req.user.ldap) values[6] = true;
+      let rels = "";
+      
+      for(rel of values[5]){
+        rels = rels + " "+rel;
+      }
+      
       console.log("Logging if request recieved from the profiled person");
       console.log(values[4]);
       
@@ -340,7 +352,7 @@ exports.getProfile = async (req, res, next) => {
         title: values[0].profile.first_name,
         userp : values[0],
         predicted : values[6],
-        friends: values[5],
+        relationship: rels,
         salary : values[1].toFixed(2),
         navbarItems : values[2],
         requestSent: values[3],
@@ -367,13 +379,22 @@ exports.postProfile = async (req, res, next) => {
     return res.redirect('/login');
   }
   
-  let updateRelation = await Relation.predicted(req.params.ldap, req.user.ldap);
-  let createPrediction = await Prediction.createPrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
-  let success = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });
-  console.log(success);
-  let notification = await Notification.createNotification(req.params.ldap, req.user.ldap, req.user.first_name+" predicted for you");
-  req.flash('success', { msg: 'Predicted!' });
-  res.redirect('/' || req.session.returnTo);
+  if(req.body.repredict){
+    let updatePrediction = await Prediction.updatePrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
+    let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });    
+    let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" re-predicted for you", salary);
+    req.flash('success', { msg: 'Predicted!' });
+    return res.redirect(req.session.returnTo||'/');
+  
+  }else{
+    let updateRelation = await Relation.predicted(req.params.ldap, req.user.ldap);
+    let createPrediction = await Prediction.createPrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
+    let salary = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });
+    // returns the new salary that can be then shown 
+    let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" predicted for you", salary);
+    req.flash('success', { msg: 'Predicted!' });
+    return res.redirect(req.session.returnTo||'/');
+  }
 };
 
 /**
@@ -437,6 +458,25 @@ exports.postRequest = async (req, res, next) => {
   }
 
   console.log(req.body);
+  if(req.body.relationship){
+    if( typeof req.body.relationship === 'string' ) {
+        req.body.relationship = [ req.body.relationship ];
+    }
+    await Relation.setRelationship(req.body.ldap, req.user.ldap, req.body.relationship);
+    let relationship = "";
+    for(rel of req.body.relationship){
+      relationship = relationship + " "+rel;
+    }
+
+    await Notification.createNotification(req.body.ldap, req.user.ldap, req.user.first_name+" related to you as"+relationship);
+    return res.send(relationship);
+  }
+  else {
+    await Relation.setRelationship(req.body.ldap, req.user.ldap, null);    
+    return res.send(null);
+  }
+  
+  /*
   switch(req.body.action){
     case 'send':
       let requ = await Request.getRequest(req.user.ldap, req.body.ldap);
@@ -468,7 +508,8 @@ exports.postRequest = async (req, res, next) => {
       await Relation.unfriend(req.user.ldap, req.body.ldap);
       await Relation.unfriend(req.body.ldap, req.user.ldap);
       return res.send("unfriend");
-  } 
+  }
+  */
 };
 
 

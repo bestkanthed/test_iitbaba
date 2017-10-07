@@ -23,7 +23,7 @@ salarySchema.statics.updateSalaries = function updateSalaries(salaries) {
         if(err) return reject(err);
       }); 
     }
-    resolve("cretaed");  
+    resolve("created");  
   });
 };
 
@@ -32,6 +32,22 @@ salarySchema.statics.getSalary = function newSalary(mid, sal) {
     this.model('Salary').findOne({ mid: mid },{},{sort:{ "createdAt" : -1} }).exec( (err, sal) => {
       if(err) return reject(err);
       return resolve(sal.salary);
+    });
+  });
+};
+
+salarySchema.statics.getGraphNodes = function getGraphNodes() {
+  return new Promise ((resolve, reject) => {
+    this.model('Salary').find({},{},{sort:{ "createdAt" : -1} }).distinct('mid').exec( (err, allSalaries) => {
+      if(err) return reject(err);
+      let nodes = [];
+      for(sal of allSalaries){
+        nodes.push({
+          id: sal.mid,
+          sal: sal.salary
+        });
+      }
+      resolve(nodes);
     });
   });
 };

@@ -8,7 +8,7 @@ const relationSchema = new mongoose.Schema({
   ldap2: String, // if here predicted is true means 2 predicted for 1
   predicted: Boolean,
   request:Boolean,
-  friends: Boolean,
+  relationship: Array,
   relation: Number // this is a number to capture the relation
 }, { timestamps: true });
 
@@ -179,6 +179,28 @@ relationSchema.statics.getLdapsOfPeopleWhoPredicted = function getLdapsOfPeopleW
         for(ldp of rel) result.push(ldp.ldap2);
         resolve(result);
       } else resolve(false); 
+    });
+  });
+};
+
+relationSchema.statics.setRelationship = function setRelationship(ldap1, ldap2, relationship) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+      if(err) reject(err);
+      rel.relationship = relationship;
+      rel.save((err, r)=>{
+        if(err) reject(err);
+        resolve(rel.relationship);
+      });
+    });
+  });
+};
+
+relationSchema.statics.getRelationship = function getRelationship(ldap1, ldap2) {
+  return new Promise ((resolve, reject) => { 
+    this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
+      if(err) reject(err);
+      resolve(rel.relationship);
     });
   });
 };

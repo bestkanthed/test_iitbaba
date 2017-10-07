@@ -4,6 +4,11 @@ const notificationSchema = new mongoose.Schema({
   ldap: String,
   from: String,
   notification: String,
+  salary: {
+    new: Number,
+    change: Number,
+    color: String
+  },
   link: String,
   seen: Boolean,
   clicked: Boolean
@@ -15,6 +20,27 @@ notificationSchema.statics.createNotification = function createNotification(ldap
       ldap: ldap, 
       from: from, 
       notification: notification,
+      link: '/profile/'+from,
+      seen: false,
+      clicked: false
+    }, (err, noti)=>{
+      if(err) reject(err);
+      resolve("created"); 
+    });
+  });
+};
+
+notificationSchema.statics.createNotificationWithSalary = function createNotification(ldap, from, notification, salary) {
+  return new Promise ((resolve, reject) => {
+      this.model('Notification').create({ 
+      ldap: ldap, 
+      from: from, 
+      notification: notification,
+      salary:{
+        new: salary.salary,
+        change: salary.change,
+        color: salary.change>0?"green":"red"
+      },
       link: '/profile/'+from,
       seen: false,
       clicked: false

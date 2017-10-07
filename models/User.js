@@ -205,8 +205,8 @@ userSchema.statics.getSearchResult = function getSearchResult(query) {
     if (query.sex) built_query['profile.sex'] = { $in: _.isArray(query.sex) ? query.sex : [query.sex] };
     if (query.rollno) built_query['profile.roll_number'] = query.rollno;
     if (query.mobile) built_query['profile.contacts'] = { $elemMatch: {number:query.mobile} };
-    if (query.first_name) built_query['profile.first_name'] = query.first_name;
-    if (query.last_name) built_query['profile.last_name'] = query.last_name;
+    if (query.first_name) built_query['first_name'] = query.first_name;
+    if (query.last_name) built_query['last_name'] = query.last_name;
     if (query.ldap) built_query['ldap'] = query.ldap;
     
     console.log("Logging query form get search results in users");

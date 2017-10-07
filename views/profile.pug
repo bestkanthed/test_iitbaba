@@ -1,6 +1,8 @@
 extends layout
 
 block content
+  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js')
   .container.profile
     .row.profile
         .col-lg-3.col-sm-12.profile
@@ -26,10 +28,20 @@ block content
                 if predicted
                     p.salary-shown='₹ '+salary+' '
                       span.unit lakh/yr
+                    form#prediction(method='POST')
+                        input(type='hidden', name='_csrf', value=_csrf)
+                        input(type='hidden', name='mid', value=userp.mid)
+                        input(type='hidden', name='repredict', value=true)                        
+                        .input-icon
+                            i ₹
+                            input.salary.profile(type='number', maxlength='4', step="0.1", name='salary', id='salary', autofocus, required)
+                        p
+                            input.submit-salary(type='submit', value='REPREDICT')
                 else
                     form#prediction(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
                         input(type='hidden', name='mid', value=userp.mid)
+                        input(type='hidden', name='repredict', value=false)                                                
                         .input-icon
                             i ₹
                             input.salary.profile(type='number', maxlength='4', step="0.1", name='salary', id='salary', autofocus, required)
@@ -40,20 +52,66 @@ block content
                 .card.title 
                     h1 Relationship
                 .card.content
-                    p.relationship UNDER DEVELOPMENT
+                    p.relationship#rel-display=relationship
+                    div.collapse.relationship-update#relationship    
+                        form#rel(action='/request', method='post')
+                            input(type='hidden', name='ldap', value=userp.ldap)
+                            .relationship-picker
+                                select.selectpicker(data-live-search='true', multiple, name='relationship')
+                                    optgroup(label="Time", data-max-options="1") 
+                                        option Current
+                                        option Ex
+                                    optgroup(label="Locus", data-max-options="1") 
+                                        option Roommate
+                                        option Wingmate
+                                        option Inmate
+                                    optgroup(label="Psyche", data-max-options="1") 
+                                        option Friend
+                                        option Love
+                                        option Crush
+                                        option Best Friend                                    
+                                        option Girlfriend
+                                        option Boyfriend
+                                    optgroup(label="Intellect", data-max-options="1") 
+                                        option Teammate
+                                        option Opposition
+                                        
+                                    
+                        p &nbsp;
                     p
-                        button.profile SEND FRIEND REQUEST
+                        button.profile#update(data-toggle="collapse",data-target="#relationship",state='update') UPDATE
+                    
+                           
+                    
     script.
       const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
       const sal = !{JSON.stringify(salary).replace(/<\//g, '<\\/')};
       const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
 
-      $("#unfriend").click(function() {
-        console.log(this.id);
-        $.post("/request", {action:"unfriend" , ldap: ldp1}).done(function( data ) {
-            $("#unfriend").attr("id", "sendRequest");
-            $("#sendRequest").text("Send Friend Request");
+      $('#rel').on('submit', function(e) {
+        e.preventDefault();
+        console.log("prevented");
+        $.post("/request", $(this).serialize()).done(function( data ) {
+            $('#rel-display').text(data);
+            console.log(data);
         });
+      });
+
+      $("#update").click(function() {
+        console.log(this.id);
+        console.log($(this).attr("state"));
+        if($(this).attr("state")=='update'){
+            $(this).text("SAVE");
+            $(this).attr("state", 'save');
+            return 0;
+        }
+        if($(this).attr("state")=='save'){
+            $('#rel').submit();
+            $(this).text("UPDATE");
+            $(this).attr("state", 'update');
+            return 0;
+        }
+        
       });
 
       $("#deleteRequest").click(function() {
@@ -144,6 +202,72 @@ block content
       const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
       const sal = !{JSON.stringify(salaryCheck).replace(/<\//g, '<\\/')};
       const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
+
+      const inputField = document.querySelector('.chosen-value');
+        const dropdown = document.querySelector('.value-list');
+        const dropdownArray = [... document.querySelectorAll('li')];
+        const dropdownItems = dropdownArray[0];
+        dropdown.classList.add('open');
+        inputField.focus(); // Demo purposes only
+
+        let valueArray = [];
+        dropdownItems.forEach(item => {
+        valueArray.push(item.textContent);
+        });
+
+        const closeDropdown = () => {
+        dropdown.classList.remove('open');
+        }
+
+        inputField.addEventListener('input', () => {
+        dropdown.classList.add('open');
+        let inputValue = inputField.value.toLowerCase();
+        let valueSubstring;
+        if (inputValue.length > 0) {
+            for (let j = 0; j < valueArray.length; j++) {
+            if (!(inputValue.substring(0, inputValue.length) === valueArray[j].substring(0, inputValue.length).toLowerCase())) {
+                dropdownItems[j].classList.add('closed');
+            } else {
+                dropdownItems[j].classList.remove('closed');
+            }
+            }
+        } else {
+            for (let i = 0; i < dropdownItems.length; i++) {
+            dropdownItems[i].classList.remove('closed');
+            }
+        }
+        });
+
+        dropdownItems.forEach(item => {
+        item.addEventListener('click', (evt) => {
+            inputField.value = item.textContent;
+            dropdownItems.forEach(dropdown => {
+            dropdown.classList.add('closed');
+            });
+        });
+        })
+
+        inputField.addEventListener('focus', () => {
+        inputField.placeholder = 'Type to filter';
+        dropdown.classList.add('open');
+        dropdownItems.forEach(dropdown => {
+            dropdown.classList.remove('closed');
+        });
+        });
+
+        inputField.addEventListener('blur', () => {
+        inputField.placeholder = 'Select state';
+        dropdown.classList.remove('open');
+        });
+
+        document.addEventListener('click', (evt) => {
+        const isDropdown = dropdown.contains(evt.target);
+        const isInput = inputField.contains(evt.target);
+        if (!isDropdown && !isInput) {
+            dropdown.classList.remove('open');
+        }
+        });
+
 
       $("#unfriend").click(function() {
         console.log(this.id);

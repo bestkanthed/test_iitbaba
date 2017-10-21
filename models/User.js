@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
   hobbies: String,
   skills: String,
 
+  complete: Number,
 
   mid: Number,
 
@@ -235,6 +236,32 @@ userSchema.statics.getUserNameByMID = function getUserNameByMID(mid) {
       if(err) reject(err);
       if(ldap) resolve(ldap.first_name+" "+ldap.last_name);
       else resolve(null);
+    });
+  });
+};
+
+userSchema.statics.setComplete = function setComplete(ldap, completeLevel) {
+  return new Promise ((resolve, reject) => { 
+    this.model('User').findOne({ldap: ldap},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
+      if(err) reject(err);
+      if(ldap) {
+        ldap.complete = completeLevel;
+        ldap.save(err=>{
+          if(err) return reject(err);
+          return resolve("updated");
+        });
+      }
+      else return resolve("no such ldap");
+    });
+  });
+};
+
+userSchema.statics.getComplete = function getComplete(ldap, completeLevel) {
+  return new Promise ((resolve, reject) => { 
+    this.model('User').findOne({ldap: ldap},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
+      if(err) return reject(err);
+      if(ldap) return resolve(ldap.complete);
+      else return resolve(null);
     });
   });
 };

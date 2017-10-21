@@ -14,7 +14,8 @@ matrixSchema.statics.getLength = function getLength() {
     return new Promise((resolve, reject) => {
         this.model('Matrix').findOne({},{},{sort:{ "createdAt" : -1}}, (err, mat)=>{
             if(err) reject(err);
-            resolve(mat.incomingEdges.length);
+            if(mat) return resolve(mat.incomingEdges.length);
+            else return resolve(0);
         });
     });
 };

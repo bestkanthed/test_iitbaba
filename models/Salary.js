@@ -31,7 +31,8 @@ salarySchema.statics.getSalary = function newSalary(mid, sal) {
   return new Promise ((resolve, reject) => {
     this.model('Salary').findOne({ mid: mid },{},{sort:{ "createdAt" : -1} }).exec( (err, sal) => {
       if(err) return reject(err);
-      return resolve(sal.salary);
+      if(sal) return resolve(sal.salary);
+      else return resolve(null);
     });
   });
 };

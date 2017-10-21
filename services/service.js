@@ -13,9 +13,11 @@ const _ = require('lodash');
 
 exports.getGraph = ()=>{
   return new Promise(async (resolve, reject) => {
-    let links = await Prediction.getGraphLinks().catch( err => { reject(err); });
+    let links = await Prediction.getGraphLinks();
     let nodes = [];
     let noOfUsers = await Matrix.getLength();
+
+    console.log(noOfUsers);
 
     nodes.push({
       id: "0",
@@ -25,6 +27,7 @@ exports.getGraph = ()=>{
     });
 
     for(let i=1;i<noOfUsers;i++){
+      console.log("pushing another node");
       nodes.push({
         id: i.toString(),
         sal:await Salary.getSalary(i), 
@@ -37,14 +40,14 @@ exports.getGraph = ()=>{
       nodes: nodes,
       links: links
     };
-    
-    resolve(graph);
+    console.log("Logging graph", graph);
+    return resolve(graph);
   });
 };
 
 exports.getGraphFor = (ldap)=>{
   return new Promise(async (resolve, reject) => {
-    let links = await Prediction.getGraphLinks().catch( err => { reject(err); });
+    let links = await Prediction.getGraphLinks();
     let nodes = [];
     let noOfUsers = await Matrix.getLength();
 
@@ -70,14 +73,14 @@ exports.getGraphFor = (ldap)=>{
 
 exports.getNewPeopleToPredict = (ldap, no)=>{
   return new Promise(async (resolve, reject) => {
-    let ldaps = await Relation.findMostRelatedUsers(ldap, no).catch( err => { reject(err); });
+    let ldaps = await Relation.findMostRelatedUsers(ldap, no);
     resolve( await User.getUsers(ldaps).catch( err => { reject(err); }));
   });
 };
 
 exports.getFirstCirlceGraph = (ldap)=>{
   return new Promise(async (resolve, reject) => {
-    let links = await Prediction.getGraphFirstLinks().catch( err => { reject(err); });
+    let links = await Prediction.getGraphFirstLinks();
     let nodes = [];
     let noOfUsers = await Matrix.getLength();
 
@@ -108,16 +111,16 @@ exports.getFirstCirlceGraph = (ldap)=>{
 
 exports.getNewPeopleToPredict = (ldap, no)=>{
   return new Promise(async (resolve, reject) => {
-    let ldaps = await Relation.findMostRelatedUsers(ldap, no).catch( err => { reject(err); });
-    resolve( await User.getUsers(ldaps).catch( err => { reject(err); }));
+    let ldaps = await Relation.findMostRelatedUsers(ldap, no);
+    resolve( await User.getUsers(ldaps));
   });
 };
 
 exports.getNavItems = (ldap, no) =>{ 
     //return an object of notifications and requests
   return new Promise(async (resolve, reject) => {
-    let notifications = await Notification.getNotifications(ldap, no).catch(err => { reject(err);});     
-    let requests = await Request.getRequests(ldap, no).catch(err => { reject(err); });
+    let notifications = await Notification.getNotifications(ldap, no);     
+    let requests = await Request.getRequests(ldap, no);
     let unseen_notifications=0;
     let unseen_requests=0;
 
@@ -185,15 +188,15 @@ exports.UpdateDatabasePostPrediction = (profile, predictor, guess) =>{
     console.log("logging predictor:");console.log(predictor);
     console.log("logging guess:");console.log(guess);
 
-    let salaryMean = await Salary.getMean(profile).catch(err => { reject(err); });
+    let salaryMean = await Salary.getMean(profile);
     console.log("logging salaryMean:");console.log(salaryMean);
-    let salaryStd = await Salary.getStd(profile).catch(err => { reject(err); });
+    let salaryStd = await Salary.getStd(profile);
     console.log("logging salaryStd:");console.log(salaryStd);
 
-    let userSalary = await Salary.getSalary(predictor).catch(err => { reject(err); });
+    let userSalary = await Salary.getSalary(predictor);
     console.log("logging userSalary:");console.log(userSalary);
-    let salWeight = await SalaryStat.getSalaryWeight(userSalary).catch(err => { reject(err); }); //Afty
-    let authWeight = await Authenticity.getAuthenticity(predictor).catch(err => { reject(err); });
+    let salWeight = await SalaryStat.getSalaryWeight(userSalary); //Afty
+    let authWeight = await Authenticity.getAuthenticity(predictor);
 
     console.log("SalaryWeigth :");console.log(salWeight);console.log("authWeigth :");console.log(authWeight);
     
@@ -252,7 +255,7 @@ exports.UpdateDatabasePostPrediction = (profile, predictor, guess) =>{
 function getSearchResults(query){  // returns the users
     //return results a users
   return new Promise(async (resolve, reject) => {
-    let results = await User.getSearchResult(query).catch(err => { reject(err);});
+    let results = await User.getSearchResult(query);
     resolve(results);
   });
 };
@@ -276,7 +279,7 @@ exports.getBoxSearchResults = (query)=>{
       if(isRollNo(c)){
         let rq = {};
         rq.rollno = c;
-        results = await getSearchResults(rq).catch(err => { reject(err); });
+        results = await getSearchResults(rq);
         console.log("Logging rollno search result length : ");
         console.log(results.length);
         if(results.length) finalResults.push.apply(finalResults, results);
@@ -389,7 +392,7 @@ exports.getBoxSearchResults = (query)=>{
       if(isMobileNo(c)){
         let ms = {};
         ms.mobile = c;
-        results = await getSearchResults(ms).catch(err => { reject(err); });
+        results = await getSearchResults(ms);
         if(results.length) finalResults.push.apply(finalResults, results);
         continue;
       }
@@ -398,7 +401,7 @@ exports.getBoxSearchResults = (query)=>{
         
         let ls = {};
         ls.ldap = c.toLowerCase();
-        results = await getSearchResults(ls).catch(err => { reject(err); });
+        results = await getSearchResults(ls);
         if(results.length){
           console.log("logging matched ldaps");
           console.log(results);          
@@ -408,12 +411,12 @@ exports.getBoxSearchResults = (query)=>{
         
         let fns = {};
         fns.first_name = c;
-        results = await getSearchResults(fns).catch(err => { reject(err); });
+        results = await getSearchResults(fns);
         if(results.length) finalResults.push.apply(finalResults, results);
         
         let lns = {};
         lns.last_name = c;
-        results = await getSearchResults(lns).catch(err => { reject(err); });
+        results = await getSearchResults(lns);
         if(results.length) finalResults.push.apply(finalResults, results);
         continue;
       }
@@ -426,7 +429,7 @@ exports.getBoxSearchResults = (query)=>{
       return resolve(finalResults);
     } 
     ///////// If final results are repeated then make them once /// filter array
-    results = await getSearchResults(bq).catch(err => { reject(err); });
+    results = await getSearchResults(bq);
     console.log("Logging results");
     console.log(results);
     if(results.length) finalResults.push.apply(finalResults, results);

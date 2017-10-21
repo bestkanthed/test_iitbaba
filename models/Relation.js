@@ -23,7 +23,7 @@ relationSchema.statics.createRelation = function createRelation(ldap1, ldap2) {
           predicted: false,
           request: false,
           friends: false,
-          relation: await relationMatrix.getRelation(ldap1, ldap2).catch(err=>{ reject(err); })
+          relation: await relationMatrix.getRelation(ldap1, ldap2)
         }, (err, rel)=>{
           if(err) reject(err);
           resolve("created"); 
@@ -75,7 +75,7 @@ relationSchema.statics.updateRelation = function updateRelation(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
-      rel.relation = await relationMatrix.getRelation(ldap1, ldap2).catch(err=>{ reject(err); })
+      rel.relation = await relationMatrix.getRelation(ldap1, ldap2);
       rel.save((err) => {
         if(err) reject(err);
         resolve("updated");

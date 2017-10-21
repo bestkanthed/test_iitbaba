@@ -45,17 +45,25 @@ const logger = new (winston.Logger)({
  */
 
 exports.home = async (req, res, next) =>{
-    
+    console.log("Home");
     let graph = await service.getGraph();
+    console.log("Logging req.user ", req.user);    
     if (req.user) {
-      let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+
+      let completeLevel = await User.getComplete(req.user.ldap);
+      if(!completeLevel) return res.redirect('/set');
+      if(completeLevel==1) return res.redirect('/picture');
+      if(completeLevel==2) return res.redirect('/avg');
+      
+      let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
       return res.render('home', {
         title: 'Home',
         navbarItems : navbarItems,
         graph: graph
       });
     }
-    res.render('home', { 
+    console.log("Now will render home");
+    return res.render('home', { 
       title : 'Home',
       graph: graph
     });
@@ -74,8 +82,12 @@ exports.getCircle = async (req, res, next) =>{
       return res.redirect('/login');
     }
 
+    let completeLevel = await User.getComplete(req.user.ldap);
+    if(!completeLevel) return res.redirect('/');
+    if(completeLevel<3) return res.redirect('/');
+
     let graph = await service.getGraphFor(req.user.ldap);
-    let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+    let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
     return res.render('circle', {
       title: 'Circle',
       navbarItems : navbarItems,
@@ -96,7 +108,7 @@ exports.postCircle = async (req, res, next) =>{
     }
     let circle = await service.getFirstCircleGraph(req.body.ldap);
 
-    let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+    let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
     return res.render('circle', {
       title: 'Circle',
       navbarItems : navbarItems,
@@ -157,7 +169,7 @@ exports.getSet = async (req, res, next) => {
     logger.info(req.ip + " opened /set without login");
     return res.redirect('/');
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
   console.log(navbarItems);
   return res.render('account/set', {
     title: 'Set Password',
@@ -193,6 +205,7 @@ exports.postSet = (req, res, next) => {
       existingUser.known = req.body.known.toUpperCase();
       existingUser.skills = req.body.skills.toUpperCase();
       existingUser.hobbies = req.body.hobbies.toUpperCase();
+      existingUser.complete = 1;
       existingUser.save((err) => {
         if (err) { 
           logger.error(err);
@@ -214,7 +227,7 @@ exports.getPicture = async (req, res, next) => {
     logger.info(req.ip + " opened /picture without login");
     return res.redirect('/');
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
   console.log(navbarItems);
   return res.render('account/picture', {
     title: 'Upload Profile Picture',
@@ -240,6 +253,7 @@ exports.postPicture = async (req, res, next)=>{
         if (err) return next(err);
         if (existingUser) {
           existingUser.profile.upload_picture = true;
+          existingUser.complete = 2;
           existingUser.save((err) => {
             if (err) return next(err);
             req.flash({ msg: 'Picture Saved' });
@@ -264,7 +278,7 @@ exports.getAverage = async (req, res, next) => {
     logger.info(req.ip + " opened /picture without login");
     return res.redirect('/');
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
   console.log(navbarItems);
   return res.render('account/avg', {
     title: 'IITbaba',
@@ -290,7 +304,7 @@ exports.postAverage = async (req, res, next)=>{
   let salaries = await Matrix.addNewUserToMatrix(newMean.total/newMean.n, userPredictionForBaba);
   let setMid = await User.setMID(req.user.ldap, salaries.length - 1);
   let updateSalaries = await Salary.updateSalaries(salaries);
-  
+  await User.setComplete(req.user.ldap, 3);
   req.flash({ msg: 'Saved' });
   return res.redirect('/');
 };
@@ -305,9 +319,14 @@ exports.getPredict = async (req, res, next) => {
     logger.info("IP " + req.ip + " /predict without login");
     return res.redirect('/');
   }
-  let usersToShow = await service.getNewPeopleToPredict(req.user.ldap, standard.notifications).catch(err => { next(err); });;
+
+  let completeLevel = await User.getComplete(req.user.ldap);
+  if(!completeLevel) return res.redirect('/');
+  if(completeLevel<3) return res.redirect('/');
+  
+  let usersToShow = await service.getNewPeopleToPredict(req.user.ldap, standard.notifications);
   //console.log(usersToShow);
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   console.log(navbarItems);
   res.render('account/predict', {
     title: 'Predict',
@@ -326,9 +345,14 @@ exports.getPredictions = async (req, res, next) => {
     logger.info("IP " + req.ip + " /predict without login");
     return res.redirect('/');
   }
+
+  let completeLevel = await User.getComplete(req.user.ldap);
+  if(!completeLevel) return res.redirect('/');
+  if(completeLevel<3) return res.redirect('/');
+  
   let op = [];
   let ip = [];
-  let opredictions = await Prediction.getPredictionsBy(req.user.mid).catch(err => { next(err); });;
+  let opredictions = await Prediction.getPredictionsBy(req.user.mid);
   for(pred of opredictions){
     op.push({
       ldap: await User.getUserLdapByMID(pred.mid1),
@@ -336,7 +360,7 @@ exports.getPredictions = async (req, res, next) => {
       prediction: pred.prediction
     });
   }
-  let ipredictions = await Prediction.getPredictionsFor(req.user.mid).catch(err => { next(err); });;
+  let ipredictions = await Prediction.getPredictionsFor(req.user.mid);
   for(pred of ipredictions){
     ip.push({
       ldap: await User.getUserLdapByMID(pred.mid2),
@@ -344,7 +368,7 @@ exports.getPredictions = async (req, res, next) => {
       prediction: pred.prediction
     });
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   console.log('ip');console.log(ip);console.log("op");console.log(op);
   res.render('account/predictions', {
     title: 'Previous Predictions',
@@ -366,15 +390,19 @@ exports.getProfile = async (req, res, next) => {
     return res.redirect('/login');
   }
 
-  let requestSent = Request.getRequest(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  let relationship = Relation.getRelationship(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  let requestReceived = Request.getRequest(req.user.ldap, req.params.ldap).catch(err => { next(err); }); // can be only true
+  let completeLevel = await User.getComplete(req.user.ldap);
+  if(!completeLevel) return res.redirect('/');
+  if(completeLevel<3) return res.redirect('/');
+
+  let requestSent = Request.getRequest(req.params.ldap, req.user.ldap);
+  let relationship = Relation.getRelationship(req.params.ldap, req.user.ldap);
+  let requestReceived = Request.getRequest(req.user.ldap, req.params.ldap); // can be only true
   let predicted = Relation.getPredicted(req.params.ldap, req.user.ldap);
   // Send ID of the request else send null
-  let user =  await User.getUser(req.params.ldap).catch(err => { next(err); });
+  let user =  await User.getUser(req.params.ldap);
   //let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  let navbarItems = service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
-  let salary = Salary.getSalary(user.mid).catch(err => { next(err); });
+  let navbarItems = service.getNavItems(req.user.ldap, standard.requests);
+  let salary = Salary.getSalary(user.mid);
 
   Promise.all([user, salary, navbarItems, requestSent, requestReceived, relationship, predicted]).then(values => { 
       console.log("Logging first_name");
@@ -406,7 +434,7 @@ exports.getProfile = async (req, res, next) => {
         requestSent: values[3],
         requestReceived: values[4] == null ? null : values[4].id
       });
-    }).catch(err=>{ next(err); });
+    });
 };
 
 /**
@@ -429,8 +457,8 @@ exports.postProfile = async (req, res, next) => {
   
   console.log(req.body);
   if(req.body.repredict){
-    let updatePrediction = await Prediction.updatePrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
-    let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });    
+    let updatePrediction = await Prediction.updatePrediction(req.body.mid, req.user.mid, req.body.salary);
+    let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary));    
     console.log('Inside repredict');
 
     let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" re-predicted for you", salary);
@@ -440,8 +468,8 @@ exports.postProfile = async (req, res, next) => {
   
   }else{
     let updateRelation = await Relation.predicted(req.params.ldap, req.user.ldap);
-    let createPrediction = await Prediction.createPrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
-    let salary = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });
+    let createPrediction = await Prediction.createPrediction(req.body.mid, req.user.mid, req.body.salary);
+    let salary = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary));
     // returns the new salary that can be then shown 
     let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" predicted for you", salary);
     console.log('not Inside repredict');    
@@ -465,8 +493,11 @@ exports.getSearch = async (req, res, next) => {
     return res.redirect('/');
   }
 
+  let completeLevel = await User.getComplete(req.user.ldap);
+  if(!completeLevel) return res.redirect('/');
+  if(completeLevel<3) return res.redirect('/');
 // Move these down with promises as they are not required here
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   console.log("Logging query");
   console.log(req.query);
  
@@ -491,7 +522,7 @@ exports.getSearch = async (req, res, next) => {
       navbarItems : navbarItems
     });
   } else{
-    results = await service.getSearchResults(req.query).catch(err => { next(err); });
+    results = await service.getSearchResults(req.query);
     res.render('results', {
       title: 'Results',
       navbarItems : navbarItems,
@@ -545,9 +576,9 @@ exports.postNotification = async (req, res, next) => {
   console.log(req.body);
 
   switch(req.body.action){
-    case 'create': return res.send(await Notification.createNotification(req.body.ldap1, req.body.ldap2, req.body.notification).catch(err=>{ next(err); }));
-    case 'see': return res.send(await Notification.seeNotifications(req.user.ldap).catch(err=>{ next(err); }));        
-    case 'click': return res.send(await Notification.clickNotification(req.body.id).catch(err=>{ next(err); }));
+    case 'create': return res.send(await Notification.createNotification(req.body.ldap1, req.body.ldap2, req.body.notification));
+    case 'see': return res.send(await Notification.seeNotifications(req.user.ldap));        
+    case 'click': return res.send(await Notification.clickNotification(req.body.id));
   }
 };
 
@@ -613,35 +644,30 @@ exports.gotCallback = async (req, res, next) => {
               }
           }, async (err1, res1)=> {
               var info = JSON.parse(res1.body);
-              //console.log("User Info:", info);
+              console.log("User Info:", info);
+              if(!info.username){console.log("Throwing back to auth/sso"); return res.redirect('/auth/iitbsso');} 
               user.ldap = info.username;
-
               //
-            let exestingUser = await User.ifExists(info.username).catch(err=>{console.log(err);});
+            let exestingUser = await User.ifExists(info.username);
             if(exestingUser){
-              let userLogin = await User.getUser(info.username).catch(err=>{console.log(err);});
+              let userLogin = await User.getUser(info.username);
               req.logIn(userLogin, (err) => {
                 if (err) { return next(err); }
                 req.flash('success', { msg: 'Successful Login!' });
-                return res.redirect('/');         
+                return res.redirect('/');
               });
             } else {
               console.log("Inside else");
               
-              await User.initializeUser(user, info).catch(err=>{console.log(err);});
-              /*
-              await Salary.createSalary(user.ldap, 100000, 10000).catch(err=>{console.log(err);});
-              await SalaryStat.updateSalaryStatNewEntry(100000).catch(err=>{console.log(err);});
-              await Authenticity.createAuthenticity(user.ldap, 0).catch(err=>{console.log(err);}); // 0 is the k value // it means max auth
-              */
-              let allUsers = await User.getAllLdaps().catch(err=>{console.log(err);});
+              await User.initializeUser(user, info);
+              let allUsers = await User.getAllLdaps();
               //console.log(allUsers);
               for(one of allUsers){
-                console.log(one.ldap);
+                console.log("Logging user ldap", one.ldap);
                 await Relation.createRelation(user.ldap, one.ldap);
                 await Relation.createRelation(one.ldap, user.ldap);
               }
-              await Notification.createNotification(user.ldap, user.ldap, "Welcome to IITbaba").catch(err=>{console.log(err);});
+              await Notification.createNotification(user.ldap, user.ldap, "Welcome to IITbaba");
               req.logIn(user, (err) => {
                 if (err) { return next(err); }         
                 req.flash('success', { msg: 'Success! Registered.' });

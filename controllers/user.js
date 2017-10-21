@@ -7,7 +7,7 @@ const fs = require('fs');
 const im = require('imagickal');
 
 const Request = require('../models/Request');
-//const KPoint = require('../models/KPoint');
+const KPoint = require('../models/KPoint');
 const Relation = require('../models/Relation');
 const Prediction = require('../models/Prediction');
 const Authenticity = require('../models/Authenticity');

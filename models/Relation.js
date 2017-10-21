@@ -65,7 +65,8 @@ relationSchema.statics.getPredicted = function getPredicted(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
       if(err) reject(err);
-      resolve(rel.predicted);
+      if(rel) return resolve(rel.predicted);
+      else resolve(false);
     });
   });
 };

@@ -113,6 +113,10 @@ app.post('/profile/:ldap', userController.postProfile);
 
 app.get('/search', userController.getSearch);
 
+app.get('/circle', userController.getCircle);
+
+app.post('/subscription', userController.postSubscription);
+
 app.post('/request', userController.postRequest);
 
 app.post('/notification', userController.postNotification);
@@ -126,6 +130,6 @@ app.use(function (err, req, res, next) {
   res.status(500).send(err);
 });
 
-app.listen(3000,'0.0.0.0' ,() => {
+app.listen(3000,'127.0.0.1' ,() => {
   console.log('  Press CTRL-C to stop\n');
 });

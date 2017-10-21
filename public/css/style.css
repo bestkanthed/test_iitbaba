@@ -514,3 +514,24 @@ p.salary-shown>span.unit{
     font-size: 18px;
     font-weight: 700;
 }
+span.notifiaction-salary{
+    font-size: 16px;
+    font-weight: 700;
+}
+#predictCover{
+	display: none;
+	position: fixed;
+    width : 800px;
+    opacity : 0.5;
+    background : black;
+    height : 350px;
+    z-index : 10;
+}
+.card.popup {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);   
+  margin: auto;
+  padding:20px;
+  opacity : 1;
+  text-align: center;
+  font-family: arial;
+}

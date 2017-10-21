@@ -1,0 +1,178 @@
+extends layout
+
+block content
+  .container.home
+    style.
+      .links line {
+      stroke: #999;
+      stroke-opacity: 0.4;
+      }
+      .nodes circle {
+      stroke: #fff;
+      stroke-width: 0;
+      stroke-opacity: 0;
+      }
+      circle:hover  {
+      stroke: #fff;
+      stroke-width: 1.5px;
+      stroke-opacity: 1;
+      }
+    #predictCover
+      .card.popup
+          img.profile#profileImage
+          form#prediction(method='POST')
+              input(type='hidden', name='_csrf', value=_csrf)
+              input(type='hidden', name='mid', id='mid')
+              input(type='hidden', name='repredict', value=false)
+              input(type='hidden', name='popup', value="true")                                             
+              .input-icon
+                  i ₹
+                  input.salary.profile(type='number', maxlength='4', step="0.01", name='salary', id='salary', autofocus, required)
+              p
+                  input.submit-salary(type='submit', value='PREDICT')
+    svg(width='1200', height='570')
+    script(src='https://d3js.org/d3.v4.min.js')
+    script.
+      var graph = !{JSON.stringify(graph).replace(/<\//g, '<\\/')};
+      $(document).keyup(function(e) {
+          if (e.keyCode == 27) $("#predictCover").css({"display":"none"});
+      });
+      $("#prediction").submit(e=>{
+        e.preventDefault();
+        let form = $('#prediction');
+        let ldap = $('#prediction').attr("ldap");
+        console.log(ldap);
+        $.ajax({
+          type: "POST",
+          url: 'profile/'+ldap,
+          data: form.serialize(),
+          success: function(response) {
+            console.log("logging response", response );
+            if(response=="predicted") {
+              $("#predictCover").css({"display":"none"});
+              graph.nodes[Number($("#mid").attr('value')) - 1].predicted = true;
+              recenter(graph.nodes[Number($("#mid").attr('value')) - 1]);
+            }
+          }
+        });
+      });
+      console.log(graph);
+      var svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height");
+      var color = d3.scaleOrdinal(d3.schemeCategory20);
+      var simulation = d3.forceSimulation()
+      .force("collide", d3.forceCollide().radius(function(d) { return 50; }))
+      .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(function(d) {return 300;}).strength(0.3))
+      .force("charge", d3.forceManyBody())
+      .force("center", d3.forceCenter(width / 2, height / 2));
+      //.force("linkDistance", 200);
+      //d3.json("miserables.json", function(error, graph) {
+        //if (error) throw error;
+       let defs = svg.append("defs")
+                      .attr("id", "imgdefs")
+                      .selectAll("pattern")
+                      .data(graph.nodes)
+                      .enter()
+                      .append("pattern")
+                      .attr("id", function(n){return n.ldap?n.ldap:"null";})
+                      .attr("height", 1)
+                      .attr("width", 1)
+                      .attr("x", "0")
+                      .attr("y", "0")
+                      .append("image")
+                      .attr("x", function(d){return d.sal*-0.22;})
+                      .attr("y", 0)
+                      .attr("height",function(d) { return d.sal*4; })
+                      .attr("width", function(d) { return d.sal*4.5; })
+                      .attr("xlink:href", function(n){return "/images/profile/"+n.ldap+".png";} )
+
+        var link = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(graph.links)
+        .enter().append("line")
+        .attr("stroke-width", function(d) { return Math.sqrt(d.value)/3; });
+        
+        var node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(graph.nodes)
+        .enter()
+        .append('a')//.attr("xlink:href", function(d) { return "profile/"+ d.ldap; })
+        .append("circle")
+        .attr("r", function(d) { return d.sal*2; })
+        .attr("fill", function(d) { return "url(#"+d.ldap+")"; })
+        .attr("id", function(d) { return "node"+d.id; })
+        .attr("predicted", function(d) { return d.predicted; })     
+        //.attr("fill", function(d) {catpattern.append("image").attr("xlink:href", "/images/profile/"+d.ldap); return "url(#catpattern)";})
+        //.attr("fill", function(d) { return color(d.group); })
+        .on("click", recenter)
+        .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+        
+        node.append("title")
+        .text(function(d) { return d.name; });
+        
+        simulation
+        .nodes(graph.nodes)
+        .on("tick", ticked);
+        
+        simulation.force("link")
+        .links(graph.links);
+        
+        function ticked() {
+          link
+          .attr("x1", function(d) { return d.source.x; })
+          .attr("y1", function(d) { return d.source.y; })
+          .attr("x2", function(d) { return d.target.x; })
+          .attr("y2", function(d) { return d.target.y; });
+          node
+          .attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y; });
+        }
+      //});
+      
+      function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+      }
+
+      function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      }
+
+      function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+      function recenter(n){
+        
+        if(!n.predicted){
+          console.log(n);
+          $("#profileImage").attr("src", '/images/profile/'+n.ldap+'.png');
+          $("#mid").attr('value', n.id);
+          $("#prediction").attr('ldap', n.ldap);
+          $("#predictCover").css({"display":"inline"});
+          // add a dropdown to predict
+        }
+        else{
+        console.log(n);
+        var circleEdit = d3.select("#node"+n.id);
+        circleEdit.attr("r", 50);
+        simulation
+        //.force("link", d3.forceLink().strength( function(d) { console.log(d); if(d.source=="2" || d.target=="2") return 1; return 1; }))
+        .force("link", d3.forceLink().id(function(d) { return d.id; }).distance( function(d) { if(d.source.id==n.id || d.target.id==n.id) return 200; else return 2000; }).strength( function(d) { if(d.source.id==n.id || d.target.id==n.id) return 1.4; else return 0.01;}))
+        .force("x", d3.forceX().x(function(d) { return width/2; }).strength(function(d) { if(d.id == n.id) return 3.1; return 0; }))
+        .force("y", d3.forceY().y(function(d) { return height/2; }).strength(function(d) { if(d.id == n.id) return 3.1; return 0;}));
+        simulation.force("link")
+        .links(graph.links);
+        simulation.alphaTarget(0.5);
+        }
+      }
+    //img.baba(src="/images/iitbabab.png" alt="iitbaba" height="480")

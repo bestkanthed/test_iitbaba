@@ -21,7 +21,71 @@ exports.getGraph = ()=>{
       id: "0",
       sal:await Salary.getSalary(0), 
       ldap:'iitbaba',
-      name: 'IIT-baba',
+      name: 'IIT-baba'
+    });
+
+    for(let i=1;i<noOfUsers;i++){
+      nodes.push({
+        id: i.toString(),
+        sal:await Salary.getSalary(i), 
+        ldap:await User.getUserLdapByMID(i),
+        name: await User.getUserNameByMID(i),
+      });    
+    }
+
+    let graph = {
+      nodes: nodes,
+      links: links
+    };
+    
+    resolve(graph);
+  });
+};
+
+exports.getGraphFor = (ldap)=>{
+  return new Promise(async (resolve, reject) => {
+    let links = await Prediction.getGraphLinks().catch( err => { reject(err); });
+    let nodes = [];
+    let noOfUsers = await Matrix.getLength();
+
+    for(let i=1;i<noOfUsers;i++){
+      let ldap1 = await User.getUserLdapByMID(i);
+      nodes.push({
+        id: i.toString(),
+        sal:await Salary.getSalary(i), 
+        ldap: ldap1,
+        name: await User.getUserNameByMID(i),
+        predicted: await Relation.getPredicted(ldap1, ldap)
+      });    
+    }
+
+    let graph = {
+      nodes: nodes,
+      links: links
+    };
+    
+    resolve(graph);
+  });
+};
+
+exports.getNewPeopleToPredict = (ldap, no)=>{
+  return new Promise(async (resolve, reject) => {
+    let ldaps = await Relation.findMostRelatedUsers(ldap, no).catch( err => { reject(err); });
+    resolve( await User.getUsers(ldaps).catch( err => { reject(err); }));
+  });
+};
+
+exports.getFirstCirlceGraph = (ldap)=>{
+  return new Promise(async (resolve, reject) => {
+    let links = await Prediction.getGraphFirstLinks().catch( err => { reject(err); });
+    let nodes = [];
+    let noOfUsers = await Matrix.getLength();
+
+    nodes.push({
+      id: "0",
+      sal:await Salary.getSalary(0), 
+      ldap:'iitbaba',
+      name: 'IIT-baba'
     });
 
     for(let i=1;i<noOfUsers;i++){
@@ -83,15 +147,15 @@ exports.getNavItems = (ldap, no) =>{
 exports.updateDatabasePostPrediction = (profile, predictor, guess) =>{
   return new Promise(async (resolve, reject) => {
     // mid of the following are stored
-    
+    let previousPrediction = await Salary.getSalary(profile);    
     console.log("going to update matrix");    
     let salaries = await Matrix.updateMatrix(profile, predictor, guess);
     console.log("salaries updated");
     let salaryUpdate = await Salary.updateSalaries(salaries);
     console.log("salaries saved");
     return resolve({
-      salary: salaryUpdate[profile],
-      change: salaryUpdate[profile]- await Salary.getSalary(profile)
+      salary: salaries[profile],
+      change: salaries[profile] - previousPrediction
     });
   });
 };
@@ -100,14 +164,16 @@ exports.updateDatabasePostPrediction = (profile, predictor, guess) =>{
 exports.updateDatabasePostRePrediction = (profile, predictor, guess) =>{
   return new Promise(async (resolve, reject) => {
     // mid of the following are stored
+    let previousPrediction = await Salary.getSalary(profile);
     console.log("going to update matrix");    
     let salaries = await Matrix.updateMatrixRepredict(profile, predictor, guess);
     console.log("salaries updated");
     let salaryUpdate = await Salary.updateSalaries(salaries);
     console.log("salaries saved");
+    console.log(salaries[profile]);
     return resolve({
-      salary: salaryUpdate[profile],
-      change: salaryUpdate[profile]- await Salary.getSalary(profile)
+      salary: salaries[profile],
+      change: salaries[profile] - previousPrediction
     });
   });
 };

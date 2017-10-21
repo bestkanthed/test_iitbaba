@@ -35,6 +35,16 @@
                   img.notification-img(src='/images/profile/'+navbarItems.notifications.notifications[n].from+'.png') 
                   .notifiaction-content
                       .notifiaction-text=navbarItems.notifications.notifications[n].notification
+                      if navbarItems.notifications.notifications[n].salary.new
+                        .notifiaction-salary-stats(style="color:"+navbarItems.notifications.notifications[n].salary.color+";")
+                          span.notifiaction-salary=navbarItems.notifications.notifications[n].salary.new+" "
+                          span.notifiaction-change=navbarItems.notifications.notifications[n].salary.change+" "
+                          span.notifiaction-change-icon
+                            if navbarItems.notifications.notifications[n].salary.change>0
+                              i.fa.fa-arrow-circle-up
+                            else
+                              i.fa.fa-arrow-circle-down
+                          span.notifiaction-percentage=" "+navbarItems.notifications.notifications[n].salary.percent+"%"            
                       .notifiaction-from=navbarItems.notifications.notifications[n].from
                       .notification-time=navbarItems.notifications.notifications[n].time
                 .dropdown-divider

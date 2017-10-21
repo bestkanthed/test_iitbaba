@@ -1,4 +1,15 @@
 const mongoose = require('mongoose');
+const Subscription = require('./Subscription');
+const webPush = require('web-push');
+
+const notificationOptions = {
+  TTL: 60,
+  vapidDetails: {
+        subject: 'mailto: bestkanthed@gmail.com',
+        publicKey: process.env.vapidPublicKey,
+        privateKey: process.env.vapidPrivateKey
+    }
+};
 
 const notificationSchema = new mongoose.Schema({
   ldap: String,
@@ -7,6 +18,7 @@ const notificationSchema = new mongoose.Schema({
   salary: {
     new: Number,
     change: Number,
+    percent: Number,
     color: String
   },
   link: String,
@@ -23,8 +35,24 @@ notificationSchema.statics.createNotification = function createNotification(ldap
       link: '/profile/'+from,
       seen: false,
       clicked: false
-    }, (err, noti)=>{
+    }, async (err, noti)=>{
       if(err) reject(err);
+      
+      let payload = JSON.stringify({
+        from: from,
+        notification: notification,
+      });
+
+      console.log("Logging Payload", payload);
+
+      let pushSubscription = await Subscription.getSubscription(ldap);
+      console.log(pushSubscription);
+      webPush.sendNotification(
+        pushSubscription,
+        payload,
+        notificationOptions
+      );
+      
       resolve("created"); 
     });
   });
@@ -32,20 +60,47 @@ notificationSchema.statics.createNotification = function createNotification(ldap
 
 notificationSchema.statics.createNotificationWithSalary = function createNotification(ldap, from, notification, salary) {
   return new Promise ((resolve, reject) => {
+      let color = salary.change>0?"green":"red";
+      if(salary.change==0) color = "blue";
       this.model('Notification').create({ 
       ldap: ldap, 
-      from: from, 
+      from: from,
       notification: notification,
       salary:{
-        new: salary.salary,
-        change: salary.change,
-        color: salary.change>0?"green":"red"
+        new: salary.salary.toFixed(2),
+        change: salary.change.toFixed(3),
+        percent: ((salary.change*100)/(salary.salary - salary.change)).toFixed(2),
+        color: color
       },
       link: '/profile/'+from,
       seen: false,
       clicked: false
-    }, (err, noti)=>{
-      if(err) reject(err);
+    }, async (err, noti)=>{
+      if(err) return reject(err);
+
+      let payload = JSON.stringify({
+        from: from,
+        notification: notification,
+        salary: {
+          new: salary.salary.toFixed(2),
+          change: salary.change.toFixed(3),
+          percent: ((salary.change*100)/(salary.salary - salary.change)).toFixed(2),
+          color: color
+        }
+      });
+      
+      console.log("Logging Payload", payload);
+
+      let pushSubscription = await Subscription.getSubscription(ldap);
+      if(pushSubscription){
+        console.log(pushSubscription);
+        webPush.sendNotification(
+          pushSubscription,
+          payload,
+          notificationOptions
+        );
+      }
+
       resolve("created"); 
     });
   });

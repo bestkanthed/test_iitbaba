@@ -28,15 +28,16 @@ block content
                 if predicted
                     p.salary-shown='₹ '+salary+' '
                       span.unit lakh/yr
-                    form#prediction(method='POST')
-                        input(type='hidden', name='_csrf', value=_csrf)
-                        input(type='hidden', name='mid', value=userp.mid)
-                        input(type='hidden', name='repredict', value=true)                        
-                        .input-icon
-                            i ₹
-                            input.salary.profile(type='number', maxlength='4', step="0.1", name='salary', id='salary', autofocus, required)
-                        p
-                            input.submit-salary(type='submit', value='REPREDICT')
+                      if user.ldap != userp.ldap
+                        form#prediction(method='POST')
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            input(type='hidden', name='mid', value=userp.mid)
+                            input(type='hidden', name='repredict', value="true")                        
+                            .input-icon
+                                i ₹
+                                input.salary.profile(type='number', maxlength='4', step="0.01", name='salary', id='salary', autofocus, required)
+                            p
+                                input.submit-salary(type='submit', value='REPREDICT')
                 else
                     form#prediction(method='POST')
                         input(type='hidden', name='_csrf', value=_csrf)
@@ -44,7 +45,7 @@ block content
                         input(type='hidden', name='repredict', value=false)                                                
                         .input-icon
                             i ₹
-                            input.salary.profile(type='number', maxlength='4', step="0.1", name='salary', id='salary', autofocus, required)
+                            input.salary.profile(type='number', maxlength='4', step="0.01", name='salary', id='salary', autofocus, required)
                         p
                             input.submit-salary(type='submit', value='PREDICT')
         .col-lg-3.col-sm-12.profile
@@ -58,23 +59,24 @@ block content
                             input(type='hidden', name='ldap', value=userp.ldap)
                             .relationship-picker
                                 select.selectpicker(data-live-search='true', multiple, name='relationship')
+                                    
                                     optgroup(label="Time", data-max-options="1") 
-                                        option Current
                                         option Ex
+                                    optgroup(label="Surperlative", data-max-options="1") 
+                                        option Best
                                     optgroup(label="Locus", data-max-options="1") 
                                         option Roommate
                                         option Wingmate
                                         option Inmate
                                     optgroup(label="Psyche", data-max-options="1") 
-                                        option Friend
-                                        option Love
-                                        option Crush
-                                        option Best Friend                                    
+                                        option Friend                                    
                                         option Girlfriend
                                         option Boyfriend
+                                        option Crush
                                     optgroup(label="Intellect", data-max-options="1") 
+                                        option Classmate
+                                        option Batchmate
                                         option Teammate
-                                        option Opposition
                                         
                                     
                         p &nbsp;

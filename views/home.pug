@@ -27,7 +27,7 @@ block content
       height = +svg.attr("height");
       var color = d3.scaleOrdinal(d3.schemeCategory20);
       var simulation = d3.forceSimulation()
-      .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(300).strength(0.3))
+      .force("link", d3.forceLink().id(function(d) { console.log(d); return d.id; }).distance(function(d) {console.log(d);console.log(typeof d.sal+" "+d.sal);return 300;}).strength(0.3))
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2));
       //.force("linkDistance", 200);
@@ -99,8 +99,8 @@ block content
       
       function dragstarted(d) {
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
+          d.fx = d.x;
+          d.fy = d.y;
       }
 
       function dragged(d) {

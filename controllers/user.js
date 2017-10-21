@@ -6,7 +6,6 @@ const standard = require('../config/standard');
 const fs = require('fs');
 const im = require('imagickal');
 
-
 const Request = require('../models/Request');
 const KPoint = require('../models/KPoint');
 const Relation = require('../models/Relation');
@@ -17,6 +16,7 @@ const Mean = require('../models/Mean');
 const Matrix = require('../models/Matrix');
 const SalaryStat = require('../models/SalaryStat');
 const Notification = require('../models/Notification');
+const Subscription = require('../models/Subscription');
 
 const service = require('../services/service');
 const _ = require('lodash');
@@ -39,6 +39,11 @@ const logger = new (winston.Logger)({
   ]
 });
 
+/**
+ * GET /
+ * home page.
+ */
+
 exports.home = async (req, res, next) =>{
     
     let graph = await service.getGraph();
@@ -53,6 +58,49 @@ exports.home = async (req, res, next) =>{
     res.render('home', { 
       title : 'Home',
       graph: graph
+    });
+};
+
+
+/**
+ * get /circle
+ * circle
+ */
+
+exports.getCircle = async (req, res, next) =>{
+
+    if (!req.user) {
+      logger.info(req.ip + " opened /circle without login");
+      return res.redirect('/login');
+    }
+
+    let graph = await service.getGraphFor(req.user.ldap);
+    let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+    return res.render('circle', {
+      title: 'Circle',
+      navbarItems : navbarItems,
+      graph: graph
+    });
+};
+
+
+/**
+ * POST /circle
+ * circle
+ */
+
+exports.postCircle = async (req, res, next) =>{
+   if (!req.user) {
+      logger.info(req.ip + " opened /circle without login");
+      return res.redirect('/login');
+    }
+    let circle = await service.getFirstCircleGraph(req.body.ldap);
+
+    let navbarItems = await service.getNavItems(req.user.ldap, standard.requests).catch(err => { next(err); });
+    return res.render('circle', {
+      title: 'Circle',
+      navbarItems : navbarItems,
+      circle: circle
     });
 };
 
@@ -314,7 +362,7 @@ exports.getProfile = async (req, res, next) => {
   // here if the req.user.ldap is same as the 
   
   if (!req.user) {
-    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
+    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +" without login");
     return res.redirect('/login');
   }
 
@@ -375,14 +423,18 @@ exports.postProfile = async (req, res, next) => {
   }
 
   if (!req.user) {
-    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +"without login");
+    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +" without login");
     return res.redirect('/login');
   }
   
+  console.log(req.body);
   if(req.body.repredict){
     let updatePrediction = await Prediction.updatePrediction(req.body.mid, req.user.mid, req.body.salary).catch(err=>{ next(err); });
     let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });    
+    console.log('Inside repredict');
+
     let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" re-predicted for you", salary);
+
     req.flash('success', { msg: 'Predicted!' });
     return res.redirect(req.session.returnTo||'/');
   
@@ -392,8 +444,10 @@ exports.postProfile = async (req, res, next) => {
     let salary = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary)).catch(err => { next(err); });
     // returns the new salary that can be then shown 
     let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" predicted for you", salary);
+    console.log('not Inside repredict');    
     req.flash('success', { msg: 'Predicted!' });
-    return res.redirect(req.session.returnTo||'/');
+    if(req.body.popup) return res.send("predicted");
+    return res.redirect('/profile/'+req.params.ldap);
   }
 };
 
@@ -467,7 +521,6 @@ exports.postRequest = async (req, res, next) => {
     for(rel of req.body.relationship){
       relationship = relationship + " "+rel;
     }
-
     await Notification.createNotification(req.body.ldap, req.user.ldap, req.user.first_name+" related to you as"+relationship);
     return res.send(relationship);
   }
@@ -475,41 +528,6 @@ exports.postRequest = async (req, res, next) => {
     await Relation.setRelationship(req.body.ldap, req.user.ldap, null);    
     return res.send(null);
   }
-  
-  /*
-  switch(req.body.action){
-    case 'send':
-      let requ = await Request.getRequest(req.user.ldap, req.body.ldap);
-      if(requ){
-        await Relation.makeFriends(req.user.ldap, req.body.ldap);
-        await Relation.makeFriends(req.body.ldap, req.user.ldap);
-        await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.first_name);
-        await Notification.createNotification(req.user.ldap, req.body.ldap, "You are now friends with "+req.body.ldap);// Make name here
-        await Request.deleteRequest(req.user.ldap, req.body.ldap).catch(err=>{ next(err); });        
-        return res.send("Also request from other side");
-      }
-      return res.send(await Request.createRequest(req.body.ldap, req.user.ldap, req.user.profile.username).catch(err=>{ next(err); }));
-    case 'delete':
-      await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); });
-      return res.send("deleted");    
-    case 'see': return res.send(await Request.seeRequests(req.user.ldap).catch(err=>{ next(err); }));        
-    case 'click': return res.send(await Request.clickRequest(req.body.id).catch(err=>{ next(err); }));        
-    case 'accept':
-      await Relation.makeFriends(req.user.ldap, req.body.ldap);
-      await Relation.makeFriends(req.body.ldap, req.user.ldap);
-      await Notification.createNotification(req.body.ldap, req.user.ldap, "You are now friends with "+req.user.profile.username);
-      await Notification.createNotification(req.user.ldap, req.body.ldap, "You are now friends with "+req.body.ldap);// Make name here
-      await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); });
-      return res.send("accepted");
-    case 'reject': 
-      await Request.deleteRequest(req.body.ldap, req.user.ldap).catch(err=>{ next(err); });
-      return res.send("rejected");
-    case 'unfriend':
-      await Relation.unfriend(req.user.ldap, req.body.ldap);
-      await Relation.unfriend(req.body.ldap, req.user.ldap);
-      return res.send("unfriend");
-  }
-  */
 };
 
 
@@ -531,6 +549,21 @@ exports.postNotification = async (req, res, next) => {
     case 'see': return res.send(await Notification.seeNotifications(req.user.ldap).catch(err=>{ next(err); }));        
     case 'click': return res.send(await Notification.clickNotification(req.body.id).catch(err=>{ next(err); }));
   }
+};
+
+/**
+ * POST /subscription
+ * register subscription for push notifications
+ */
+
+exports.postSubscription = async (req, res, next) => {
+  if (!req.user) {
+    return res.send("No user to subscribe");
+  }
+  let subscription = JSON.parse(req.body.subscription);
+  console.log("Logging system endpoint", subscription.endpoint);
+  if(subscription.endpoint)
+  return res.send(await Subscription.updateSubscription(req.user.ldap, subscription));
 };
 
 /**
@@ -560,7 +593,7 @@ exports.gotCallback = async (req, res, next) => {
         form: {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://10.8.100.130:3000/auth/iitbsso/callback'
+            'redirect_uri': 'http://localhost:3000/auth/iitbsso/callback'
         }
     }, function(err, resf) {
 

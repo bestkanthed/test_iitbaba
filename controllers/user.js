@@ -624,7 +624,7 @@ exports.gotCallback = async (req, res, next) => {
         form: {
             'code': code,
             'grant_type': 'authorization_code',
-            'redirect_uri': 'http://localhost:3000/auth/iitbsso/callback'
+            'redirect_uri': 'https://iitbaba.com/auth/iitbsso/callback'
         }
     }, function(err, resf) {
 

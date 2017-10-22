@@ -619,6 +619,7 @@ exports.gotCallback = async (req, res, next) => {
   request({
         url: 'https://gymkhana.iitb.ac.in/sso/oauth/token/',
         method: 'POST',
+        rejectUnauthorized: false,
         headers : {
             "Authorization" : "Basic "+ new Buffer(process.env.IITB_SSO_CLIENT_ID+":"+process.env.IITB_SSO_CLIENT_SECRET).toString('base64')
         },
@@ -642,6 +643,7 @@ exports.gotCallback = async (req, res, next) => {
         request({
               url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number',
               method: 'GET',
+              rejectUnauthorized: false,
               headers : {
                   "Authorization" : "Bearer "+ tokens.access_token
               }

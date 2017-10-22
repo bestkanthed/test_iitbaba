@@ -1,0 +1,3 @@
+Predict how much your will friends earn.
+They predict how much will you earn.
+Based on PageRank Algorithm your estimate income is calculated.

@@ -200,8 +200,9 @@ relationSchema.statics.setRelationship = function setRelationship(ldap1, ldap2, 
 relationSchema.statics.getRelationship = function getRelationship(ldap1, ldap2) {
   return new Promise ((resolve, reject) => { 
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec((err, rel)=>{
-      if(err) reject(err);
-      resolve(rel.relationship);
+      if(err) return reject(err);
+      if(rel) return resolve(rel.relationship);
+      else resolve("no");
     });
   });
 };

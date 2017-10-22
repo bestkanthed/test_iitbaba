@@ -535,3 +535,7 @@ span.notifiaction-salary{
   text-align: center;
   font-family: arial;
 }
+.container.center{
+    padding-right: 10px;
+    text-align:center;
+}

@@ -262,8 +262,8 @@ exports.postPicture = async (req, res, next)=>{
           });
         }
       });
-    }).catch(err=>{
-      console.log(err);
+    }).catch(err1=>{
+      console.log("logging err",err1);
       return res.redirect('/picture');
     });
   });
@@ -562,7 +562,6 @@ exports.postRequest = async (req, res, next) => {
   }
 };
 
-
 /**
  * POST /notification
  * action on notification
@@ -631,7 +630,6 @@ exports.gotCallback = async (req, res, next) => {
     }, function(err, resf) {
 
         if(err) console.log(err);
-        console.log(resf);
         var tokens = JSON.parse(resf.body);
         //console.log("Token:", tokens);
         //console.log(user);

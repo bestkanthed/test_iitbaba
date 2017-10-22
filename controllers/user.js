@@ -615,6 +615,7 @@ exports.logout = (req, res) => {
 exports.gotCallback = async (req, res, next) => {
   var code = req.query.code;
   const user = new User({ldap: "newRequest"});
+  require('ssl-root-cas').inject();
   request({
         url: 'https://gymkhana.iitb.ac.in/sso/oauth/token/',
         method: 'POST',

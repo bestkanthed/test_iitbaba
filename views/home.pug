@@ -17,9 +17,17 @@ block content
       stroke-width: 1.5px;
       stroke-opacity: 1;
       }
-    svg(width='1200', height='570')
+    svg
     script(src='https://d3js.org/d3.v4.min.js')
     script.
+      
+      console.log("logging width of window", $(window).width());
+      console.log("logging height of window", $(window).height());
+      $("svg").attr({
+        "width": $(window).width()*0.9,
+        "height": $(window).height()*0.85
+      });
+      
       var graph = !{JSON.stringify(graph).replace(/<\//g, '<\\/')};
       console.log(graph);
       var svg = d3.select("svg"),

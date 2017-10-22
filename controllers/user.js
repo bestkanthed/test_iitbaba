@@ -5,6 +5,7 @@ const winston = require('winston');
 const standard = require('../config/standard');
 const fs = require('fs');
 const im = require('imagickal');
+const ssl = require('ssl-root-cas/latest').inject();
 
 const Request = require('../models/Request');
 const KPoint = require('../models/KPoint');
@@ -615,7 +616,6 @@ exports.logout = (req, res) => {
 exports.gotCallback = async (req, res, next) => {
   var code = req.query.code;
   const user = new User({ldap: "newRequest"});
-  require('ssl-root-cas').inject();
   request({
         url: 'https://gymkhana.iitb.ac.in/sso/oauth/token/',
         method: 'POST',

@@ -628,6 +628,8 @@ exports.gotCallback = async (req, res, next) => {
         }
     }, function(err, resf) {
 
+        if(err) console.log(err);
+        console.log(resf);
         var tokens = JSON.parse(resf.body);
         //console.log("Token:", tokens);
         //console.log(user);

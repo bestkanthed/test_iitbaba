@@ -1,35 +1,42 @@
 .black-theme{
     color:rgba(0,0,0,0.85) !important;
+    font-family :'Raleway', sans-serif;
 }
 .black-theme-bg{
-    background-color:rgba(0,0,0,0.825) !important;
-    border-color:rgba(0,0,0,0.825) !important;
+    box-shadow: 0 0 8px #888888;
+    background-color:rgba(0,0,0,0.85) !important;
+    font-family :'Raleway', sans-serif;
+    border: none;
 }
 .black-theme-bg:hover{
-    background-color:rgba(0,0,0,0.7) !important;
-    border-color:rgba(0,0,0,0.7) !important;
+    background-color:rgba(0,0,0,0.875) !important;
 }
 
 strong.baba-logo{
-    color: white;   
-    font-size:24px;
-    font-family: 'Snowburst One', cursive;
+    color:rgba(255,255,255,0.9);   
+    font-size:32px;
+    font-family: 'Loved by the King', cursive;
 }
 strong.baba-logo:hover{
-    color: black;   
+    color:rgba(255,255,255,1);   
 }
 .container.home{
     padding-top: 60px;
     text-align:center;
 }
 .navbar.navbar-default.navbar-fixed-top.black-translucent-background{
-    background-color: rgba(0, 0, 0, 0.825);
+    background-color: rgba(0, 0, 0, 0.85);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    border-color: rgba(0, 0, 0, 0.825);
+    border-color: rgba(0, 0, 0, 0.85);
+}
+ul.dropdown-menu.settings>li>a{
+    font-family :'Raleway', sans-serif;
+    color:rgba(255,255,255,0.8) !important;    
 }
 ul.navbar-nav>li.about>a, ul.navbar-nav>li.register>a, ul.navbar-nav>li.login>a{
-    font-weight: 500;
-    color:rgba(255,255,255,0.8);
+    font-weight: 700;
+    color:rgba(255,255,255,0.9);
+    font-family :'Raleway', sans-serif;
 }
 ul.navbar-nav>li.about>a:hover, ul.navbar-nav>li.register>a:hover, ul.navbar-nav>li.login>a:hover{
     color:rgba(255,255,255,1);
@@ -44,7 +51,6 @@ a.electric-blue-text-color{
 }
 
 input[type=text].search-box {
-    width: 170px;
     box-sizing: border-box;
     border: 2px;
     border-color: rgba(0, 0, 0, 0.87);
@@ -59,8 +65,26 @@ input[type=text].search-box {
     transition: width 0.4s ease-in-out;
 }
 
-input[type=text].search-box:focus {
-    width: 100%;
+@media screen and (min-width: 480px) {
+    input[type=text].search-box:focus {
+        width: 100%;
+    }
+    input[type=text].search-box {
+    width: 180px;
+    }
+}
+@media screen and (max-width: 480px) {
+    input[type=text].search-box:focus {
+        width: 130px;
+    }
+    input[type=text].search-box {
+    width: 120px;
+    }
+}
+
+input[type=username],
+input[type=password]{
+    font-family :'Raleway', sans-serif;
 }
 .navbar-header{
     display: flex;
@@ -68,6 +92,10 @@ input[type=text].search-box:focus {
 .navbar-header-left{
     display: flex;
     margin-right:auto;
+}
+a.navbar-brand{
+    padding-right: 20px;
+    padding-top: 17px;  
 }
 .navbar-header-right{
     display: flex;
@@ -78,7 +106,8 @@ input[type=text].search-box:focus {
     border-bottom: 0px;
     padding-top: 0px;
     padding-bottom: 0px;
-    padding-right: 4px;  
+    padding-right: 0px;
+    padding-left:0px;    
 }
 .number-label{
     background: #5ebd5e;
@@ -96,13 +125,13 @@ input[type=text].search-box:focus {
     vertical-align: baseline;
     border-radius: .25em;
 }
-
 .nav-icon{
     font-size: 16px;
     display: none;
 }
 .nav-icon-text{
     font-size: 16px;
+    font-family :'Raleway', sans-serif;
 }
 
 @media (min-width: 768px) {
@@ -412,7 +441,7 @@ login details
 }
 
 .container.login{
-    padding-top: 100px;
+    padding-top: 120px;
     margin:auto; 
 }
 
@@ -535,7 +564,41 @@ span.notifiaction-salary{
   text-align: center;
   font-family: arial;
 }
-.container.center{
-    padding-right: 10px;
-    text-align:center;
+.col-login{
+    float: none;
+    margin: 0 auto;
+    /*
+    border: 2px;
+    border-style: solid;
+    */
+    border-radius: 4px;
+    
+    box-shadow: 0 0 8px #888888;
+}
+.col-login> *{
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-right: 24px;
+    padding-left: 24px;
+}
+.login-username{
+    padding-top: 48px;    
+}
+.button-login{
+    padding-bottom: 48px;        
+}
+*::-webkit-input-placeholder {
+    font-family :'Raleway', sans-serif;
+}
+*:-moz-placeholder {
+    /* FF 4-18 */
+    font-family :'Raleway', sans-serif;
+}
+*::-moz-placeholder {
+    /* FF 19+ */
+    font-family :'Raleway', sans-serif;
+}
+*:-ms-input-placeholder {
+    /* IE 10+ */
+    font-family :'Raleway', sans-serif;
 }

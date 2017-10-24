@@ -30,8 +30,12 @@ strong.baba-logo:hover{
     border-color: rgba(0, 0, 0, 0.85);
 }
 ul.dropdown-menu.settings>li>a{
-    font-family :'Raleway', sans-serif;
-    color:rgba(255,255,255,0.8) !important;    
+    font-family :'Raleway', sans-serif;    
+}
+@media screen and (max-width: 480px) {
+    ul.dropdown-menu.settings>li>a{
+        color:rgba(255,255,255,0.8) !important;    
+    }   
 }
 ul.navbar-nav>li.about>a, ul.navbar-nav>li.register>a, ul.navbar-nav>li.login>a{
     font-weight: 700;
@@ -75,7 +79,7 @@ input[type=text].search-box {
 }
 @media screen and (max-width: 480px) {
     input[type=text].search-box:focus {
-        width: 130px;
+        width: 140px;
     }
     input[type=text].search-box {
     width: 120px;
@@ -94,7 +98,7 @@ input[type=password]{
     margin-right:auto;
 }
 a.navbar-brand{
-    padding-right: 20px;
+    padding-right: 36px;
     padding-top: 17px;  
 }
 .navbar-header-right{
@@ -344,11 +348,10 @@ button.profile:hover, a.profile:hover {
   opacity: 0.7;
 }
 .container.profile{
-    padding-top: 60px;
+    padding-top: 80px;
 }
 img.profile{
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    height: 400px;
     width:100%;
 }
 
@@ -523,9 +526,16 @@ input[type="color"]:focus,
   outline: 0 none;
 }
 
-.container.picture{
+.container.picture{ 
     padding-top: 70px;
 }
+@media screen and (max-width: 480px) {
+    .container.picture{ 
+        padding-left: 0px; 
+        padding-top: 70px;
+    }
+}
+
 .container.avg{
     padding-top: 70px;
 }
@@ -564,7 +574,7 @@ span.notifiaction-salary{
   text-align: center;
   font-family: arial;
 }
-.col-login{
+.col-login, .col-set{
     float: none;
     margin: 0 auto;
     /*
@@ -575,11 +585,26 @@ span.notifiaction-salary{
     
     box-shadow: 0 0 8px #888888;
 }
-.col-login> *{
+.col-login> *, .col-set> *{
     padding-top: 16px;
     padding-bottom: 16px;
     padding-right: 24px;
     padding-left: 24px;
+}
+.set-button-row{
+    text-align: center;
+}
+.set-button{
+    margin: 0 auto;
+    display: inline-block;
+}
+.set-first-name{
+    padding-top: 16px;
+    padding-left: 0px;
+}
+.set-last-name{
+    padding-top: 16px;
+    padding-right: 0px;
 }
 .login-username{
     padding-top: 48px;    
@@ -601,4 +626,88 @@ span.notifiaction-salary{
 *:-ms-input-placeholder {
     /* IE 10+ */
     font-family :'Raleway', sans-serif;
+}
+.col-hiw{
+    font-family :'Raleway', sans-serif;
+    float: none;
+    margin: 0 auto;
+    border-radius: 4px;
+    box-shadow: 0 0 8px #888888;
+}
+h1.hiw-title{
+    padding: 20px; 
+    font-size: 54px;
+    font-weight: 900;
+}
+.col-hiw>*{
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.predict-yourself-row{
+    text-align: center;
+}
+.predict-yourself{
+    display: inline-block;
+    margin: 0 auto;
+    padding: 16px;
+}
+input[type=number].predict-yourself-input{
+    font-weight: 900;
+    font-size: 20px;
+    text-align: center;
+}
+.col-hiw>p{
+        font-size: 16px;
+    }
+@media screen and (min-width: 480px) {
+    h1.hiw-title{
+        font-size: 54px;
+    }    
+}
+@media screen and (max-width: 480px) {
+    h1.hiw-title{
+        font-size: 36px;
+    }
+}
+
+/*sadawd*/
+.col-info{
+    font-family :'Raleway', sans-serif;
+    border-radius: 4px;
+    box-shadow: 0 0 8px #888888;
+}
+h1.info-title{
+    padding: 20px; 
+    font-size: 36px;
+    font-weight: 900;
+}
+.col-info>*{
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.predict-yourself-row{
+    text-align: center;
+}
+.predict-yourself{
+    display: inline-block;
+    margin: 0 auto;
+    padding: 16px;
+}
+input[type=number].predict-yourself-input{
+    font-weight: 900;
+    font-size: 20px;
+    text-align: center;
+}
+.col-hiw>p{
+        font-size: 16px;
+    }
+@media screen and (min-width: 480px) {
+    h1.hiw-title{
+        font-size: 54px;
+    }    
+}
+@media screen and (max-width: 480px) {
+    h1.hiw-title{
+        font-size: 36px;
+    }
 }

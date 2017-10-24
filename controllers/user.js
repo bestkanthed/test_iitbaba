@@ -203,9 +203,9 @@ exports.postSet = (req, res, next) => {
       existingUser.password = req.body.password;
       existingUser.first_name = req.body.first.toUpperCase();;
       existingUser.last_name = req.body.last.toUpperCase();
-      existingUser.known = req.body.known.toUpperCase();
-      existingUser.skills = req.body.skills.toUpperCase();
-      existingUser.hobbies = req.body.hobbies.toUpperCase();
+      // existingUser.known = req.body.known.toUpperCase();
+      // existingUser.skills = req.body.skills.toUpperCase();
+      // existingUser.hobbies = req.body.hobbies.toUpperCase();
       existingUser.complete = 1;
       existingUser.save((err) => {
         if (err) { 

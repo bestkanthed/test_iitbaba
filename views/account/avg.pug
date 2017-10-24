@@ -2,18 +2,20 @@ extends ../layout
 
 block content
   .container.avg
-    .col-sm-8.col-sm-offset-2
-      form#prediction(method='POST')
-        //- Average income different from income of average choose your words wisely
-        legend What do you think is the annual income of an average IIT-B graduate
-            input(type='hidden', name='_csrf', value=_csrf)
-            .form-group
-              label(for='salary') Lakh INR/year
-              input.form-control(type='number', step='0.01', name='babaSalary', id='babaSalary', autofocus, required)
-            .form-group
-              button.btn.btn-primary.btn-reset.black-theme-bg(type='submit')
-                i.fa.fa-keyboard-o
-                |  Predict
+    .row.row-hiw
+      .col-lg-6.col-sm-12.col-hiw
+        h1.hiw-title How it works
+        p You estimate how much your friends will earn when they graduate.
+        p They estimate for you.
+        p Unit for prediction is Lakh INR/year everywhere.
+        p By PageRank algorithm everyone's worth is calculated. Know how.
+        p Start with estimating yourself when you graduate.
+        form#prediction(method='POST')
+          input(type='hidden', name='_csrf', value=_csrf)
+          input.form-control.predict-yourself-input(type='number', step='0.01', placeholder="Lakh INR/year",name='babaSalary', id='babaSalary', autofocus, required)
+          .row.predict-yourself-row
+            .predict-yourself
+              button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Predict
     script.
       $("#prediction").submit(function() {
           console.log("This");

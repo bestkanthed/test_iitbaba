@@ -5,24 +5,7 @@ block content
   script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js')
   .container.profile
     .row.profile
-        .col-lg-3.col-sm-12.profile
-            .card
-                h1.profile.name=userp.first_name+" "+userp.last_name
-                p.profile.known=userp.known
-                p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
-                p.profile.hostel=userp.profile.insti_address.hostel_name+" | Room "+userp.profile.insti_address.room
-                p.profile.hobbies=userp.hobbies
-                p.profile.skills=userp.skills
-                div(style='margin: 20px 0;')
-                    a.profile(href='#')
-                        i.fa.fa-dribbble
-                    a.profile(href='#')
-                        i.fa.fa-twitter
-                    a.profile(href='#')
-                        i.fa.fa-linkedin
-                    a.profile(href='#')
-                        i.fa.fa-facebook
-        .col-lg-5.col-sm-12.profile
+        .col-lg-4.col-sm-12.profile
             .card.profile
                 img.profile(src='/images/profile/'+userp.ldap+'.png')
                 if predicted
@@ -48,6 +31,21 @@ block content
                             input.salary.profile(type='number', maxlength='4', step="0.01", name='salary', id='salary', autofocus, required)
                         p
                             input.submit-salary(type='submit', value='PREDICT')
+        .col-lg-4.col-sm-12.profile.col-info
+            .card
+                h1.profile.name.info-title=userp.first_name+" "+userp.last_name
+                p.profile.known=userp.known
+                p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
+                p.profile.hostel=userp.profile.insti_address.hostel_name+" | Room "+userp.profile.insti_address.room
+                p.profile.hobbies=userp.hobbies
+                p.profile.skills=userp.skills
+                div(style='margin: 20px 0;')
+                    a.profile(href='#')
+                        i.fa.fa-twitter
+                    a.profile(href='#')
+                        i.fa.fa-linkedin
+                    a.profile(href='#')
+                        i.fa.fa-facebook
         .col-lg-3.col-sm-12.profile
             .card.relationship
                 .card.title 

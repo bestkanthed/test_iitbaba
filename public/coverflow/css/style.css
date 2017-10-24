@@ -132,13 +132,12 @@ li:nth-child(12) .imgdiv,
 	-webkit-transform: translate3d(140px, 0, 0);
 	transform: translate3d(140px, 0, 0);
 }
-*/
 
 #coverflow ul .straightLI {
 	-webkit-transform: translate3d(0, 0, 0);
 	transform: translate3d(0, 0, 0);
 }
-
+*/
 .notransition {
 	-webkit-transition: none !important;
 	transition: none !important;
@@ -208,7 +207,7 @@ li:nth-child(12) .imgdiv,
 	display: none;
 	width: 20px;
 	height: 20px;
-	background: ;
+	background: rgb(242, 242, 242);
 	float: left;
 	border-radius: 10px;
 }

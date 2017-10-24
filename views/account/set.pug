@@ -4,37 +4,18 @@ block content
   .container.set
     .col-sm-8.col-sm-offset-2
       form(method='POST')
-        legend Set Credentials
         input(type='hidden', name='_csrf', value=_csrf)
-        .form-group
-          label.col-sm-3.control-label(for='first') First Name
-          .col-sm-7
-            input.form-control(type='text', name='first', id='first', placeholder='Name', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='last') Last Name
-          .col-sm-7
-            input.form-control(type='text', name='last', id='last', placeholder='Sirname', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='known') Known For
-          .col-sm-7
-            input.form-control(type='text', name='known', id='known', placeholder='Ex: Convener, Dramatics Club', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='hobbies') Hobbies
-          .col-sm-7
-            input.form-control(type='text', name='hobbies', id='hobbies', placeholder='Ex: Thinking', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='skills') Skills
-          .col-sm-7
-            input.form-control(type='text', name='skills', id='skills', placeholder='Ex: Coding', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='password') Password
-          .col-sm-7
-            input.form-control(type='password', name='password', id='password', placeholder='New password', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='confirm') Confirm Password
-          .col-sm-7
-            input.form-control(type='password', name='confirm', id='confirm', placeholder='Confirm password', required)
-        .form-group
-          button.btn.btn-primary.btn-reset.black-theme-bg(type='submit')
-            i.fa.fa-keyboard-o
-            |  Set Password
+        .row
+          .col-xs-12.col-lg-6.col-set
+            .row
+              .col-xs-6.col-lg-6.set-first-name
+                input.form-control(type='text', name='first', id='first', placeholder='First name', autofocus, required)
+              .col-xs-6.col-lg-6.set-last-name
+                input.form-control(type='text', name='last', id='last', placeholder='Surname', autofocus, required)
+            .row
+              input.form-control(type='password', name='password', id='password', placeholder='New password', autofocus, required)
+            .row
+              input.form-control(type='password', name='confirm', id='confirm', placeholder='Confirm password', required)
+            .row.set-button-row
+              .set-button
+                button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Create an account

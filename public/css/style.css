@@ -711,3 +711,6 @@ input[type=number].predict-yourself-input{
         font-size: 36px;
     }
 }
+.row.profile{
+    padding: 32px;
+}

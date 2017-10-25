@@ -1,3 +1,26 @@
+extends ../layout
+
+block content
+  .container.edit
+    .col-sm-8.col-sm-offset-2
+      form(method='POST')
+        input(type='hidden', name='_csrf', value=_csrf)
+        .row
+          .col-xs-12.col-lg-6.col-set
+            .row
+              .col-xs-6.col-lg-6.set-first-name
+                label.col-sm-3.control-label(for='known') First Name
+                input.form-control(type='text', name='first', id='first', placeholder='First name', autofocus, required)
+              .col-xs-6.col-lg-6.set-last-name
+                input.form-control(type='text', name='last', id='last', placeholder='Surname', autofocus, required)
+            .row
+              input.form-control(type='password', name='password', id='password', placeholder='New password', autofocus, required)
+            .row
+              input.form-control(type='password', name='confirm', id='confirm', placeholder='Confirm password', required)
+            .row.set-button-row
+              .set-button
+                button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Create an account
+
 .form-group
           label.col-sm-3.control-label(for='known') Known For
           .col-sm-7

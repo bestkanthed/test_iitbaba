@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const relationMatrix = require('../matrix/relationMatrix');
+const User = require('./User');
+const _ = require('lodash');
 // put asyncs at the right places
 // like here in exec 
 // Take care on where to find one and where to find many
@@ -207,5 +209,44 @@ relationSchema.statics.getRelationship = function getRelationship(ldap1, ldap2) 
   });
 };
 
+relationSchema.statics.getGraphLinks = function getGraphLinks() {
+  return new Promise ((resolve, reject) => {
+    this.model('Relation').find({}, async (err, allRel)=>{
+      if(err) reject(err);
+      //console.log("Logging all predictions ", allPredictions);      
+      let links = [];
+      for(rel of allRel){
+        console.log("Logging relation", rel);
+        let link = {};
+        if(rel.predicted) link.predicted = true;
+        if(rel.relationship){
+          if (rel.relationship.length){
+            console.log("Logging reltionship", rel.relationship);
+            let relationship='';
+            for(relL of rel.relationship){
+              relationship = relationship + " "+relL;
+            }
+            link.relationship = relationship;
+          }
+        }
+        if(!_.isEmpty(link)){
+          console.log("Logging link", link);
+          console.log("Logging ldap1",rel.ldap1);
+          console.log("Logging ldap2",rel.ldap2);
+          let source = await User.getUserMIDByLdap(rel.ldap2);
+          let target = await User.getUserMIDByLdap(rel.ldap1);
+          if (source) link.source = source.toString();
+          else link.source = "1";
+          if (target) link.target = target.toString();
+          else link.target = "1";
+          link.value = 15;
+          links.push(link);
+        }
+      }
+      console.log("Logging links ", links);
+      return resolve(links);
+    });
+  });
+};
 const Relation = mongoose.model('Relation', relationSchema);
 module.exports = Relation;

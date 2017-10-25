@@ -230,6 +230,16 @@ userSchema.statics.getUserLdapByMID = function getUserLdapByMID(mid) {
   });
 };
 
+userSchema.statics.getUserMIDByLdap = function getUserMIDByLdap(ldap) {
+  return new Promise ((resolve, reject) => { 
+    this.model('User').findOne({ldap: ldap},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
+      if(err) reject(err);
+      if(ldap) resolve(ldap.mid);
+      else resolve(null);
+    });
+  });
+};
+
 userSchema.statics.getUserNameByMID = function getUserNameByMID(mid) {
   return new Promise ((resolve, reject) => { 
     this.model('User').findOne({mid: mid},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{

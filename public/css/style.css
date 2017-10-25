@@ -165,12 +165,25 @@ a.navbar-brand{
     margin-right: 4px;
     margin-bottom: 4px;
 }
-.dropdown-menu>a:hover, .more-notifications>a:hover, .more-requests>a:hover{
-    text-decoration: none;
-    color:rgba(0, 0, 0, 0.775);
+@media screen and (min-width: 480px) {
+    .dropdown-menu>a:hover, .more-notifications>a:hover, .more-requests>a:hover{
+        text-decoration: none; 
+        color:rgba(0, 0, 0, 0.775);
+    }
+    .dropdown-menu>a, .more-notifications>a, .more-requests>a{
+        font-family :'Raleway', sans-serif;
+        color: black;
+    }    
 }
-.dropdown-menu>a, .more-notifications>a, .more-requests>a{
-    color: black;
+@media screen and (max-width: 480px) {
+    .dropdown-menu>a:hover, .more-notifications>a:hover, .more-requests>a:hover{
+        text-decoration: none;
+        color:rgba(255, 255, 255, 0.775);
+    }
+    .dropdown-menu>a, .more-notifications>a, .more-requests>a{
+        color:white;
+        font-family :'Raleway', sans-serif;
+    }
 }
 .notification{
     display: flex;
@@ -359,6 +372,7 @@ input.salary.profile{
     width: 100%;
     height: 36px;
     font-size: 24px;
+    font-family :'Raleway', sans-serif; 
     text-align: center;
 }
 input.submit-salary{
@@ -366,6 +380,7 @@ input.submit-salary{
   outline: 0;
   display: inline-block;
   padding: 8px;
+  font-family :'Raleway', sans-serif;
   color: white;
   background-color: rgba(0, 0, 0, 0.95);
   text-align: center;
@@ -557,17 +572,30 @@ span.notifiaction-salary{
     font-size: 16px;
     font-weight: 700;
 }
+@media screen and (min-width: 480px) {
+    #predictCover{
+        width : 85%;    
+    }
+    
+    .card.popup {
+        width: 40%;
+    }    
+}
+@media screen and (max-width: 480px) {
+    #predictCover{
+        width : 85%;    
+    }
+}
 #predictCover{
 	display: none;
-	position: fixed;
-    width : 800px;
-    opacity : 0.5;
-    background : black;
-    height : 350px;
+	margin-top: 60px;
+    position: fixed;
+    background : rgba(0, 0, 0, 0.7);
     z-index : 10;
+    border-radius: 8px;
+    overflow: hidden; 
 }
-.card.popup {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);   
+.card.popup {   
   margin: auto;
   padding:20px;
   opacity : 1;

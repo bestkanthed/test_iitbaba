@@ -47,18 +47,21 @@ exports.getGraph = ()=>{
 
 exports.getGraphFor = (ldap)=>{
   return new Promise(async (resolve, reject) => {
-    let links = await Prediction.getGraphLinks();
+    let links = await Relation.getGraphLinks();
     let nodes = [];
     let noOfUsers = await Matrix.getLength();
 
     for(let i=1;i<noOfUsers;i++){
       let ldap1 = await User.getUserLdapByMID(i);
+      let predicted;
+      if(ldap1==ldap) predicted = true;
+      else predicted = await Relation.getPredicted(ldap1, ldap);
       nodes.push({
         id: i.toString(),
         sal:await Salary.getSalary(i), 
         ldap: ldap1,
         name: await User.getUserNameByMID(i),
-        predicted: await Relation.getPredicted(ldap1, ldap)
+        predicted: predicted
       });    
     }
 

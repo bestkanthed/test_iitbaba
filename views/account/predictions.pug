@@ -3,28 +3,31 @@ extends ../layout
 block content
     .container.result
       .row
-        .col-lg-6
+        .col-lg-5.predictions
           .table-responsive
               table.table-hover.outgoing
-                  caption You Predictied
+                  caption.outgoing-caption 
+                    strong Predictied by you
                   thead
                     tr
                       th Name
-                      th(align='right') Predictied
+                      th(style="text-align:right") Predictied
                   tbody
                     - for (var r = 0; r < op.length; r++)
                       tr
                         td=op[r].name
                         td(align='right')='₹ '+op[r].prediction+' Lakh/yr'
               
-        .col-lg-6
+        .col-lg-1
+        .col-lg-5.predictions
           .table-responsive
             table.table-hover.incoming
-              caption Predictied for You
+              caption.incoming-caption 
+                strong Predictied for you
               thead
                 tr
                   th Name
-                  th(align='right') Prediction
+                  th(style="text-align:right") Prediction
               tbody
                 - for (var r = 0; r < ip.length; r++)
                   tr

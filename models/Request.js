@@ -4,6 +4,7 @@ const requestSchema = new mongoose.Schema({
   ldap: String, // The one 
   from: String,
   name: String,
+  request: String,
   seen: Boolean,
   clicked: Boolean,
   accepted: Boolean,
@@ -13,7 +14,7 @@ const requestSchema = new mongoose.Schema({
 requestSchema.statics.createRequest = function createRequest(ldap, from, name) {
   return new Promise ((resolve, reject) => {
     this.model('Request').create({ 
-      ldap: ldap, 
+      ldap: ldap,
       from: from,
       name: name,
       seen: false,

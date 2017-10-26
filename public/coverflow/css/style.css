@@ -93,8 +93,8 @@
 	width: 375px;
 	margin-left: -62px;
 	color: rgb(255, 255, 255);
-	font-family: "Lucida Sans Unicode", Helvetica, Arial, sans-serif;
-	font-size: 18px;
+	font-family: 'Raleway', sans-serif;
+	font-size: 14px;
 }
 
 #coverflow .text p {
@@ -193,7 +193,6 @@ li:nth-child(12) .imgdiv,
 	height: 20px;
 	cursor: pointer;
 	position: absolute;
-	z-index: 10000;
 	margin-left: auto;
 	margin-right: auto;
 	left: 0;

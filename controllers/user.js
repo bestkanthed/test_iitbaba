@@ -465,7 +465,7 @@ exports.postProfile = async (req, res, next) => {
     let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" re-predicted for you", salary);
 
     req.flash('success', { msg: 'Predicted!' });
-    return res.redirect(req.session.returnTo||'/');
+    return res.redirect('/profile/'+req.params.ldap);
   
   }else{
     let updateRelation = await Relation.predicted(req.params.ldap, req.user.ldap);
@@ -553,7 +553,7 @@ exports.postRequest = async (req, res, next) => {
     for(rel of req.body.relationship){
       relationship = relationship + " "+rel;
     }
-    await Notification.createNotification(req.body.ldap, req.user.ldap, req.user.first_name+" related to you as"+relationship);
+    await Request.createRequest(req.body.ldap, req.user.ldap, req.user.first_name+" related to you as"+relationship);
     return res.send(relationship);
   }
   else {

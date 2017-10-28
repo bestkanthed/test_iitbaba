@@ -219,7 +219,7 @@ block content
           previousCenter.ldap = n.ldap;
           previousCenter.radius = n.sal*2;
         }
-        else return window.location = "http://localhost:5000/profile/"+n.ldap;
+        else return window.location = "https://iitbaba.com/profile/"+n.ldap;
         node.select("title")
         .text(function(d) { 
           let connection = $.grep(graph.links, function(e){ console.log("logging e",e);return e.source.id == n.id && e.target.id == d.id;});

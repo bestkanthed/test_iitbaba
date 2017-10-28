@@ -6,7 +6,7 @@
           strong.baba-logo
             | IIT-baba
         if user
-          form.navbar-form.search(role='search', method='get', action='/search')
+          form.navbar-form.search(role='search', method='get', action='/search', title="Search anything: h8, meta, girls, amay")
             input.search-box#srch-term.form-control(placeholder='Search', name='box', type='text')
       .navbar-header-right
         button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
@@ -49,7 +49,7 @@
                       .notification-time=navbarItems.notifications.notifications[n].time
                 .dropdown-divider
               .more-notifications
-                a.dropdown-item(href='#') MORE NOTIFICATIONS
+                a.dropdown-item#allow-push(href='#')
 
           //
             li.requests#request-toggle
@@ -83,12 +83,12 @@
                 a(href='/profile/'+user.ldap) Account
               li.divider
               li
-                a(href='/set') Edit Info
+                a(href='/edit') Edit Info
               li.divider
-              //
-                li
-                  a(href='/predict') Predict
-                li.divider
+              li
+                a(href='/circle') Circle
+              li.divider
+              //  
                 li
                   a(href='/search?page=0') Search Advanced
                 li.divider

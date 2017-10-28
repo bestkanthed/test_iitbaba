@@ -57,6 +57,7 @@ a.electric-blue-text-color{
 input[type=text].search-box {
     box-sizing: border-box;
     border: 2px;
+    font-family: 'Raleway', sans-serif;
     border-color: rgba(0, 0, 0, 0.87);
     border-radius: 2px;
     font-size: 8x;
@@ -98,8 +99,9 @@ input[type=password]{
     margin-right:auto;
 }
 a.navbar-brand{
-    padding-right: 36px;
-    padding-top: 17px;  
+    padding-right: 32px;
+    padding-top: 18px;
+    padding-left: 18px;   
 }
 .navbar-header-right{
     display: flex;
@@ -312,49 +314,47 @@ a.dropdown-toggle.electric-blue-text-color.settings-dropdown{
   margin: auto;
   text-align: center;
   font-family: arial;
+  border-radius: 8px; 
+}
+.card.profile-info{
+    padding-bottom: 8px; 
 }
 
-p.profile.name{
-  color:black;  
+.profile.name{
+  padding-top: 16px; 
+  font-size: 30px; 
+  color:rgba(0, 0, 0, 0.95);  
 }
 
 .known.profile {
-  color: black;
+  color:rgba(0, 0, 0, 0.9);
   font-size: 20px;
 }
 
-.department.profile {
-  color: grey;
+.department.profile, .hostel.profile, .skills.profile, .hobbies.profile, .from.profile, .contact.profile{
+  color:rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  text-transform: capitalize;
+}
+.email.profile{
+  color:rgba(0, 0, 0, 0.8);
   font-size: 18px;
 }
-
-.hostel.profile {
-  color: grey;
+.looking.profile {
+  font-weight: 600;
+  color:rgba(0, 0, 0, 0.8);
   font-size: 18px;
-}
-
-.skills.profile {
-  color: grey;
-  font-size: 18px;
-}
-
-.hobbies.profile {
-  color: grey;
-  font-size: 18px;
-}
-
-.degree.profile {
-  color: grey;
-  font-size: 18px;
+  text-transform: capitalize;
 }
 
 button.profile {
   border: none;
+  border-radius: 0 0 8px 8px; 
   outline: 0;
   display: inline-block;
   padding: 8px;
   color: white;
-  background-color: rgba(0, 0, 0, 0.975);
+  background-color: rgba(0, 0, 0, 0.9);
   opacity: 0.925;
   text-align: center;
   cursor: pointer;
@@ -366,27 +366,34 @@ button.profile {
 a.profile {
   text-decoration: none;
   font-size: 22px;
-  padding: 2px;
-  color: black;
+  padding: 4px;
+  color:rgba(0,0,0,0.85);
+  font-family :'Raleway', sans-serif;
+
 }
 
 button.profile:hover, a.profile:hover {
-  opacity: 0.7;
+  background-color:rgba(0,0,0,0.95);
 }
 .container.profile{
     padding-top: 80px;
 }
 img.profile{
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius:8px 8px 0 0; 
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
     width:100%;
 }
-
 input.salary.profile{
     width: 100%;
     height: 36px;
     font-size: 24px;
     font-family :'Raleway', sans-serif; 
     text-align: center;
+    border-radius:8px 8px 0 0;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+input.salary.profile:focus{
+    border-color: rgba(0, 0, 0, 0.8);
 }
 input.submit-salary{
   border: none;
@@ -400,6 +407,7 @@ input.submit-salary{
   cursor: pointer;
   width: 100%;
   font-size: 18px;
+  border-radius: 0 0 8px 8px;
 }
 input.submit-salary:hover{
   opacity: 0.7;
@@ -445,12 +453,21 @@ Card for relationship
 */
 
 .card.relationship{
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  font-family :'Raleway', sans-serif;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #888888;
   margin: auto;
   text-align: center;
-  font-family: arial;
 }
-
+p.relationship-tag{
+    color:rgba(0, 0, 0, 0.85); 
+    font-size: 20px; 
+}
+p.relationship#rel-display{
+    color:rgba(0, 0, 0, 0.9); 
+    font-size: 24px;
+    font-weight: 900;
+}
 .relationship-picker{
     padding: 24px;
     text-align: left;
@@ -575,7 +592,9 @@ input[type="color"]:focus,
 }
 p.salary-shown{
     font-size: 24px;
-    font-weight: 800;
+    color:rgba(0, 0, 0, 0.85);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 900;
 }
 p.salary-shown>span.unit{
     font-size: 18px;
@@ -714,9 +733,10 @@ input[type=number].predict-yourself-input{
 /*sadawd*/
 .col-info{
     font-family :'Raleway', sans-serif;
-    border-radius: 4px;
+    border-radius: 8px;
     box-shadow: 0 0 8px #888888;
 }
+
 h1.info-title{
     padding: 20px; 
     font-size: 36px;
@@ -752,9 +772,29 @@ input[type=number].predict-yourself-input{
         font-size: 36px;
     }
 }
-.row.profile{
-    padding: 32px;
+@media screen and (min-width: 480px) {
+    .row.profile{
+        padding: 32px;
+    }    
 }
+@media screen and (max-width: 480px) {
+    .row.profile{
+        padding: 2px;
+    }
+}
+@media screen and (max-width: 480px) {
+    .profile-img, .profile-relationship{
+        padding-right: 0px;
+        padding-left: 0px;  
+    }
+    .profile-img{
+        padding-bottom: 6px;
+    }
+    .profile-relationship{
+        padding-top: 16px;
+    }
+}
+
 ::-webkit-scrollbar
 {
   width: 12px;  /* for vertical scrollbars */
@@ -798,4 +838,81 @@ td,th{
 caption.outgoing-caption, caption.incoming-caption{
     font-size: 30px;
     padding-left: 2px; 
+}
+.container.edit{
+    padding-top: 60px;
+    color: black;
+}
+.col-edit> *{
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-right: 24px;
+    padding-left: 24px;
+}
+.col-edit{
+    /*
+    border: 2px;
+    border-style: solid;
+    */
+    padding-bottom: 16px; 
+    margin: 8px;
+    border-radius: 4px;
+    font-family: 'Raleway', sans-serif;
+    box-shadow: 0 0 8px #888888;
+}
+label{
+    margin-top: 7px; 
+}
+.save-button{
+    margin: 16px;
+    padding: 16px;
+    width: 128px;
+    font-size: 16px;
+}
+/* For Firefox */
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+/* Webkit browsers like Safari and Chrome */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+button.btn.dropdown-toggle{
+    border: none;
+    padding-right: 12px; 
+}
+button.btn.dropdown-toggle:focus {
+    border: none;
+    outline: 0 !important;
+}
+.bs-caret{
+    display: none; 
+}
+.btn-group.bootstrap-select.show-tick{
+    width: 100% !important;
+}
+.filter-option.pull-left{
+    text-align: center !important;
+}
+.container.center{
+    padding-left:0px; 
+}
+.container.about{
+    padding-top: 70px;
+    color: rgba(0, 0, 0, 0.9);
+    font-family: 'Raleway', sans-serif;
+}
+.about-col{
+    padding: 16px;
+    padding-left: 20px; 
+    margin: 8px;
+    border-radius: 4px;
+    box-shadow: 0 0 8px #888888;   
+}
+#name{
+    color: white;
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px; 
 }

@@ -111,6 +111,11 @@ app.get('/predictions', userController.getPredictions);
 app.get('/profile/:ldap', userController.getProfile);
 app.post('/profile/:ldap', userController.postProfile);
 
+app.get('/edit', userController.getEdit);
+app.post('/edit', userController.postEdit);
+
+app.get('/about', userController.getAbout);
+
 app.get('/search', userController.getSearch);
 
 app.get('/circle', userController.getCircle);

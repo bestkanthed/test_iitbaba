@@ -21,6 +21,7 @@ block content
       .card.popup
           img.profile#profileImage
           form#prediction(method='POST')
+              p#name
               input(type='hidden', name='_csrf', value=_csrf)
               input(type='hidden', name='mid', id='mid')
               input(type='hidden', name='repredict', value=false)
@@ -36,14 +37,16 @@ block content
       console.log("logging height of window", $(window).height());
       $("svg").attr({
         "width": $(window).width()*0.9,
-        "height": $(window).height()*0.85
+        "height": $(window).height()*0.975
       });
+      let sal = 0;
       let previousCenter = {
         mid: 0,
         ldap: "iitbaba",
         radius:0
       }
       var graph = !{JSON.stringify(graph).replace(/<\//g, '<\\/')};
+      var userLdap = !{JSON.stringify(user.ldap).replace(/<\//g, '<\\/')};
       $(document).keyup(function(e) {
           if (e.keyCode == 27) $("#predictCover").css({"display":"none"});
       });
@@ -51,6 +54,14 @@ block content
         e.preventDefault();
         let form = $('#prediction');
         let ldap = $('#prediction').attr("ldap");
+        if($("#salary").val()>sal*3 || $("#salary").val()>50){
+              alert("Are you high? Try something else.");
+              return false;
+        }
+        if($("#salary").val()<sal/2 || $("#salary").val()<3.5){
+              alert("Do yo do cheap durgs? Try something else.");
+              return false;
+        }
         console.log(ldap);
         $.ajax({
           type: "POST",
@@ -151,6 +162,10 @@ block content
         simulation.force("link")
         .links(graph.links);
         
+        let user = $.grep(graph.nodes, function(e){return e.ldap == userLdap});
+        console.log("Logging user", user);
+        setTimeout(function(){recenter(user[0]);}, 3000);
+
         function ticked() {
           link
           .attr("x1", function(d) { return d.source.x; })
@@ -163,7 +178,7 @@ block content
         }
       //});
       
-      function dragstarted(d) {
+      function dragstarted(d) {        
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
           d.fx = d.x;
           d.fy = d.y;
@@ -183,7 +198,9 @@ block content
         
         if(!n.predicted){
           console.log(n);
+          sal = n.sal;
           $("#profileImage").attr("src", '/images/profile/'+n.ldap+'.png');
+          $("#name").text(n.name);
           $("#mid").attr('value', n.id);
           $("#prediction").attr('ldap', n.ldap);
           $("#predictCover").css({"display":"inline"});
@@ -202,11 +219,15 @@ block content
           previousCenter.ldap = n.ldap;
           previousCenter.radius = n.sal*2;
         }
+        else return window.location = "http://localhost:5000/profile/"+n.ldap;
         node.select("title")
         .text(function(d) { 
           let connection = $.grep(graph.links, function(e){ console.log("logging e",e);return e.source.id == n.id && e.target.id == d.id;});
           if(connection.length){
-            if(connection[0].relationship) return d.name+"\n"+n.name+"'s"+connection[0].relationship; 
+            if(connection[0].relationship) {
+              if(userLdap==n.ldap) return d.name+"\n"+connection[0].relationship.slice(1);
+              return d.name+"\n"+n.name+"'s"+connection[0].relationship; 
+            }
           }
           return d.name;
         });

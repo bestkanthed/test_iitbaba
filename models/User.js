@@ -14,6 +14,20 @@ const userSchema = new mongoose.Schema({
   known: String,
   hobbies: String,
   skills: String,
+  hostel: Number,
+  room: String,
+  from: String,
+  dob: Date,
+  contact: String,
+  email: String,
+  looking: String,
+  
+  google: String,
+  facebook: String,
+  twitter: String,
+  linkedin: String,
+  instagram: String,
+  snapchat: String,
 
   complete: Number,
 

@@ -5,7 +5,7 @@ block content
   script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js')
   .container.profile
     .row.profile
-        .col-lg-3.col-sm-12.profile
+        .col-lg-4.col-sm-12.profile-img
             .card.profile
                 img.profile(src='/images/profile/'+userp.ldap+'.png')
                 if predicted
@@ -16,9 +16,7 @@ block content
                             input(type='hidden', name='_csrf', value=_csrf)
                             input(type='hidden', name='mid', value=userp.mid)
                             input(type='hidden', name='repredict', value="true")                        
-                            .input-icon
-                                i ₹
-                                input.salary.profile(type='number', maxlength='4', step="0.01", name='salary', id='salary', autofocus, required)
+                            input.salary.profile(type='number', maxlength='4', step="0.01", name='salary', id='salary', autofocus, required)
                             p
                                 input.submit-salary(type='submit', value='REPREDICT')
                 else
@@ -32,54 +30,87 @@ block content
                         p
                             input.submit-salary(type='submit', value='PREDICT')
         .col-lg-4.col-sm-12.profile.col-info
-            .card
-                h1.profile.name.info-title=userp.first_name+" "+userp.last_name
+            .card.profile-info
+                p.profile.name.info-title
+                    strong=userp.first_name+" "+userp.last_name
                 p.profile.known=userp.known
                 p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
-                p.profile.hostel=userp.profile.insti_address.hostel_name+" | Room "+userp.profile.insti_address.room
-                p.profile.hobbies=userp.hobbies
-                p.profile.skills=userp.skills
+                if userp.hostel && user.room
+                    p.profile.hostel="Hostel "+userp.hostel+" | Room "+userp.room
+                else
+                    if userp.hostel
+                        p.profile.hostel="Hostel "+userp.hostel
+                    else
+                        p.profile.hostel=userp.profile.insti_address.hostel_name+" | Room "+userp.profile.insti_address.room
+                
+                p.profile.hobbies=userp.hobbies?userp.hobbies.toLowerCase():undefined
+                p.profile.skills=userp.skills?userp.skills.toLowerCase():undefined
+                p.profile.from=userp.from?userp.from.toLowerCase():undefined
+                if userp.contact && userp.email
+                    p.profile.email=userp.contact.toLowerCase()+' | '+userp.email.toLowerCase()
+                else
+                    if userp.contact
+                        p.profile.email=userp.contact.toLowerCase()
+                    if userp.email
+                        p.profile.email=userp.contact.toLowerCase()                           
+                if userp.looking
+                    p.profile.looking="Looking for "+userp.looking.toLowerCase()
                 div(style='margin: 20px 0;')
-                    a.profile(href='#')
-                        i.fa.fa-twitter
-                    a.profile(href='#')
-                        i.fa.fa-linkedin
-                    a.profile(href='#')
-                        i.fa.fa-facebook
-        .col-lg-3.col-sm-12.profile
-            .card.relationship
+                    if userp.google
+                        a.profile(href='https://plus.google.com/'+userp.google)
+                            i.fa.fa-google-plus
+                    if userp.facebook
+                        a.profile(href='https://www.facebook.com/'+userp.facebook)
+                            i.fa.fa-facebook
+                    if userp.twitter
+                        a.profile(href='https://twitter.com/'+userp.twitter)
+                            i.fa.fa-twitter
+                    if userp.linkedin
+                        a.profile(href=userp.linkedin)
+                            i.fa.fa-linkedin
+                    if userp.instagram
+                        a.profile(href='https://www.instagram.com/'+userp.instagram+'/')
+                            i.fa.fa-instagram
+                    if userp.snapchat
+                        a.profile
+                            i.fa.fa-snapchat-ghost=userp.snapchat
+        .col-lg-3.col-sm-12.profile-relationship
+            .card.relationship.col-relationship
                 .card.title 
-                    h1 Relationship
+                    p.relationship-tag Relationship
                 .card.content
-                    p.relationship#rel-display=relationship
-                    div.collapse.relationship-update#relationship    
-                        form#rel(action='/request', method='post')
-                            input(type='hidden', name='ldap', value=userp.ldap)
-                            .relationship-picker
-                                select.selectpicker(data-live-search='true', multiple, name='relationship')
-                                    
-                                    optgroup(label="Time", data-max-options="1") 
-                                        option Ex
-                                    optgroup(label="Surperlative", data-max-options="1") 
-                                        option Best
-                                    optgroup(label="Locus", data-max-options="1") 
-                                        option Roommate
-                                        option Wingmate
-                                        option Inmate
-                                    optgroup(label="Psyche", data-max-options="1") 
-                                        option Friend                                    
-                                        option Girlfriend
-                                        option Boyfriend
-                                        option Crush
-                                    optgroup(label="Intellect", data-max-options="1") 
-                                        option Classmate
-                                        option Batchmate
-                                        option Teammate
+                    if userp.ldap==user.ldap
+                        p.relationship#rel-display='You'
+                    else
+                        p.relationship#rel-display=relationship
+                        div.collapse.relationship-update#relationship    
+                            form#rel(action='/request', method='post')
+                                input(type='hidden', name='ldap', value=userp.ldap)
+                                .relationship-picker
+                                    select.selectpicker(data-live-search='true', multiple, name='relationship')
                                         
-                                    
-                        p &nbsp;
-                    p
-                        button.profile#update(data-toggle="collapse",data-target="#relationship",state='update') UPDATE
+                                        optgroup(label="Time", data-max-options="1") 
+                                            option Ex
+                                        optgroup(label="Surperlative", data-max-options="1") 
+                                            option Best
+                                        optgroup(label="Locus", data-max-options="1") 
+                                            option Roommate
+                                            option Wingmate
+                                            option Inmate
+                                        optgroup(label="Psyche", data-max-options="1") 
+                                            option Friend                                    
+                                            option Girlfriend
+                                            option Boyfriend
+                                            option Crush
+                                        optgroup(label="Intellect", data-max-options="1") 
+                                            option Classmate
+                                            option Batchmate
+                                            option Teammate
+                                            
+                                        
+                            p &nbsp;
+                        p
+                            button.profile#update(data-toggle="collapse",data-target="#relationship",state='update') UPDATE
                     
                            
                     
@@ -156,12 +187,12 @@ block content
           console.log("This");
           console.log(sal);
           console.log("That");
-          if($("#salary").val()>sal*10){
-              alert("Are you high? Try something else.");
+          if($("#salary").val()>sal*3|| $("#salary").val()>50){
+              alert("Too high. Try something else.");
               return false;
           } 
-          if($("#salary").val()<sal/2.5){
-              alert("Do yo do cheap durgs? Try something else.");
+          if($("#salary").val()<sal/2 || $("#salary").val()<3.5){
+              alert("Too low. Try something else.");
               return false;
           }
           return true;

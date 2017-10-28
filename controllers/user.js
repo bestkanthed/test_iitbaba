@@ -162,6 +162,25 @@ exports.postLogin = (req, res, next) => {
 };
 
 /**
+ * GET /about
+ * About page.
+ */
+exports.getAbout = async (req, res, next) =>{
+    console.log("Home");    
+    if (req.user) {
+      let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
+      return res.render('about', {
+        title: 'About',
+        navbarItems : navbarItems,
+      });
+    }
+    console.log("Now will render about");
+    return res.render('about', { 
+      title : 'About',
+    });
+};
+
+/**
  * GET /set
  * Set page.
  */
@@ -184,6 +203,11 @@ exports.getSet = async (req, res, next) => {
  */
 exports.postSet = (req, res, next) => {
   //console.log(req.body);
+  if (!req.user) {
+    logger.info(req.ip + " posted /set without login");
+    return res.redirect('/');
+  }
+  
   req.assert('first', 'First name cannot be blank').notEmpty();  
   req.assert('last', 'Last name cannot be blank').notEmpty();  
   req.assert('password', 'Password cannot be blank').notEmpty();
@@ -201,7 +225,7 @@ exports.postSet = (req, res, next) => {
       return next(err); }
     if (existingUser) {
       existingUser.password = req.body.password;
-      existingUser.first_name = req.body.first.toUpperCase();;
+      existingUser.first_name = req.body.first.toUpperCase();
       existingUser.last_name = req.body.last.toUpperCase();
       // existingUser.known = req.body.known.toUpperCase();
       // existingUser.skills = req.body.skills.toUpperCase();
@@ -215,6 +239,68 @@ exports.postSet = (req, res, next) => {
       });
       req.flash({ msg: 'Profile updated' });
       return res.redirect('/picture');
+    }
+  });
+};
+
+/**
+ * GET /edit
+ * Get edit page.
+ */
+exports.getEdit = async (req, res, next) => {
+  if (!req.user) {
+    logger.info(req.ip + " opened /edit without login");
+    return res.redirect('/');
+  }
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
+  console.log(navbarItems);
+  return res.render('account/edit', {
+    title: 'Edit',
+    navbarItems: navbarItems,
+  });
+};
+
+/**
+ * POST /edit
+ * Edit details.
+ */
+exports.postEdit = (req, res, next) => {
+  //console.log(req.body);
+  if (!req.user) {
+    logger.info(req.ip + " posted /edit without login");
+    return res.redirect('/');
+  }
+  
+  User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
+    if (err) { return next(err); }
+    if (existingUser) {
+      existingUser.first_name = req.body.first.toUpperCase();
+      existingUser.last_name = req.body.last.toUpperCase();
+      existingUser.hostel = req.body.hostel.toUpperCase();
+      existingUser.room = req.body.room.toUpperCase();
+      existingUser.from = req.body.from.toUpperCase();
+      existingUser.dob = req.body.dob.toUpperCase();
+      existingUser.contact = req.body.contact.toUpperCase();
+      existingUser.email = req.body.email.toUpperCase();
+      existingUser.known = req.body.known;
+      existingUser.hobbies = req.body.hobbies;
+      existingUser.skills = req.body.skills;
+      existingUser.looking = req.body.looking;
+      existingUser.google = req.body.google;
+      existingUser.facebook = req.body.facebook;
+      existingUser.twitter = req.body.twitter;
+      existingUser.linkedin = req.body.linkedin;
+      existingUser.instagram = req.body.instagram;
+      existingUser.snapchat = req.body.snapchat;
+      
+      existingUser.save((err) => {
+        if (err) { 
+          logger.error(err);
+          return next(err); 
+        }
+        req.flash({ msg: 'Profile updated' });
+        return res.redirect('/edit');
+      });
     }
   });
 };

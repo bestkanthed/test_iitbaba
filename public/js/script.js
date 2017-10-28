@@ -13,6 +13,10 @@ var app = (function() {
   // TODO 2.2 - request permission to show notifications
   Notification.requestPermission(function(status) {
     console.log('Notification permission status:', status);
+    if(status=='denied'){
+      $('#allow-push').text("ALLOW PUSH NOTIFICATIONS");
+      $("#allow-push").attr("href", "https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DDesktop&hl=en");
+    }
   });
   
   function subscribeUser() {

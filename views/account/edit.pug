@@ -2,34 +2,87 @@ extends ../layout
 
 block content
   .container.edit
-    .col-sm-8.col-sm-offset-2
       form(method='POST')
         input(type='hidden', name='_csrf', value=_csrf)
         .row
-          .col-xs-12.col-lg-6.col-set
+          .col-xs-12.col-lg-4.col-edit
             .row
-              .col-xs-6.col-lg-6.set-first-name
-                label.col-sm-3.control-label(for='known') First Name
-                input.form-control(type='text', name='first', id='first', placeholder='First name', autofocus, required)
-              .col-xs-6.col-lg-6.set-last-name
-                input.form-control(type='text', name='last', id='last', placeholder='Surname', autofocus, required)
+                h1 Basic
             .row
-              input.form-control(type='password', name='password', id='password', placeholder='New password', autofocus, required)
+                label.col-sm-3.control-label(for='first') Name 
+                .col-sm-4
+                    input.form-control(type='text', name='first', id='first', value=user.first_name, placeholder='Name', autofocus, required)
+                .col-sm-5
+                    input.form-control(type='text', name='last', id='last', value=user.last_name, placeholder='Surname', autofocus, required)
             .row
-              input.form-control(type='password', name='confirm', id='confirm', placeholder='Confirm password', required)
-            .row.set-button-row
-              .set-button
-                button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Create an account
-
-.form-group
-          label.col-sm-3.control-label(for='known') Known For
-          .col-sm-7
-            input.form-control(type='text', name='known', id='known', placeholder='Ex: Convener, Dramatics Club', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='hobbies') Hobbies
-          .col-sm-7
-            input.form-control(type='text', name='hobbies', id='hobbies', placeholder='Ex: Thinking', autofocus, required)
-        .form-group
-          label.col-sm-3.control-label(for='skills') Skills
-          .col-sm-7
-            input.form-control(type='text', name='skills', id='skills', placeholder='Ex: Coding', autofocus, required)
+                label.col-sm-3.control-label(for='hostel') Hostel
+                .col-sm-4
+                    input.form-control(type='number', name='hostel', id='hostel', value=user.hostel, placeholder='Number', autofocus)
+                .col-sm-5
+                    input.form-control(type='text', name='room', id='room', value=user.room, placeholder='Room', autofocus)
+            .row
+                label.col-sm-3.control-label(for='from') Form
+                .col-sm-9
+                    input.form-control(type='text', name='from', id='from', value=user.from, placeholde='Hometown', autofocus)
+            .row
+                label.col-sm-3.control-label(for='dob') Dob
+                .col-sm-9
+                    input.form-control(type='date', name='dob', id='dob', value=user.dob?user.dob.toISOString().slice(0,10):null ,autofocus)
+            .row
+                label.col-sm-3.control-label(for='contact') Contact
+                .col-sm-9
+                    input.form-control(type='text', name='contact', id='contact', value=user.contact, placeholder='Mobile', autofocus)
+            .row
+                label.col-sm-3.control-label(for='email') Email
+                .col-sm-9
+                    input.form-control(type='email', name='email', id='email', value=user.email, placeholder='Personal', autofocus)
+          .col-xs-12.col-lg-4.col-edit
+            .row
+                h1(title='People will search for these') Persona
+            .row
+                .col-sm-4
+                    label.control-label(for='known', title='Under your name', value=user.first_name, placeholder='Under your name') Uyn
+                .col-sm-8
+                    input.form-control(type='text', title='What should appear under your name', value=user.known, name='known', id='known', placeholder='Ex: Creator, IIT-baba', autofocus)
+            .row
+                label.col-sm-4.control-label(for='hobbies', title='You just love') Hobbies
+                .col-sm-8
+                    input.form-control(type='text', name='hobbies', id='hobbies', value=user.hobbies, placeholder='You do for fun', autofocus)
+            .row
+                label.col-sm-4.control-label(for='skills', title='You can help others with') Skills
+                .col-sm-8
+                    input.form-control(type='text', name='skills', id='skills', value=user.skills, placeholder='', autofocus)
+            .row
+                label.col-sm-4.control-label(for='looking', title='Missing out on') Looking For
+                .col-sm-8
+                    input.form-control(type='text', name='looking', id='looking', value=user.looking, placeholder='Ex: Co-founder, Boyfriend, Gay Friend', autofocus)
+          .col-xs-12.col-lg-3.col-edit
+            .row
+                h1 Social
+            .row
+                .col-sm-4
+                    label.control-label(for='google') Google
+                .col-sm-8
+                    input.form-control(type='text', name='google', id='google', value=user.google, placeholder='G+ account link', autofocus)
+            .row
+                label.col-sm-4.control-label(for='facebook') Facebook
+                .col-sm-8
+                    input.form-control(type='text', name='facebook', id='facebook', value=user.facebook, placeholder='Facebook ID', autofocus)
+            .row
+                label.col-sm-4.control-label(for='twitter') Twitter
+                .col-sm-8
+                    input.form-control(type='text', name='twitter', id='twitter', value=user.twitter, placeholder='Twitter ID', autofocus)
+            .row
+                label.col-sm-4.control-label(for='linkedin') Linkedin
+                .col-sm-8
+                    input.form-control(type='text', name='linkedin', id='linkedin', value=user.linkedin, placeholder='Profile page link', autofocus)
+            .row
+                label.col-sm-4.control-label(for='instagram') Instagram
+                .col-sm-8
+                    input.form-control(type='text', name='instagram', id='instagram', value=user.instagram, placeholder='Insta ID', autofocus)
+            .row
+                label.col-sm-4.control-label(for='snapchat') Snapchat
+                .col-sm-8
+                    input.form-control(type='text', name='snapchat', id='snapchat', value=user.snapchat, placeholder='Snap ID', autofocus)
+        .row.set-button-row
+            button.save-button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') SAVE

@@ -95,7 +95,7 @@ limitations under the License.
     if(payload.salary){
         let icon = payload.salary.change>0?'up':'down';
         if(payload.salary.change==0) icon='same';
-        options.image = 'images/'+icon+'.png';
+        //options.image = 'images/'+icon+'.png';
         /*
         options.actions =  [{
             action: 'explore', 

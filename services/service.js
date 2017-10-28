@@ -54,13 +54,15 @@ exports.getGraphFor = (ldap)=>{
     for(let i=1;i<noOfUsers;i++){
       let ldap1 = await User.getUserLdapByMID(i);
       let predicted;
+      let name = await User.getUserNameByMID(i);
+      if(name) name = toTitleCase(name);
       if(ldap1==ldap) predicted = true;
       else predicted = await Relation.getPredicted(ldap1, ldap);
       nodes.push({
         id: i.toString(),
         sal:await Salary.getSalary(i), 
         ldap: ldap1,
-        name: await User.getUserNameByMID(i),
+        name: name,
         predicted: predicted
       });    
     }
@@ -380,9 +382,9 @@ exports.getBoxSearchResults = (query)=>{
         if(bq.department) bq.department.push("ME"); else {bq.department=[]; bq.department.push("ME");} matched = true; continue;
       }
       if(c=="META" || c=="MEMS" || c=="METALLURGY" || c=="METALLURGICAL" || c=="MATERIALS" || c=="MATERIAL"){ 
-        if(bq.department) bq.department.push("MEMS"); else {bq.department=[]; bq.department.push("MEMS");} matched = true; continue;
+        if(bq.department) {bq.department.push("MEMS");bq.department.push("MS");} else {bq.department=[]; bq.department.push("MEMS");bq.department.push("MS");} matched = true; continue;
       }
-      if(c == "PHY" || c=="PH" || c=="PHYSICS"){ 
+      if(c == "PHY" || c=="PH" || c=="PHYSICS" || c=="EP"){
         if(bq.department) bq.department.push("PH"); else {bq.department=[]; bq.department.push("PH");} matched = true; continue;
       }
       if(c[0]=="H" && !isNaN(c.substring(1))){ 
@@ -460,4 +462,8 @@ function isRollNo(c){
 
 function isName(c){
   return isNaN(c);
+}
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }

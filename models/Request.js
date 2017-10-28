@@ -58,10 +58,6 @@ requestSchema.statics.getRequests = function getRequests(ldap, no) {
 requestSchema.statics.seeRequests = function seeRequests(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Request').find({ ldap : ldap, seen : false}, (err, reqs)=>{
-      console.log("logging ldap from seeRequests");
-      console.log(ldap);
-      console.log("logging reqs from seeRequests");
-      console.log(reqs);
       if(err) reject(err);
       for(req of reqs){
         req.seen = true;

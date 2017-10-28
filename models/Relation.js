@@ -176,7 +176,7 @@ relationSchema.statics.getLdapsOfPeopleWhoPredicted = function getLdapsOfPeopleW
     this.model('Relation').find({ ldap1: ldap, predicted:true },{},{sort:{ "createdAt" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
       if(err) reject(err);
       console.log("Logging predicted people");
-      console.log(rel);
+      //console.log(rel);
       if(rel!=null){
         let result = [];
         for(ldp of rel) result.push(ldp.ldap2);
@@ -216,12 +216,12 @@ relationSchema.statics.getGraphLinks = function getGraphLinks() {
       //console.log("Logging all predictions ", allPredictions);      
       let links = [];
       for(rel of allRel){
-        console.log("Logging relation", rel);
+        //console.log("Logging relation", rel);
         let link = {};
         if(rel.predicted) link.predicted = true;
         if(rel.relationship){
           if (rel.relationship.length){
-            console.log("Logging reltionship", rel.relationship);
+            //console.log("Logging reltionship", rel.relationship);
             let relationship='';
             for(relL of rel.relationship){
               relationship = relationship + " "+relL;
@@ -230,9 +230,6 @@ relationSchema.statics.getGraphLinks = function getGraphLinks() {
           }
         }
         if(!_.isEmpty(link)){
-          console.log("Logging link", link);
-          console.log("Logging ldap1",rel.ldap1);
-          console.log("Logging ldap2",rel.ldap2);
           let source = await User.getUserMIDByLdap(rel.ldap2);
           let target = await User.getUserMIDByLdap(rel.ldap1);
           if (source) link.source = source.toString();

@@ -19,8 +19,6 @@ passport.deserializeUser((id, done) => {
  * Sign in using Email and Password.
  */
 passport.use(new LocalStrategy((username, password, done) => {
-  console.log("cnf ldap");
-  console.log(username);
   User.findOne({ ldap : username.toLowerCase() }, (err, user) => {
     if (err) { return done(err); }
     if (!user) {
@@ -49,8 +47,6 @@ passport.use('oauth2', new OAuth2Strategy({
     passReqToCallback: true
   },
   function(req, accessToken, refreshToken, profile, done) {
-      console.log("d");
-      console.log(req);
      done(null,null);
   }
 ));

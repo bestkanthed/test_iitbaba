@@ -74,7 +74,7 @@ predictionSchema.statics.getGraphLinks = function getGraphLinks() {
             value: pred.prediction
         });
       }
-      console.log("Logging links ", links);
+      //console.log("Logging links ", links);
       return resolve(links);
     });
   });

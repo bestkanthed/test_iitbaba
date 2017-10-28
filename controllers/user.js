@@ -48,7 +48,7 @@ const logger = new (winston.Logger)({
 exports.home = async (req, res, next) =>{
     console.log("Home");
     let graph = await service.getGraph();
-    console.log("Logging req.user ", req.user);    
+    
     if (req.user) {
 
       let completeLevel = await User.getComplete(req.user.ldap);
@@ -166,7 +166,7 @@ exports.postLogin = (req, res, next) => {
  * About page.
  */
 exports.getAbout = async (req, res, next) =>{
-    console.log("Home");    
+    console.log("About");    
     if (req.user) {
       let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
       return res.render('about', {
@@ -190,7 +190,6 @@ exports.getSet = async (req, res, next) => {
     return res.redirect('/');
   }
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
-  console.log(navbarItems);
   return res.render('account/set', {
     title: 'Set Password',
     navbarItems: navbarItems
@@ -252,8 +251,7 @@ exports.getEdit = async (req, res, next) => {
     logger.info(req.ip + " opened /edit without login");
     return res.redirect('/');
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
-  console.log(navbarItems);
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   return res.render('account/edit', {
     title: 'Edit',
     navbarItems: navbarItems,
@@ -314,8 +312,7 @@ exports.getPicture = async (req, res, next) => {
     logger.info(req.ip + " opened /picture without login");
     return res.redirect('/');
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
-  console.log(navbarItems);
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   return res.render('account/picture', {
     title: 'Upload Profile Picture',
     navbarItems: navbarItems
@@ -329,13 +326,13 @@ exports.getPicture = async (req, res, next) => {
  * posted picture .
  */
 exports.postPicture = async (req, res, next)=>{
-  console.log("Posted");
+  console.log("Posted picture");
   let base64Data = req.body.image_data.replace(/^data:image\/png;base64,/, "");
   filename = "./public/images/profile/"+req.user.ldap+".png";
   fs.writeFile(filename, base64Data, 'base64', function(err) {
     if(err) return next(err);
     im.identify("./public/images/profile/"+req.user.ldap+".png", true).then(function (data) {
-	    console.log(data);
+	    console.log("Logging picture data", data);
       User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
         if (err) return next(err);
         if (existingUser) {
@@ -365,8 +362,7 @@ exports.getAverage = async (req, res, next) => {
     logger.info(req.ip + " opened /picture without login");
     return res.redirect('/');
   }
-  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
-  console.log(navbarItems);
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   return res.render('account/avg', {
     title: 'IITbaba',
     navbarItems: navbarItems
@@ -414,7 +410,6 @@ exports.getPredict = async (req, res, next) => {
   let usersToShow = await service.getNewPeopleToPredict(req.user.ldap, standard.notifications);
   //console.log(usersToShow);
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
-  console.log(navbarItems);
   res.render('account/predict', {
     title: 'Predict',
     users : usersToShow,
@@ -491,26 +486,13 @@ exports.getProfile = async (req, res, next) => {
   let navbarItems = service.getNavItems(req.user.ldap, standard.requests);
   let salary = Salary.getSalary(user.mid);
 
-  Promise.all([user, salary, navbarItems, requestSent, requestReceived, relationship, predicted]).then(values => { 
-      console.log("Logging first_name");
-      console.log(values[0].profile.first_name);
+  Promise.all([user, salary, navbarItems, requestSent, requestReceived, relationship, predicted]).then(values => {
       if(req.params.ldap==req.user.ldap) values[6] = true;
       let rels = "";
       
       for(rel of values[5]){
         rels = rels + " "+rel;
       }
-      
-      console.log("Logging if request recieved from the profiled person");
-      console.log(values[4]);
-      
-      console.log("Logging notifications");
-      console.log(values[2].notifications);
-
-      console.log("Logging salary");
-      console.log(values[1].toFixed(2));
-      
-
       res.render('profile', {
         title: values[0].profile.first_name,
         userp : values[0],
@@ -575,7 +557,7 @@ exports.getSearch = async (req, res, next) => {
   console.log("search");
   
   if (!req.user) {
-    console.log("Here");
+    console.log("In no one");
     logger.info("IP " + req.ip + " /search without login");
     return res.redirect('/');
   }
@@ -733,7 +715,7 @@ exports.gotCallback = async (req, res, next) => {
               }
           }, async (err1, res1)=> {
               var info = JSON.parse(res1.body);
-              console.log("User Info:", info);
+              // console.log("User Info:", info);
               if(!info.username){console.log("Throwing back to auth/sso"); return res.redirect('/auth/iitbsso');} 
               user.ldap = info.username;
               //

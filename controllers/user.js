@@ -471,20 +471,28 @@ exports.getProfile = async (req, res, next) => {
     logger.info("IP " + req.ip + " /profile?" + req.params.ldap +" without login");
     return res.redirect('/login');
   }
+  if(req.params.ldap=='iitbaba'){
+    return res.redirect('/about');
+  }
 
   let completeLevel = await User.getComplete(req.user.ldap);
   if(!completeLevel) return res.redirect('/');
   if(completeLevel<3) return res.redirect('/');
 
-  let requestSent = Request.getRequest(req.params.ldap, req.user.ldap);
-  let relationship = Relation.getRelationship(req.params.ldap, req.user.ldap);
-  let requestReceived = Request.getRequest(req.user.ldap, req.params.ldap); // can be only true
-  let predicted = Relation.getPredicted(req.params.ldap, req.user.ldap);
+  let requestSent = await Request.getRequest(req.params.ldap, req.user.ldap);
+  let relationship = await Relation.getRelationship(req.params.ldap, req.user.ldap);
+  let requestReceived = await Request.getRequest(req.user.ldap, req.params.ldap); // can be only true
+  let predicted = await Relation.getPredicted(req.params.ldap, req.user.ldap);
+  let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
+  
   // Send ID of the request else send null
   let user =  await User.getUser(req.params.ldap);
+  if(!user) return res.render('nullprofile', {
+      title: 'Not Registered',
+      navbarItems : navbarItems,
+  });
   //let alreadyPredicted = Relation.getPredicted(req.params.ldap, req.user.ldap).catch(err => { next(err); });
-  let navbarItems = service.getNavItems(req.user.ldap, standard.requests);
-  let salary = Salary.getSalary(user.mid);
+  if(user) salary = await Salary.getSalary(user.mid);
 
   Promise.all([user, salary, navbarItems, requestSent, requestReceived, relationship, predicted]).then(values => {
       if(req.params.ldap==req.user.ldap) values[6] = true;

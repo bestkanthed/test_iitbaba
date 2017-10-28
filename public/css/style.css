@@ -378,6 +378,11 @@ button.profile:hover, a.profile:hover {
 .container.profile{
     padding-top: 80px;
 }
+.container.nullprofile{
+    
+    padding-top: 70px;
+    text-align: center;
+}
 img.profile{
     border-radius:8px 8px 0 0; 
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
@@ -917,4 +922,18 @@ button.btn.dropdown-toggle:focus {
     color: white;
     font-family: 'Raleway', sans-serif;
     font-size: 20px; 
+}
+.nsp{
+    font-family: 'Raleway', sans-serif;
+    color: black;
+}
+@media screen and (max-width: 480px) {
+    img.baba{
+        width: 100%;
+    }   
+}
+@media screen and (min-width: 480px) {
+    img.baba{
+        width: 480px;
+    }   
 }

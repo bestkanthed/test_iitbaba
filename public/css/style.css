@@ -840,6 +840,8 @@ caption.outgoing-caption, caption.incoming-caption{
     padding-left: 2px; 
 }
 .container.edit{
+    padding-left:0;
+    padding-right:16px;    
     padding-top: 60px;
     color: black;
 }

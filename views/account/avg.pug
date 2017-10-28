@@ -18,9 +18,6 @@ block content
               button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Predict
     script.
       $("#prediction").submit(function() {
-          console.log("This");
-          console.log(sal);
-          console.log("That");
           if($("#salary").val()>20){
               alert("Are you high? Give an aprropriate guess.");
               return false;

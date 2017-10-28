@@ -1,6 +1,9 @@
 # Node build artifacts
 node_modules
 npm-debug.log
+access.log
+errors.log
+info.log
 
 # Local development
 *.env

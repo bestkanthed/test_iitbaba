@@ -74,7 +74,7 @@
           li.dropdown(class=(title == 'Account Management') ? 'active' : undefined)
             a.dropdown-toggle.electric-blue-text-color.settings-dropdown(href='#', data-toggle='dropdown')
               if user
-                img.navbar-profile-img(src='/images/profile/'+user.ldap+'.png')
+                img.navbar-profile-img(src='/images/profile/'+user.ldap+'.png', onerror='this.src="/images/profile/null.png";')
               else
                 img.navbar-profile-img(src='/images/baba.jpg')
               i.caret

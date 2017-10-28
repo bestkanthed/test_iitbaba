@@ -22,8 +22,28 @@ block content
     script.
       $("#main-container").css('padding-left','0');
       $("#main-container").css('padding-right','0');
+      $("#main-container").css('margin','0');
+      $(window).on('orientationchange', function(e) {
+          $.mobile.changePage(window.location.href, {
+              allowSamePageTransition: true,
+              transition: 'none',
+              reloadPage: true
+          });
+      });
+      window.onorientationchange = function() { 
+          var orientation = window.orientation; 
+              switch(orientation) { 
+                  case 0:
+                  case 90:
+                  case -90: window.location.reload(); 
+                  break; } 
+      };
       console.log("logging width of window", $(window).width());
       console.log("logging height of window", $(window).height());
+      $("svg").css('margin','0');
+      $("svg").css('position','absolute');
+      $("svg").css('left','0');
+      $("svg").css('top','0'); 
       $("svg").attr({
         "width": $(window).width(),
         "height": $(window).height()

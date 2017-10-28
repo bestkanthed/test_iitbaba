@@ -36,8 +36,8 @@ block content
       console.log("logging width of window", $(window).width());
       console.log("logging height of window", $(window).height());
       $("svg").attr({
-        "width": $(window).width()*0.9,
-        "height": $(window).height()*0.975
+        "width": $(window).width(),
+        "height": $(window).height()
       });
       let sal = 0;
       let previousCenter = {
@@ -50,6 +50,10 @@ block content
       $(document).keyup(function(e) {
           if (e.keyCode == 27) $("#predictCover").css({"display":"none"});
       });
+      $("svg").css('margin','0');
+      $("svg").css('position','absolute');
+      $("svg").css('left','0');
+      $("svg").css('top','0');
       $("#prediction").submit(e=>{
         e.preventDefault();
         let form = $('#prediction');

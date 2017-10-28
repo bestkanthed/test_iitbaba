@@ -65,7 +65,7 @@ predictionSchema.statics.getGraphLinks = function getGraphLinks() {
   return new Promise ((resolve, reject) => {
     this.model('Prediction').find({}, (err, allPredictions)=>{
       if(err) reject(err);
-      console.log("Logging all predictions ", allPredictions);      
+      //console.log("Logging all predictions ", allPredictions);      
       let links = [];
       for(pred of allPredictions){
         links.push({

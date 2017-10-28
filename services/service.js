@@ -40,7 +40,7 @@ exports.getGraph = ()=>{
       nodes: nodes,
       links: links
     };
-    console.log("Logging graph", graph);
+    //console.log("Logging graph", graph);
     return resolve(graph);
   });
 };

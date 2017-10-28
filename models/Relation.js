@@ -240,7 +240,7 @@ relationSchema.statics.getGraphLinks = function getGraphLinks() {
           links.push(link);
         }
       }
-      console.log("Logging links ", links);
+      //console.log("Logging links ", links);
       return resolve(links);
     });
   });

@@ -629,7 +629,7 @@ exports.postRequest = async (req, res, next) => {
     for(rel of req.body.relationship){
       relationship = relationship + " "+rel;
     }
-    await Notification.createNotification(req.body.ldap, req.user.ldap, req.user.first_name+" related to you as"+relationship);
+    await Notification.createNotification(req.body.ldap, req.user.ldap, toTitleCase(req.user.first_name.toLowerCase())+" related to you as"+relationship);
     return res.send(relationship);
   }
   else {
@@ -756,4 +756,8 @@ exports.gotCallback = async (req, res, next) => {
             }
           });
     });
+};
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };

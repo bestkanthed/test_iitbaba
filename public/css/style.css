@@ -372,8 +372,12 @@ a.profile {
 
 }
 
-button.profile:hover, a.profile:hover {
+button.profile:hover{
   background-color:rgba(0,0,0,0.95);
+}
+
+a.profile:hover{
+    color:rgba(0,0,0,0.9);
 }
 .container.profile{
     padding-top: 80px;
@@ -407,7 +411,7 @@ input.submit-salary{
   padding: 8px;
   font-family :'Raleway', sans-serif;
   color: white;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: rgba(0, 0, 0, 0.9);
   text-align: center;
   cursor: pointer;
   width: 100%;
@@ -415,7 +419,7 @@ input.submit-salary{
   border-radius: 0 0 8px 8px;
 }
 input.submit-salary:hover{
-  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.95);  
 }
 
 /* 

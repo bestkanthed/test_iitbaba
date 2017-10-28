@@ -20,12 +20,13 @@ block content
     svg
     script(src='https://d3js.org/d3.v4.min.js')
     script.
-      
+      $("#main-container").css('padding-left','0');
+      $("#main-container").css('padding-right','0');
       console.log("logging width of window", $(window).width());
       console.log("logging height of window", $(window).height());
       $("svg").attr({
-        "width": $(window).width()*0.9,
-        "height": $(window).height()*0.85
+        "width": $(window).width(),
+        "height": $(window).height()
       });
       
       var graph = !{JSON.stringify(graph).replace(/<\//g, '<\\/')};
@@ -35,6 +36,7 @@ block content
       height = +svg.attr("height");
       var color = d3.scaleOrdinal(d3.schemeCategory20);
       var simulation = d3.forceSimulation()
+      .force("collide", d3.forceCollide().radius(function(d) { return d.sal*2; }))
       .force("link", d3.forceLink().id(function(d) { console.log(d); return d.id; }).distance(function(d) {console.log(d);console.log(typeof d.sal+" "+d.sal);return 300;}).strength(0.3))
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2));

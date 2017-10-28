@@ -21,7 +21,8 @@ strong.baba-logo:hover{
     color:rgba(255,255,255,1);   
 }
 .container.home{
-    padding-top: 60px;
+    padding-left:0px;
+    padding-right:0px; 
     text-align:center;
 }
 .navbar.navbar-default.navbar-fixed-top.black-translucent-background{

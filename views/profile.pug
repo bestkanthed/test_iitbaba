@@ -145,44 +145,6 @@ block content
         
       });
 
-      $("#deleteRequest").click(function() {
-        console.log(this.id);      
-        console.log("delete request");
-        $.post("/request", {action:"delete" , ldap: ldp1}).done(function( data ) {
-            $("#deleteRequest").attr("id", "sendRequest");
-            $("#sendRequest").text("Send Friend Request");
-        });
-      });
-
-      $("#acceptRequest").click(function() {
-        console.log(this.id);      
-        console.log("accept request");
-        $.post("/request", {action:"accept", id: id, ldap: ldp1}).done(function( data ) {
-            $("#acceptRequest").attr("id", "unfriend");
-            $("#unfriend").text("Unfriend");
-            $("#rejectRequest").remove();
-        });
-      });
-
-      $("#rejectRequest").click(function() {
-        console.log(this.id);      
-        console.log("reject request");
-        $.post("/request", {action:"reject", id: id, ldap: ldp1}).done(function( data ) {
-            $("#acceptRequest").attr("id", "sendRequest");
-            $("#rejectRequest").remove();
-            $("#sendRequest").text("Send Friend Request");
-        });
-      });
-
-      $("#sendRequest").click(function() {
-        console.log(this.id);      
-        console.log("send request");
-        $.post("/request", {action:"create", ldap: ldp1}).done(function( data ) {
-            $("#sendRequest").attr("id", "deleteRequest");
-            $("#deleteRequest").text("Delete Sent Request");
-        });
-      });
-
       $("#prediction").submit(function() {
           console.log("This");
           console.log(sal);

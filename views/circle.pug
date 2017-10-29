@@ -254,6 +254,7 @@ block content
         }))
         .force("x", d3.forceX().x(function(d) { return width/2; }).strength(function(d) { if(d.id == n.id) return 3.5; return 0; }))
         .force("y", d3.forceY().y(function(d) { return height/2; }).strength(function(d) { if(d.id == n.id) return 3.5; return 0;}));
+        .force("collide", d3.forceCollide().radius(function(d) { if(d.id == n.id) return 80; return d.sal*2; }))
         simulation.force("link")
         .links(graph.links);
         simulation.alphaTarget(0.5);

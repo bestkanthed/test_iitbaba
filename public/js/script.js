@@ -146,7 +146,6 @@ var app = (function() {
     });
   } else {
     console.warn('Push messaging is not supported');
-    pushButton.textContent = 'Push Not Supported';
   }
 
 })();

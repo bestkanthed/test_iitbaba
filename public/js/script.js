@@ -145,7 +145,8 @@ var app = (function() {
   }
 
 })();
-
-$(function () {
-    $('body').show();
-});
+window.onload=function() {
+    $(function () {
+        $('body').show();
+    });
+}

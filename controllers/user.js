@@ -189,6 +189,10 @@ exports.getSet = async (req, res, next) => {
     logger.info(req.ip + " opened /set without login");
     return res.redirect('/');
   }
+  if(await User.getComplete(req.user.ldap) == 1){
+    req.flash('errors', 'Initial form completion is already over');
+    return res.redirect('/');
+  }
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests)
   return res.render('account/set', {
     title: 'Set Password',
@@ -204,6 +208,11 @@ exports.postSet = (req, res, next) => {
   //console.log(req.body);
   if (!req.user) {
     logger.info(req.ip + " posted /set without login");
+    return res.redirect('/');
+  }
+
+  if(await User.getComplete(req.user.ldap) == 2){
+    req.flash('errors', 'Initial form completion is already over');
     return res.redirect('/');
   }
   
@@ -279,7 +288,7 @@ exports.postEdit = (req, res, next) => {
       existingUser.from = req.body.from.toUpperCase();
       existingUser.dob = req.body.dob.toUpperCase();
       existingUser.contact = req.body.contact.toUpperCase();
-      existingUser.email = req.body.email.toUpperCase();
+      existingUser.email = req.body.email.toLowerCase();
       existingUser.known = req.body.known;
       existingUser.hobbies = req.body.hobbies;
       existingUser.skills = req.body.skills;
@@ -308,8 +317,13 @@ exports.postEdit = (req, res, next) => {
  * Set picture page.
  */
 exports.getPicture = async (req, res, next) => {
+  
   if (!req.user) {
     logger.info(req.ip + " opened /picture without login");
+    return res.redirect('/');
+  }
+  if(await User.getComplete(req.user.ldap) == 2){
+    req.flash('errors', 'Initial form completion is already over');
     return res.redirect('/');
   }
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
@@ -327,6 +341,10 @@ exports.getPicture = async (req, res, next) => {
  */
 exports.postPicture = async (req, res, next)=>{
   console.log("Posted picture");
+  if(await User.getComplete(req.user.ldap) == 2){
+    req.flash('errors', 'Initial form completion is already over');
+    return res.redirect('/');
+  }
   let base64Data = req.body.image_data.replace(/^data:image\/png;base64,/, "");
   filename = "./public/images/profile/"+req.user.ldap+".png";
   fs.writeFile(filename, base64Data, 'base64', function(err) {
@@ -359,12 +377,16 @@ exports.postPicture = async (req, res, next)=>{
  */
 exports.getAverage = async (req, res, next) => {
   if (!req.user) {
-    logger.info(req.ip + " opened /picture without login");
+    logger.info(req.ip + " opened /avg without login");
+    return res.redirect('/');
+  }
+  if(await User.getComplete(req.user.ldap) == 3){
+    req.flash('errors', 'Initial form completion is already over');
     return res.redirect('/');
   }
   let navbarItems = await service.getNavItems(req.user.ldap, standard.requests);
   return res.render('account/avg', {
-    title: 'IITbaba',
+    title: 'Your Estimate',
     navbarItems: navbarItems
   });
 };
@@ -376,6 +398,20 @@ exports.getAverage = async (req, res, next) => {
 exports.postAverage = async (req, res, next)=>{
   console.log("Posted");
   let userPredictionForBaba = Number(req.body.babaSalary);
+  if (!req.user) {
+    logger.info(req.ip + " posted /avg without login");
+    return res.redirect('/');
+  }
+
+  if(await User.getComplete(req.user.ldap)==3){
+    req.flash('errors', 'You already predicted for yourself');
+    return res.redirect('/');
+  }
+
+  if(userPredictionForBaba<2 || userPredictionForBaba>50){
+    req.flash('errors', 'Not a good estimate');
+    return res.redirect('/avg');
+  }
   //let babaPredictionForUser = await Mean.getMean();
   //babaPredictionForUser = Number(babaPredictionForUser?babaPredictionForUser:userPredictionForBaba);
   let mean = await Mean.getMean(); 
@@ -522,17 +558,23 @@ exports.postProfile = async (req, res, next) => {
   req.assert('salary', 'Prediction cannot be blank').notEmpty();
   const errors = req.validationErrors();
 
-  if (errors) {
-    req.flash('errors', errors);
-    return res.redirect('/' || req.session.returnTo);
+  if (!req.user) {
+    logger.info("IP " + req.ip + " /profile/" + req.params.ldap +" without login");
+    return res.redirect('/login');
   }
 
-  if (!req.user) {
-    logger.info("IP " + req.ip + " /profile?" + req.params.ldap +" without login");
-    return res.redirect('/login');
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/profile/'+ req.params.ldap);
   }
   
   console.log(req.body);
+  
+  if(Number(req.body.salary)<3.5 || Number(req.body.salary)>100){
+    req.flash('errors', 'Inapporpriate estimation');
+    return res.redirect('/profile/'+ req.params.ldap);
+  }
+  
   if(req.body.repredict){
     let updatePrediction = await Prediction.updatePrediction(req.body.mid, req.user.mid, req.body.salary);
     let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary));    

@@ -12,18 +12,18 @@ block content
         p Start with estimating yourself when you graduate.
         form#prediction(method='POST')
           input(type='hidden', name='_csrf', value=_csrf)
-          input.form-control.predict-yourself-input(type='number', step='0.01', placeholder="Lakh INR/year",name='babaSalary', id='babaSalary', autofocus, required)
+          input.form-control.predict-yourself-input(type='number', step='0.01', placeholder="Lakh INR/year",name='babaSalary', id='salary', autofocus, required)
           .row.predict-yourself-row
             .predict-yourself
               button.btn.btn-primary.btn-reset.black-theme-bg(type='submit') Predict
     script.
       $("#prediction").submit(function() {
-          if($("#salary").val()>20){
-              alert("Are you high? Give an aprropriate guess.");
+          if($("#salary").val()>50){
+              alert("Don't overestimate yourself.");
               return false;
-          } 
+          }
           if($("#salary").val()<2){
-              alert("Do yo do cheap durgs? Try something else.");
+              alert("Don't underestimate yourself.");
               return false;
           }
           return true;

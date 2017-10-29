@@ -46,16 +46,17 @@ notificationSchema.statics.createNotification = function createNotification(ldap
       console.log("Logging Payload", payload);
 
       let pushSubscription = await Subscription.getSubscription(ldap);
-      if(pushSubscription.endpoint){
-        console.log("Push subscription", pushSubscription);
-        webPush.sendNotification(
-          pushSubscription,
-          payload,
-          notificationOptions
-        );
-        return resolve("created");
-      }
-      else return resolve("no endpoint");
+      if(pushSubscription){
+        if(pushSubscription.endpoint){
+          console.log("Push subscription", pushSubscription);
+          webPush.sendNotification(
+            pushSubscription,
+            payload,
+            notificationOptions
+          );
+          return resolve("created");
+        } else return resolve("no endpoint");
+      } else return resolve("no subscription");
     });
   });
 };

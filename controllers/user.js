@@ -711,8 +711,10 @@ exports.postSubscription = async (req, res, next) => {
   }
   let subscription = JSON.parse(req.body.subscription);
   console.log("Logging system endpoint", subscription.endpoint);
-  if(subscription.endpoint)
-  return res.send(await Subscription.updateSubscription(req.user.ldap, subscription));
+  if(subscription){
+    if(subscription.endpoint) return res.send(await Subscription.updateSubscription(req.user.ldap, subscription));
+  }
+  else return res.send("Invalid subscription to update");
 };
 
 /**

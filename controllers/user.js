@@ -204,7 +204,7 @@ exports.getSet = async (req, res, next) => {
  * POST /set
  * Set usermane and password.
  */
-exports.postSet = (req, res, next) => {
+exports.postSet = async (req, res, next) => {
   //console.log(req.body);
   if (!req.user) {
     logger.info(req.ip + " posted /set without login");
@@ -574,7 +574,7 @@ exports.postProfile = async (req, res, next) => {
     req.flash('errors', 'Inapporpriate estimation');
     return res.redirect('/profile/'+ req.params.ldap);
   }
-  
+
   if(req.body.repredict){
     let updatePrediction = await Prediction.updatePrediction(req.body.mid, req.user.mid, req.body.salary);
     let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary));    

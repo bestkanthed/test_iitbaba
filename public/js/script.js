@@ -1,3 +1,8 @@
+window.onload=function() {
+    $(function () {
+        $('body').show();
+    });
+}
 var app = (function() {
   'use strict';
 
@@ -145,8 +150,3 @@ var app = (function() {
   }
 
 })();
-window.onload=function() {
-    $(function () {
-        $('body').show();
-    });
-}

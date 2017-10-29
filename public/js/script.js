@@ -145,3 +145,7 @@ var app = (function() {
   }
 
 })();
+
+$(function () {
+    $('body').show();
+});

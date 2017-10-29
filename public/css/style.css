@@ -1,3 +1,12 @@
+#loading-mask {
+    background-color: white;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+}
 .black-theme{
     color:rgba(0,0,0,0.85) !important;
     font-family :'Raleway', sans-serif;

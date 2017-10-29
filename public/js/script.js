@@ -1,7 +1,5 @@
 window.onload=function() {
-    $(function () {
-        $('body').show();
-    });
+  document.getElementById('loading-mask').style.display='none';
 }
 var app = (function() {
   'use strict';

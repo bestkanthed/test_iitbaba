@@ -580,7 +580,7 @@ exports.postProfile = async (req, res, next) => {
     let salary = await service.updateDatabasePostRePrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary));    
     console.log('Inside repredict');
 
-    let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" re-predicted for you", salary);
+    let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, toTitleCase(req.user.first_name)+" re-predicted for you", salary);
 
     req.flash('success', { msg: 'Predicted!' });
     return res.redirect('/profile/'+req.params.ldap);
@@ -590,7 +590,7 @@ exports.postProfile = async (req, res, next) => {
     let createPrediction = await Prediction.createPrediction(req.body.mid, req.user.mid, req.body.salary);
     let salary = await service.updateDatabasePostPrediction(Number(req.body.mid), Number(req.user.mid), Number(req.body.salary));
     // returns the new salary that can be then shown 
-    let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, req.user.first_name+" predicted for you", salary);
+    let notification = await Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, toTitleCase(req.user.first_name)+" predicted for you", salary);
     console.log('not Inside repredict');    
     req.flash('success', { msg: 'Predicted!' });
     if(req.body.popup) return res.send("predicted");
@@ -671,7 +671,7 @@ exports.postRequest = async (req, res, next) => {
     for(rel of req.body.relationship){
       relationship = relationship + " "+rel;
     }
-    await Notification.createNotification(req.body.ldap, req.user.ldap, toTitleCase(req.user.first_name.toLowerCase())+" related to you as"+relationship);
+    await Notification.createNotification(req.body.ldap, req.user.ldap, toTitleCase(req.user.first_name)+" related to you as"+relationship);
     return res.send(relationship);
   }
   else {

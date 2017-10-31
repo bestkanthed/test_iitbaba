@@ -55,9 +55,9 @@ block content
       width = +svg.attr("width"),
       height = +svg.attr("height");
       var color = d3.scaleOrdinal(d3.schemeCategory20);
-      let screenConst = width/480;
+      let screenConst = width/960;
       var simulation = d3.forceSimulation()
-      .force("collide", d3.forceCollide().radius(function(d) { return screenConst*d.sal; }))
+      .force("collide", d3.forceCollide().radius(function(d) { return screenConst*d.sal*2; }))
       .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(function(d) {return screenConst*150;}).strength(0.3))
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2));
@@ -97,7 +97,7 @@ block content
         .enter()
         .append('a').attr("xlink:href", function(d) { return "profile/"+ d.ldap; })
         .append("circle")
-        .attr("r", function(d) { return screenConst*d.sal; })
+        .attr("r", function(d) { return screenConst*d.sal*2; })
         .attr("fill", function(d) { return "url(#"+d.ldap+")"; })
         //.attr("fill", function(d) {catpattern.append("image").attr("xlink:href", "/images/profile/"+d.ldap); return "url(#catpattern)";})
         //.attr("fill", function(d) { return color(d.group); })

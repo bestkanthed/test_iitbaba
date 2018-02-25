@@ -3,7 +3,7 @@ const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const request = require('request');
 const User = require('../models/User');
-const standard = require('./standard');
+const config = require('./config');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -19,13 +19,14 @@ passport.deserializeUser((id, done) => {
  * Sign in using Email and Password.
  */
 passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ ldap : username.toLowerCase() }, (err, user) => {
-    if (err) { return done(err); }
+  User.findOne({ ldap : username }, (err, user) => {
+    if (err) { 
+      console.log("DB err", err);return done(err); }
     if (!user) {
       return done(null, false, { msg: `LDAP ${username} not found.` });
     }
     user.comparePassword(password, (err, isMatch) => {
-      if (err) { return done(err); }
+      if (err) { console.log("comare pass err", err); return done(err); }
       if (isMatch) {
         return done(null, user);
       }
@@ -43,7 +44,7 @@ passport.use('oauth2', new OAuth2Strategy({
     tokenURL: 'https://gymkhana.iitb.ac.in/sso/oauth/token',
     clientID: process.env.IITB_SSO_CLIENT_ID,
     clientSecret: process.env.IITB_SSO_CLIENT_SECRET,
-    callbackURL: "https://iitbaba.com/auth/iitbsso/callback",
+    callbackURL: config.domain+'/auth/iitbsso/callback',
     passReqToCallback: true
   },
   function(req, accessToken, refreshToken, profile, done) {

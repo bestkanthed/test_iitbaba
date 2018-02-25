@@ -19,7 +19,7 @@ relationSchema.statics.createRelation = function createRelation(ldap1, ldap2) {
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
       if(!rel){
-        this.model('Relation').create({ 
+        this.model('Relation').create({
           ldap1: ldap1, 
           ldap2: ldap2,
           predicted: false,
@@ -162,11 +162,11 @@ relationSchema.statics.unfriend = function unfriend(ldap1, ldap2) {
 
 relationSchema.statics.findMostRelatedUsers = function findMostRelatedUsers(ldap) {
   return new Promise ((resolve, reject) => { 
-    this.model('Relation').find({ ldap1: ldap},{},{sort:{ "relation" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
-      if(err) reject(err);
+    this.model('Relation').find({ ldap2: ldap, predicted: false},{},{sort:{ "relation" : -1} }).select('ldap1 -_id').exec((err, rel)=>{
+      if(err) return reject(err);
       let result = [];
-      for(ldp of rel) result.push(ldp.ldap2);
-      resolve(result);
+      for(ldp of rel) result.push(ldp.ldap1);
+      return resolve(result);
     });
   });
 };
@@ -215,15 +215,29 @@ relationSchema.statics.getGraphLinks = function getGraphLinks() {
       if(err) reject(err);
       //console.log("Logging all predictions ", allPredictions);      
       let links = [];
+
       for(rel of allRel){
         //console.log("Logging relation", rel);
         let link = {};
+        let relCoff = 0;
         if(rel.predicted) link.predicted = true;
         if(rel.relationship){
           if (rel.relationship.length){
             //console.log("Logging reltionship", rel.relationship);
             let relationship='';
             for(relL of rel.relationship){
+              if(relL=='Best') relCoff=relCoff+3;
+              if(relL=='Ex') relCoff=relCoff-0.3;
+              if(relL=='Roommate') relCoff=relCoff+2;
+              if(relL=='Wingmate') relCoff=relCoff+1;
+              if(relL=='Inmate') relCoff=relCoff+0.1;
+              if(relL=='Friend') relCoff=relCoff+0.5;
+              if(relL=='Girlfriend') relCoff=relCoff+2.5;
+              if(relL=='Boyfriend') relCoff=relCoff+2.5;
+              if(relL=='Crush') relCoff=relCoff+3;
+              if(relL=='Classmate') relCoff=relCoff+0.25;
+              if(relL=='Batchmate') relCoff=relCoff+0.1;
+              if(relL=='Teammate') relCoff=relCoff+1;
               relationship = relationship + " "+relL;
             }
             link.relationship = relationship;
@@ -236,7 +250,7 @@ relationSchema.statics.getGraphLinks = function getGraphLinks() {
           else link.source = "1";
           if (target) link.target = target.toString();
           else link.target = "1";
-          link.value = 15;
+          link.value = relCoff;
           links.push(link);
         }
       }

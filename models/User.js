@@ -99,9 +99,15 @@ userSchema.pre('save', function save(next) {
  * Helper method for validating user's password.
  */
 userSchema.methods.comparePassword = function comparePassword(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-    cb(err, isMatch);
-  });
+  if(!this.password) {
+    cb(null, false);
+  }
+  else {
+    bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+      cb(err, isMatch);
+    });
+  }
+  
 };
 
 /**
@@ -118,36 +124,36 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
-userSchema.statics.initializeUser = function initializeUser(user, info){
+userSchema.methods.initializeUser = function initializeUser(info){
   return new Promise ((resolve, reject) => { 
-    user.profile.id =  info.id;
-    user.profile.first_name =  info.first_name;
-    user.profile.last_name = info.last_name;
-    user.profile.username = info.username;
-    user.profile.deg_type = info.type;
-    user.profile.profile_picture = info.profile_picture;
-    user.profile.sex = info.sex;
-    user.profile.email = info.email;
-    user.profile.mobile = info.mobile;
-    user.profile.roll_number = info.roll_number;
-    user.profile.contacts = info.contacts;
+    this.profile.id =  info.id;
+    this.profile.first_name =  info.first_name;
+    this.profile.last_name = info.last_name;
+    this.profile.username = info.username;
+    this.profile.deg_type = info.type;
+    this.profile.profile_picture = info.profile_picture;
+    this.profile.sex = info.sex;
+    this.profile.email = info.email;
+    this.profile.mobile = info.mobile;
+    this.profile.roll_number = info.roll_number;
+    this.profile.contacts = info.contacts;
     if(info.insti_address){
-      user.profile.insti_address.id = info.insti_address.id;
-      user.profile.insti_address.room = info.insti_address.room;
-      user.profile.insti_address.hostel = info.insti_address.hostel;
-      user.profile.insti_address.hostel_name = info.insti_address.hostel_name;
+      this.profile.insti_address.id = info.insti_address.id;
+      this.profile.insti_address.room = info.insti_address.room;
+      this.profile.insti_address.hostel = info.insti_address.hostel;
+      this.profile.insti_address.hostel_name = info.insti_address.hostel_name;
     }
     if(info.program){    
-      user.profile.program.id = info.program.id;
-      user.profile.program.department = info.program.department;
-      user.profile.program.department_name = info.program.department_name;
-      user.profile.program.join_year = info.program.join_year;
-      user.profile.program.graduation_year = info.program.graduation_year;
-      user.profile.program.degree = info.program.degree;
-      user.profile.program.degree_name = info.program.degree_name;
+      this.profile.program.id = info.program.id;
+      this.profile.program.department = info.program.department;
+      this.profile.program.department_name = info.program.department_name;
+      this.profile.program.join_year = info.program.join_year;
+      this.profile.program.graduation_year = info.program.graduation_year;
+      this.profile.program.degree = info.program.degree;
+      this.profile.program.degree_name = info.program.degree_name;
     }
-    user.profile.secondary_emails = info.secondary_emails;
-    user.save(err=>{
+    this.profile.secondary_emails = info.secondary_emails;
+    this.save(err=>{
       if(err) reject(err);
       console.log("user saved");
       resolve("created");
@@ -155,25 +161,45 @@ userSchema.statics.initializeUser = function initializeUser(user, info){
   });
 };
 
+userSchema.statics.getNo = function getNo(){
+  return new Promise ((resolve, reject) => { 
+    this.model('User').count((err, count)=>{
+      if(err) reject(err);
+      return resolve(count);
+    });
+  });
+};
+
 userSchema.statics.getUser = function getUser(ldap){
   return new Promise ((resolve, reject) => { 
-    this.model('User').findOne({ ldap: ldap }).exec((err, user)=>{
-      //console.log("Logging from get user");
-      //console.log(user);
+    this.model('User').findOne({ ldap: ldap}).exec((err, user)=>{
       if(err) reject(err);
       resolve(user);
     });
   });
 };
 
-userSchema.statics.setMID = function getUser(ldap, mid){
+userSchema.statics.setMID = function setMID(ldap, mid){
   return new Promise ((resolve, reject) => { 
     this.model('User').findOne({ ldap: ldap }).exec((err, user)=>{
       if(err) reject(err);
       user.mid = mid;
       user.save((err, usr)=>{
         if(err) reject(err);
-        resolve('mid saved');
+        return resolve('mid saved');
+      });
+    });
+  });
+};
+
+userSchema.statics.setComplete = function setComplete(ldap, complete){
+  return new Promise ((resolve, reject) => { 
+    this.model('User').findOne({ ldap: ldap }).exec((err, user)=>{
+      if(err) reject(err);
+      user.complete = complete;
+      user.save((err, usr)=>{
+        if(err) reject(err);
+        return resolve('complete saved');
       });
     });
   });
@@ -212,7 +238,7 @@ userSchema.statics.ifExists = function ifExists(ldap) {
 userSchema.statics.getSearchResult = function getSearchResult(query) {
   return new Promise ((resolve, reject) => { 
     console.log(query);
-    let built_query = {};
+    let built_query = {complete : 3};
     if (query.degree) built_query['profile.program.degree'] = { $in: _.isArray(query.degree) ? query.degree : [query.degree] };
     if (query.year_of_joining) built_query['profile.program.join_year'] = { $in: _.isArray(query.year_of_joining) ? query.year_of_joining : [query.year_of_joining] };
     if (query.department) built_query['profile.program.department'] = { $in: _.isArray(query.department) ? query.department : [query.department] };
@@ -264,28 +290,12 @@ userSchema.statics.getUserNameByMID = function getUserNameByMID(mid) {
   });
 };
 
-userSchema.statics.setComplete = function setComplete(ldap, completeLevel) {
+userSchema.methods.setComplete = function setComplete(completeLevel) {
   return new Promise ((resolve, reject) => { 
-    this.model('User').findOne({ldap: ldap},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
-      if(err) reject(err);
-      if(ldap) {
-        ldap.complete = completeLevel;
-        ldap.save(err=>{
-          if(err) return reject(err);
-          return resolve("updated");
-        });
-      }
-      else return resolve("no such ldap");
-    });
-  });
-};
-
-userSchema.statics.getComplete = function getComplete(ldap, completeLevel) {
-  return new Promise ((resolve, reject) => { 
-    this.model('User').findOne({ldap: ldap},{},{sort:{ "createdAt" : -1} }).exec((err, ldap)=>{
+    this.complete = completeLevel;
+    this.save(err => {
       if(err) return reject(err);
-      if(ldap) return resolve(ldap.complete);
-      else return resolve(null);
+      return resolve("updated");
     });
   });
 };

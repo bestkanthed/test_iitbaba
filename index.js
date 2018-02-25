@@ -12,27 +12,10 @@ const winston = require('winston');
 const fs = require('fs');
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
 const morgan = require('morgan');
-
-const logger = new (winston.Logger)({
-  transports: [
-    new (winston.transports.File)({
-      name: 'error',
-      filename: 'errors.log',
-      level: 'error'
-    }),
-    new (winston.transports.File)({
-      name: 'info',
-      filename: 'info.log',
-      level: 'info'
-    })
-  ]
-});
+const logger = require('./utilities/logger');
 
 dotenv.load({ path: '.env.test' });
 
-const User = require('./models/User');
-const userController = require('./controllers/user');
-const homeController = require('./controllers/home');
 const passportConfig = require('./config/passport');
 const app = express();
 
@@ -72,62 +55,108 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: 3600 }));
+
+
+/**
+ * For testing
+ */
+const testController = require('./controllers/test');
+
+
+/**
+ * For all visitors
+ */
+const homeController = require('./controllers/home');
+
+
+/**
+ * For all logged in users
+ */
+const User = require('./models/User');
+const userAccountSetupController = require('./controllers/userAccountSetup');
+const userAccountSecurityController = require('./controllers/userAccountSecurity');
+const userAccountController = require('./controllers/userAccount');
+const userProductController = require('./controllers/userProduct');
+
+/**
+ * Open routes
+ */
+
+app.get('/createTestUser', testController.createTestUser);
+
+app.get('/', homeController.home);
+
+app.get('/about', homeController.getAbout);
+
+app.get('/invite', homeController.getInvite);
+
+app.get('/login', userAccountSecurityController.getLogin);
+app.post('/login', userAccountSecurityController.postLogin);
+
+app.get('/account/forgot', userAccountSecurityController.getForgot);
+app.post('/account/forgot', userAccountSecurityController.postForgot);
+
+app.get('/account/reset', userAccountSecurityController.getReset);
+app.post('/account/reset', userAccountSecurityController.postReset);
+
+app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile ldap picture sex phone program insti_address'}));
+app.get('/auth/iitbsso/callback', userAccountSecurityController.gotCallback);
+
+app.get('/logout', userAccountSecurityController.logout);
+
+/**
+ * Closed to user routes
+ */
+
 app.use((req, res, next) => {
-  // After successful login, redirect back to the intended page
-  if (!req.user &&
-      req.path !== '/login' &&
-      req.path !== '/signup' &&
-      !req.path.match(/^\/auth/) &&
-      !req.path.match(/\./)) {
-    req.session.returnTo = req.path;
-  } else if (req.user &&
-      req.path == '/account') {
-    req.session.returnTo = req.path;
+  // If user is not logged in and trying to use internal paths, save his path
+  if (!req.user) {
+    if(req.path!='/subscription' && req.path!='/request' && req.path!='/notification') req.session.returnTo = req.path;
+    return res.redirect('/login');
   }
   next();
 });
 
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 3600 }));
+app.get('/account/setup/1', userAccountSetupController.getSet);
+app.post('/account/setup/1', userAccountSetupController.postSet);
 
-app.get('/', userController.home);
+app.get('/account/setup/2', userAccountSetupController.getPicture);
+app.post('/account/setup/2', userAccountSetupController.postPicture);
 
-app.get('/login', userController.getLogin);
-app.post('/login', userController.postLogin);
+app.get('/account/setup/3', userAccountSetupController.getAverage);
+app.post('/account/setup/3', userAccountSetupController.postAverage);
 
-app.get('/logout', userController.logout);
+app.use((req, res, next) => {
+  if(!req.user.complete) return res.redirect('/account/setup/1');
+  if(req.user.complete == 1) return res.redirect('/account/setup/2');
+  if(req.user.complete == 2) return res.redirect('/account/setup/3');
+  next();
+});
 
-app.get('/set', userController.getSet);
-app.post('/set', userController.postSet);
+app.get('/account/edit', userAccountController.getEdit);
+app.post('/account/edit', userAccountController.postEdit);
 
-app.get('/picture', userController.getPicture);
-app.post('/picture', userController.postPicture);
+app.get('/suggestion', userProductController.getPredict);
+app.get('/prediction', userProductController.getPredictions);
 
-app.get('/avg', userController.getAverage);
-app.post('/avg', userController.postAverage);
+app.get('/profile/:ldap', userProductController.getProfile);
+app.post('/profile/:ldap', userProductController.postProfile);
 
-app.get('/predict', userController.getPredict);
-app.get('/predictions', userController.getPredictions);
+app.get('/search', userProductController.getSearch);
 
-app.get('/profile/:ldap', userController.getProfile);
-app.post('/profile/:ldap', userController.postProfile);
+app.get('/circle', userProductController.getCircle);
 
-app.get('/edit', userController.getEdit);
-app.post('/edit', userController.postEdit);
+app.post('/subscription', userProductController.postSubscription);
 
-app.get('/about', userController.getAbout);
+app.post('/request', userProductController.postRequest);
 
-app.get('/search', userController.getSearch);
+app.get('/notification', userProductController.getNotification);
+app.post('/notification', userProductController.postNotification);
 
-app.get('/circle', userController.getCircle);
-
-app.post('/subscription', userController.postSubscription);
-
-app.post('/request', userController.postRequest);
-
-app.post('/notification', userController.postNotification);
-
-app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile ldap picture sex phone program insti_address' }));
-app.get('/auth/iitbsso/callback', userController.gotCallback);
+app.get('*', function(req, res){
+  return res.render('notFound', { title : 'Not found' });
+});
 
 app.use(function (err, req, res, next) {
   logger.error(err.stack);
@@ -135,6 +164,6 @@ app.use(function (err, req, res, next) {
   res.status(500).send(err);
 });
 
-app.listen(5000,'127.0.0.1' ,() => {
+app.listen(5000,'0.0.0.0' ,() => {
   console.log('  Press CTRL-C to stop\n');
 });

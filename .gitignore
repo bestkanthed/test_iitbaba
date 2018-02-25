@@ -13,3 +13,10 @@ info.log
 # Docker
 Dockerfile
 docker-compose.yml
+
+#Uploads
+# First, ignore everything
+public/images/profile/*
+
+# Whitelist default flag image
+!public/images/profile/null.png

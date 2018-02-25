@@ -1,8 +1,8 @@
 extends layout
 
 block content
-  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css')
-  script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js')
+  link(rel='stylesheet', href='/css/bootstrap-select.min.css')
+  script(src='/js/lib/bootstrap-select.min.js')
   .container.profile
     .row.profile
         .col-lg-4.col-sm-12.profile-img
@@ -34,7 +34,8 @@ block content
                 p.profile.name.info-title
                     strong=userp.first_name+" "+userp.last_name
                 p.profile.known=userp.known
-                p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
+                if userp.profile.program
+                    p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
                 if userp.hostel && user.room
                     p.profile.hostel="Hostel "+userp.hostel+" | Room "+userp.room
                 else
@@ -143,19 +144,4 @@ block content
             return 0;
         }
         
-      });
-
-      $("#prediction").submit(function() {
-          console.log("This");
-          console.log(sal);
-          console.log("That");
-          if($("#salary").val()>sal*3 || $("#salary").val()>100){
-              alert("Too high. Try something else.");
-              return false;
-          } 
-          if($("#salary").val()<sal/2 || $("#salary").val()<3.5){
-              alert("Too low. Try something else.");
-              return false;
-          }
-          return true;
       });

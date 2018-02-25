@@ -74,7 +74,7 @@ input[type=text].search-box {
     background-image: url('/css/images/searchicon.png');
     background-position: 8px 6px; 
     background-repeat: no-repeat;
-    padding: 12px 20px 12px 40px;
+    padding-left: 20px;
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;
 }
@@ -950,4 +950,40 @@ button.btn.dropdown-toggle:focus {
     img.baba{
         width: 480px;
     }   
+}
+.alert{
+    margin-top: 80px;
+    font-family: 'Raleway', sans-serif;
+}
+.invite_button{
+    padding-top: 16px; 
+}
+.shirt-img-div-1{
+    text-align : right;
+}
+.shirt-img {
+    height: 400px;
+}
+#mobile-invite{
+    display: none;
+}
+@media screen and (max-width: 480px) {
+    .shirt-img {
+        width: 95%;
+        height: auto;        
+    }
+    .shirt-img-div-1{
+        text-align : center;
+        padding-bottom: 16px;
+    }
+    .shirt-img-div-2{
+        text-align : center;
+        padding-bottom: 8px;
+    }
+    #mobile-invite{
+        display: block;
+    }
+    #desktop-invite{
+        display: none;
+    }
 }

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Subscription = require('./Subscription');
 const webPush = require('web-push');
+const Email = require('../utilities/email');
 
 const notificationOptions = {
   TTL: 60,
@@ -30,7 +31,7 @@ notificationSchema.statics.createNotification = function createNotification(ldap
   return new Promise ((resolve, reject) => {
       this.model('Notification').create({ 
       ldap: ldap, 
-      from: from, 
+      from: from,
       notification: notification,
       link: '/profile/'+from,
       seen: false,
@@ -44,7 +45,7 @@ notificationSchema.statics.createNotification = function createNotification(ldap
       });
 
       console.log("Logging Payload", payload);
-
+      let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'/notifications">here</a> to respond </p></div>');
       let pushSubscription = await Subscription.getSubscription(ldap);
       if(pushSubscription){
         if(pushSubscription.endpoint){
@@ -64,7 +65,8 @@ notificationSchema.statics.createNotification = function createNotification(ldap
 notificationSchema.statics.createNotificationWithSalary = function createNotification(ldap, from, notification, salary) {
   return new Promise ((resolve, reject) => {
       let color = salary.change>0?"green":"red";
-      if(salary.change==0) color = "blue";
+      if(salary.change.toFixed(2)==0) color = "blue";
+      console.log("Logging salary from notification", salary);
       this.model('Notification').create({ 
       ldap: ldap, 
       from: from,
@@ -80,7 +82,6 @@ notificationSchema.statics.createNotificationWithSalary = function createNotific
       clicked: false
     }, async (err, noti)=>{
       if(err) return reject(err);
-
       let payload = JSON.stringify({
         from: from,
         notification: notification,
@@ -92,8 +93,7 @@ notificationSchema.statics.createNotificationWithSalary = function createNotific
         }
       });
       
-      console.log("Logging Payload", payload);
-
+      let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'/notifications">here</a> to respond </p></div>');      
       let pushSubscription = await Subscription.getSubscription(ldap);
       if(pushSubscription){
         console.log("Push subscription", pushSubscription);

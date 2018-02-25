@@ -1,6 +1,3 @@
-window.onload=function() {
-  document.getElementById('loading-mask').style.display='none';
-}
 var app = (function() {
   'use strict';
 

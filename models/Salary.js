@@ -27,7 +27,7 @@ salarySchema.statics.updateSalaries = function updateSalaries(salaries) {
   });
 };
 
-salarySchema.statics.getSalary = function newSalary(mid, sal) {
+salarySchema.statics.getSalary = function getSalary(mid, sal) {
   return new Promise ((resolve, reject) => {
     this.model('Salary').findOne({ mid: mid },{},{sort:{ "createdAt" : -1} }).exec( (err, sal) => {
       if(err) return reject(err);

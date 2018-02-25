@@ -4,11 +4,12 @@ block content
   .container.avg
     .row.row-hiw
       .col-lg-6.col-sm-12.col-hiw
-        h1.hiw-title How it works
+        h1.hiw-title 
+          span How it works
+          img(src='/images/pagerank.png', width='100%')
         p You estimate how much your friends will earn when they graduate.
         p They estimate for you.
         p Unit for prediction is Lakh INR/year everywhere.
-        p By PageRank algorithm everyone's worth is calculated. Know how.
         p Start with estimating yourself when you graduate.
         form#prediction(method='POST')
           input(type='hidden', name='_csrf', value=_csrf)

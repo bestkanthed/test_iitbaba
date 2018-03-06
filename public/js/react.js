@@ -1,1 +1,1 @@
-import Notifications from './components/Notifications';
+import Notifications from './components/Notification';

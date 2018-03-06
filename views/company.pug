@@ -1,0 +1,18 @@
+extends layout
+
+block content
+    .container.about
+      .row
+        .col-lg-12
+            h1 Companies handcrafted for you
+            h1 Learn | Grow | Earn           
+        .col-lg-12
+            - for(let i=0; i<companies.length; i++)
+                .row
+                    a(href='/company/'+companies[i].id)
+                        .col-lg-1.col-sm-2
+                            img(src='/images/company/logo/'+companies[i].name+'.png', style='width: 100%; border-radius:4px;')
+                        .col-lg-4=companies[i].name
+                        .col-lg-4=companies[i].website
+                        .col-lg-12
+                            h5=companies[i].mission

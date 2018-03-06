@@ -16,8 +16,7 @@ const subscriptionSchema = new mongoose.Schema({
 
 subscriptionSchema.statics.updateSubscription = function updateSubscription(ldap, subscription) {
   return new Promise ((resolve, reject) => {
-      console.log("logging subscription : ", subscription);
-    this.model('Subscription').findOne({ldap: ldap}, (err, subs)=>{
+      this.model('Subscription').findOne({ldap: ldap}, (err, subs)=>{
         if(err) reject(err);
         if(subs){
             subs.subscription.endpoint = subscription.endpoint;
@@ -28,8 +27,7 @@ subscriptionSchema.statics.updateSubscription = function updateSubscription(ldap
                 if(err) reject(err);
                 resolve("updated");
             });
-        }else{
-            console.log("Reached till else");
+        } else {
             this.model('Subscription').create({ 
                 ldap: ldap,
                 subscription:{

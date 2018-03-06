@@ -1,13 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-export default class Notifications extends React.Component {
+export default class Internship extends React.Component {
   constructor(props) {
     super(props);
     //this.handleChange = this.handleChange.bind(this);
     //this.handleSubmit = this.handleSubmit.bind(this);
   }
   render() {
-    console.log("this props in notifiaction comming from the get requesrt", this.props);
     return (
       <span className='notifications'>
         <NotificationButton />
@@ -80,6 +79,5 @@ $.get("/notification").done(response => {
   if(response.notifications) {
     ReactDOM.render(<NotificationMenu notifications={response.notifications.notifications}/>, document.getElementById('notification-dropdown'));
     if(response.notifications.unseen) $('#notification-label').text(response.notifications.unseen);
-    console.log("Logging unseen", response.notifications.unseen);
   }
-});
+}); 

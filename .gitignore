@@ -18,5 +18,9 @@ docker-compose.yml
 # First, ignore everything
 public/images/profile/*
 
+#Uploads
+# First, ignore everything
+public/images/company/logo/*
+
 # Whitelist default flag image
-!public/images/profile/null.png
+!public/images/company/logo/default.png

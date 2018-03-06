@@ -175,7 +175,6 @@ relationSchema.statics.getLdapsOfPeopleWhoPredicted = function getLdapsOfPeopleW
   return new Promise ((resolve, reject) => { 
     this.model('Relation').find({ ldap1: ldap, predicted:true },{},{sort:{ "createdAt" : -1} }).select('ldap2 -_id').exec((err, rel)=>{
       if(err) reject(err);
-      console.log("Logging predicted people");
       //console.log(rel);
       if(rel!=null){
         let result = [];

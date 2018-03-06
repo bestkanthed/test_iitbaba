@@ -1,0 +1,50 @@
+extends layout
+
+block content
+    .container.about
+      .row Learn | Grow | Earn
+        .col-lg-12
+            h1 Companies refined by process
+            h3 StampMyVisa
+            img(id='logo')
+            p Position : Software Engineer | Pay : INR 15k/month | Duration : 2 months
+            br
+            p Company Mission : Rev. visa industry Onclick open req  upload/have resume??? font aqua
+            p invite a friend who might like this internship Hey bro gerate internship for you, get tshirt if your ref get internship
+            .row
+              .col-lg-6.col-sm-12.shirt-img-div-1
+                img.shirt-img(src='/images/baba_tshirt_front.png', height='400', style='border-radius : 20px;')
+              .col-lg-6.col-sm-12.shirt-img-div-2
+                img.shirt-img(src='/images/baba_tshirt_back.png', height='400' , style='border-radius : 20px;')
+            .row#mobile-invite(style='padding-top: 16px')            
+                .col-lg-6.col-sm-6.share(style='font-size:10px;')
+                    a(href="whatsapp://send?text=https://iitbaba.com/auth/iitbsso?REFME", data-action="share/whatsapp/share") 
+                        i.fa.fa-whatsapp
+                        | &nbsp;Invite via Whatsapp
+                .col-lg-6.col-sm-6.share(style='font-size:10px;')
+                    a(href="fb-messenger://share/?link=https://iitbaba.com/auth/iitbsso?REFME")
+                        i.fa.fa-facebook
+                        | &nbsp;Invite via Messenger
+            .row#desktop-invite.invite_button
+                .col-lg-4
+                .col-lg-4
+                    button.profile#invite(style='border-radius : 8px;') Invite
+                .col-lg-4
+    script.
+        $(document).ready(function() {
+            $.ajaxSetup({ cache: true });
+            $.getScript('https://connect.facebook.net/en_US/sdk.js', function(){
+                FB.init({
+                    appId: '172447820214193',
+                    version: 'v2.7' // or v2.1, v2.2, v2.3, ...
+                });
+                $('#loginbutton,#feedbutton').removeAttr('disabled');
+                //FB.getLoginStatus(updateStatusCallback);
+            });
+        });
+        $('#invite').click(function() {
+            FB.ui({
+                method: 'send',
+                link: 'https://iitbaba.com/auth/iitbsso',
+            });
+        });

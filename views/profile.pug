@@ -122,7 +122,6 @@ block content
 
       $('#rel').on('submit', function(e) {
         e.preventDefault();
-        console.log("prevented");
         $.post("/request", $(this).serialize()).done(function( data ) {
             $('#rel-display').text(data);
             console.log(data);
@@ -130,8 +129,6 @@ block content
       });
 
       $("#update").click(function() {
-        console.log(this.id);
-        console.log($(this).attr("state"));
         if($(this).attr("state")=='update'){
             $(this).text("SAVE");
             $(this).attr("state", 'save');

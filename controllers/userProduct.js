@@ -17,6 +17,24 @@ const Search = require('../models/Search');
 const Subscription = require('../models/Subscription');
 const _ = require('lodash');
 
+const internship = require('./userProduct/internship');
+
+/**
+ * Internships
+ */
+exports.getInternshipPage = internship.getInternshipPage;
+
+exports.getInternship = internship.getInternship;
+exports.postInternship = internship.postInternship;
+
+exports.getPostInternshipPage = internship.getPostInternshipPage;
+exports.postPostInternshipPage = internship.postPostInternshipPage;
+
+/*
+exports.getReviewInternship = internship.getReviewInternship;
+exports.postReviewInternship = internship.postReviewInternship;
+*/
+
 /**
  * get /circle
  * circle
@@ -135,7 +153,6 @@ exports.postProfile = async (req, res, next) => {
   }
 
   let mean = await Prediction.getMeanFor(req.body.mid);
-  console.log('mean', mean);
   if(mean<10) mean = 10;
   if(Number(req.body.salary)<mean/3 || Number(req.body.salary)>mean*3) {
     let inappropriatePrediction = InvalidPrediction.create(req.body.mid, req.user.mid, req.body.salary);

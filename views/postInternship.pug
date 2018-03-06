@@ -1,0 +1,87 @@
+extends layout
+
+block content
+    .container.edit
+      form(method='POST', enctype='multipart/form-data')
+        //input(type='hidden', name='_csrf', value=_csrf)
+        .row
+          .col-lg-12.col-edit
+            .row
+                h1 Comapany Details
+            .row
+                label.col-sm-3.control-label(for='companyName') Company Name 
+                .col-sm-9
+                    input.form-control(type='text', name='companyName', id='companyName', placeholder='', autofocus, required)
+            .row
+                label.col-sm-3.control-label(for='companyMissoin') Company Mission
+                .col-sm-9
+                    input.form-control(type='text', name='companyMissoin', id='companyMissoin', placeholder='', autofocus, required)
+            .row
+                label.col-sm-3.control-label(for='logo') Company Logo
+                .col-sm-9
+                    input.form-control(type='file', name='logo', id='logo', required)
+                .col-sm-9
+                    img(id='logoPreview', src='#', alt='Company Logo Preview', style='width: 40px; border-radius:4px;')
+            .row
+                label.col-sm-3.control-label(for='adderess') Adderess (Main)
+                .col-sm-9
+                    input.form-control(type='text', name='adderess', id='adderess', required)
+            .row
+                label.col-sm-3.control-label(for='website') Website
+                .col-sm-9
+                    input.form-control(type='text', name='website', id='website', required)
+            .row
+                label.col-sm-3.control-label(for='contactPerson') Primary Contact Person
+                .col-sm-9
+                    input.form-control(type='text', name='contactPerson', id='contactPerson', required)
+            .row
+                label.col-sm-3.control-label(for='contactNo') Primary Contact No.
+                .col-sm-9
+                    input.form-control(type='number', name='contactNo', id='contactNo', required)
+            .row
+                label.col-sm-3.control-label(for='contactEmail') Email for applicaiton notification
+                .col-sm-9
+                    input.form-control(type='contactEmail', name='contactEmail', id='contactEmail', required)
+            .row
+                h1 Internship Details
+            .row
+                label.col-sm-3.control-label(for='position') Position
+                .col-sm-9
+                    input.form-control(type='text', name='position', id='position', required)
+            .row
+                label.col-sm-3.control-label(for='jobDescription') Job Description
+                .col-sm-9
+                    textarea.form-control(type='text', name='jobDescription', id='jobDescription', required)
+            .row
+                label.col-sm-3.control-label(for='position') Stipend in INR/month
+                .col-sm-9
+                    input.form-control(type='number', name='position', id='position', required)
+            .row
+                label.col-sm-3.control-label(for='date') Tetative Start Date
+                .col-sm-9
+                    input.form-control(type='date', name='date', id='date')
+            .row
+                label.col-sm-3.control-label(for='duration') Duration in Months
+                .col-sm-9
+                    input.form-control(type='number', name='duration', id='duration')
+            .row
+                .col-sm-offset-3.col-sm-7
+                    button.col-sm-3.btn.btn-primary.black-theme-bg(type='submit')
+                        i.fa.fa-user
+                        |  Post Internship
+      script.
+        function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+                
+                reader.onload = function (e) {
+                    $('#logoPreview').attr('src', e.target.result);
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        $("#logo").change(function(){
+            readURL(this);
+        });

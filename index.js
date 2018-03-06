@@ -13,6 +13,7 @@ const fs = require('fs');
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
 const morgan = require('morgan');
 const logger = require('./utilities/logger');
+const fileUpload = require('express-fileupload');
 
 dotenv.load({ path: '.env.test' });
 
@@ -28,7 +29,7 @@ mongoose.connection.on('error', (err) => {
 });
 
 app.set('view engine', 'pug');
-
+app.use(fileUpload());
 app.use(morgan('combined', {stream: accessLogStream}));
 
 app.use(bodyParser.json({limit:'50mb'}));
@@ -78,6 +79,7 @@ const userAccountSetupController = require('./controllers/userAccountSetup');
 const userAccountSecurityController = require('./controllers/userAccountSecurity');
 const userAccountController = require('./controllers/userAccount');
 const userProductController = require('./controllers/userProduct');
+const companyController = require('./controllers/company');
 
 /**
  * Open routes
@@ -104,6 +106,19 @@ app.get('/auth/iitbsso', passport.authenticate('oauth2', { scope: 'basic profile
 app.get('/auth/iitbsso/callback', userAccountSecurityController.gotCallback);
 
 app.get('/logout', userAccountSecurityController.logout);
+
+/**
+ * Company routes
+ */
+app.get('/company', companyController.getCompany);
+
+app.get('/company/register', companyController.getRegisterCompany);
+app.post('/company/register', companyController.postRegisterCompany);
+
+app.get('/company/:companyId', companyController.getCompanyById);
+app.post('/company/:companyId', companyController.postCompanyById);
+
+app.post('/company/:companyId/:internshipId', companyController.postDeleteInternshipById);
 
 /**
  * Closed to user routes
@@ -145,6 +160,15 @@ app.post('/profile/:ldap', userProductController.postProfile);
 
 app.get('/search', userProductController.getSearch);
 
+app.get('/internship', userProductController.getInternshipPage);
+/*
+app.get('/internship/:intern', userProductController.getInternship);
+app.post('/internship/:intern', userProductController.postInternship);
+
+app.get('/internship/post', userProductController.getPostInternshipPage);
+app.post('/internship/post', userProductController.postPostInternshipPage);
+
+*/
 app.get('/circle', userProductController.getCircle);
 
 app.post('/subscription', userProductController.postSubscription);

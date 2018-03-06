@@ -70,10 +70,12 @@ input[type=text].search-box {
     border-color: rgba(0, 0, 0, 0.87);
     border-radius: 2px;
     font-size: 8x;
+    /*
     background-color: white;
     background-image: url('/css/images/searchicon.png');
     background-position: 8px 6px; 
     background-repeat: no-repeat;
+    */
     padding-left: 20px;
     -webkit-transition: width 0.4s ease-in-out;
     transition: width 0.4s ease-in-out;

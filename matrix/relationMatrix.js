@@ -22,7 +22,6 @@ exports.getRelation = (ldap1, ldap2) =>{
             }
             if(user1.profile.insti_address.hostel === user2.profile.insti_address.hostel) rel_coff = rel_coff + 3;
             if(user1.profile.sex !== user2.profile.sex) rel_coff = rel_coff + 2;
-            console.log("Logging relation coff", rel_coff);
             return resolve(rel_coff);
         //}).catch(err => { reject(err); });
     });

@@ -1,0 +1,64 @@
+extends layout
+
+block content
+    .container.about
+      .row
+        .col-lg-12
+            .row
+                .col-lg-1.col-sm-2
+                    img(src='/images/company/logo/'+company.name+'.png' style='width: 100%; border-radius:4px;')
+                .col-lg-4
+                    h1=company.name
+            .row
+                .col-lg-12
+                    h5=company.mission
+                .col-lg-12
+                    h6=company.website
+      .page-header
+        h3 Offered Internships
+      .row
+        .col-lg-12
+            - for(let i=0; i<internships.length; i++)
+                .row
+                    a(href='/company/'+company.id+'/internship/'+internships[i].id)
+                        .col-lg-4=internships[i].position
+                        .col-lg-4='INR '+internships[i].stipend+'/month'
+                        .col-lg-4=internships[i].duration+' months'
+                        .col-lg-12=internships[i].jobDescription
+      .page-header
+        h3 Add New
+      .row
+        .col-lg-12
+            .container.edit
+                form(method='POST')
+                    input(type='hidden', name='_csrf', value=_csrf)
+                    input(type='hidden', name='companyId', value=company.id)                    
+                    .row
+                        .col-lg-12.col-edit
+                            .row
+                                h1 Internship Details
+                            .row
+                                label.col-sm-3.control-label(for='position') Position
+                                .col-sm-9
+                                    input.form-control(type='text', name='position', id='position', required)
+                            .row
+                                label.col-sm-3.control-label(for='jobDescription') Job Description
+                                .col-sm-9
+                                    textarea.form-control(type='text', name='jobDescription', id='jobDescription', required)
+                            .row
+                                label.col-sm-3.control-label(for='stipend') Stipend in INR/month
+                                .col-sm-9
+                                    input.form-control(type='number', name='stipend', id='stipend', required)
+                            .row
+                                label.col-sm-3.control-label(for='startDate') Tetative Start Date
+                                .col-sm-9
+                                    input.form-control(type='date', name='startDate', id='startDate')
+                            .row
+                                label.col-sm-3.control-label(for='duration') Duration in Months
+                                .col-sm-9
+                                    input.form-control(type='number', name='duration', id='duration')
+                            .row
+                                .col-sm-offset-3.col-sm-7
+                                    button.col-sm-3.btn.btn-primary.black-theme-bg(type='submit')
+                                        i.fa.fa-user
+                                        |  Post Internship

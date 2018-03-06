@@ -155,8 +155,7 @@ userSchema.methods.initializeUser = function initializeUser(info){
     this.profile.secondary_emails = info.secondary_emails;
     this.save(err=>{
       if(err) reject(err);
-      console.log("user saved");
-      resolve("created");
+      return resolve("created");
     });
   });
 };
@@ -237,7 +236,6 @@ userSchema.statics.ifExists = function ifExists(ldap) {
 
 userSchema.statics.getSearchResult = function getSearchResult(query) {
   return new Promise ((resolve, reject) => { 
-    console.log(query);
     let built_query = {complete : 3};
     if (query.degree) built_query['profile.program.degree'] = { $in: _.isArray(query.degree) ? query.degree : [query.degree] };
     if (query.year_of_joining) built_query['profile.program.join_year'] = { $in: _.isArray(query.year_of_joining) ? query.year_of_joining : [query.year_of_joining] };
@@ -250,8 +248,7 @@ userSchema.statics.getSearchResult = function getSearchResult(query) {
     if (query.last_name) built_query['last_name'] = query.last_name;
     if (query.ldap) built_query['ldap'] = query.ldap;
     
-    console.log("Logging query form get search results in users");
-    console.log(built_query);
+    console.log("Logging query form get search results in users", built_query);
     
     this.model('User').find(built_query,{},{sort:{ "createdAt" : -1} }).exec((err, results)=>{
       if(err) reject(err);

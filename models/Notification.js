@@ -44,12 +44,10 @@ notificationSchema.statics.createNotification = function createNotification(ldap
         notification: notification,
       });
 
-      console.log("Logging Payload", payload);
       let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'/notifications">here</a> to respond </p></div>');
       let pushSubscription = await Subscription.getSubscription(ldap);
       if(pushSubscription){
         if(pushSubscription.endpoint){
-          console.log("Push subscription", pushSubscription);
           webPush.sendNotification(
             pushSubscription,
             payload,
@@ -66,7 +64,6 @@ notificationSchema.statics.createNotificationWithSalary = function createNotific
   return new Promise ((resolve, reject) => {
       let color = salary.change>0?"green":"red";
       if(salary.change.toFixed(2)==0) color = "blue";
-      console.log("Logging salary from notification", salary);
       this.model('Notification').create({ 
       ldap: ldap, 
       from: from,
@@ -96,7 +93,6 @@ notificationSchema.statics.createNotificationWithSalary = function createNotific
       let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'/notifications">here</a> to respond </p></div>');      
       let pushSubscription = await Subscription.getSubscription(ldap);
       if(pushSubscription){
-        console.log("Push subscription", pushSubscription);
         webPush.sendNotification(
           pushSubscription,
           payload,

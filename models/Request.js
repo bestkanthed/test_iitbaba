@@ -85,7 +85,6 @@ requestSchema.statics.clickRequest = function clickRequest(id) {
 
 requestSchema.statics.acceptRequest = function acceptRequest(id) {
   return new Promise ((resolve, reject) => { 
-    console.log(id);
     this.model('Request').findOne({ _id : id }, (err, requ)=>{
       if(err) reject(err);
       requ.accepted = true;

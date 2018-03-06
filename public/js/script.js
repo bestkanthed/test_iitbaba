@@ -84,8 +84,6 @@ var app = (function() {
     // and get the subscription object
     swRegistration.pushManager.getSubscription()
     .then(function(subscription) {
-      console.log("logging subs");
-      console.log(JSON.stringify(subscription));
       isSubscribed = (subscription !== null);
       if(!isSubscribed) return subscribeUser();
       updateSubscriptionOnServer(JSON.stringify(subscription));
@@ -126,7 +124,7 @@ var app = (function() {
   if ('serviceWorker' in navigator && 'PushManager' in window) {
     console.log('Service Worker and Push is supported');
 
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('/sw.js')
     .then(function(swReg) {
       console.log('Service Worker is registered', swReg);
 

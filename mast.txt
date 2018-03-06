@@ -1,3 +1,13 @@
 Predict how much your will friends earn.
 They predict how much will you earn.
 Based on PageRank Algorithm your estimate income is calculated.
+
+Apply - add resume.
+talent@iitbaba.com
+iitbaba.com/internships
+want to post for an internship? get bussiness login at realtions@iitbaba.com
+
+add shubham to coordinate.
+create an interface to post internships
+
+My create user becomes the outside intership provider

@@ -55,8 +55,8 @@ exports.gotCallback = async (req, res, next) => {
                 return res.redirect('/login');
             }
             user.ldap = info.username;
-            let userLogin = User.getUser(info.username);
-            if(await userLogin) {
+            let userLogin = await User.getUser(info.username);
+            if(userLogin) {
                 req.logIn(userLogin, (err) => {
                     if (err) return next(err);
                     req.flash('success', { msg: 'Successful Login!' });

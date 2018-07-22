@@ -88,6 +88,7 @@ const companyController = require('./controllers/company');
 app.get('/createTestUser', testController.createTestUser);
 
 app.get('/', homeController.home);
+app.get('/connection', homeController.getConnection);
 
 app.get('/about', homeController.getAbout);
 

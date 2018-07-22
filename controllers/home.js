@@ -6,6 +6,18 @@ const Graph = require('../models/Graph');
  */
 
 exports.home = async (req, res, next) => {
+    //let graph = Graph.read();
+    return res.render('index', { 
+      title : 'Home'
+    });
+};
+
+/**
+ * GET /connection
+ * connection page.
+ */
+
+exports.getConnection = async (req, res, next) => {
     let graph = Graph.read();
     return res.render('home', { 
       title : 'Home',

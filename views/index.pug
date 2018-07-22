@@ -1,96 +1,162 @@
-doctype html
-html
-  head
-    meta(charset='utf-8')
-    meta(http-equiv='X-UA-Compatible', content='IE=edge')
-    meta(name='viewport', content='width=device-width, initial-scale=1.0')
-    meta(name='theme-color' content='#4DA5F4')
-    meta(name='csrf-token', content=_csrf)
-    title #{title} - Hackathon Starter
-    link(rel='shortcut icon', href='/favicon.png')
-    link(rel='stylesheet', href='/css/main.css')
-    script(src="https://gymkhana.iitb.ac.in/sso/static/widget/js/login.min.js", type="application/javascript")
-    script(src="https://code.jquery.com/jquery-3.2.1.min.js")
+extends indexlayout
 
-  body
-    div(id="sso-root")
-    button(id='target')
-  
+block content
+  link(rel='stylesheet', type='text/css', href='/css/lib/slick/slick.css')
+  link(rel='stylesheet', type='text/css', href='/css/lib/slick/slick-theme.css')
+  script(type='text/javascript', src='/js/lib/slick.min.js')
+
+  #cover
+  #form-get-started
+    .center-div
+      .row
+        .cancel ✕
+      .row.get-started-row
+        .col-lg-5.form-image
+          img.go(src='/images/go.png', width='100%', style='border-radius: 16px 0 0 16px;')
+        .col-lg-7
+          form.show-requirements(method='POST', id='show_requirements_form')
+                input(type='hidden', name='_csrf', value=_csrf)
+                span I am travelling to &nbsp;
+                br
+                input.get-started-input.typeahead(type='text', name='country', id='country', placeholder='Country', required, autocomplete='off')
+                br
+                span &nbsp;for&nbsp;
+                br
+                select.get-started-input(name='purpose', id='purpose', placeholder='Purpose', required)
+                  option(value="Purpose", selected) Purpose
+                br
+                span &nbsp;with&nbsp;
+                br
+                span(style='color:#4a90e2;') &nbsp;Indian Passport&nbsp;
+                .form-group.show-req
+                  .col-sm-12
+                      button.btn.btn-primary.show-requirements-button(type='submit') SHOW REQUIREMENTS
+
+  .row.landing-row
+    .col-lg-12.banner
+      h1.banner_label This placement season, know who will be worth what.
+    .col-lg-12.banner
+      h3.banner_tagline Find the answer to the question at the back of your mind.
+    .col-lg-12.get_started
+      a(href='/auth/iitbsso').btn.btn-primary.btn-reset.black-theme-bg GET STARTED
+  .container
+    hr
+    .row.workflow-row.flip-in-phone
+      .col-md-6.col-sm-12.workflow-column-description
+        h2.workflow-heading Search
+        h3.workflow-description
+          span Do a natural search for people
+          br
+          br
+          ul
+            li Name, Hostel, Hometown, Year of Joining, Department, Gender, Hobbies, Interests... Anything!
+            br
+            li Just type it in the search box.
+            br
+          span AND CONNECT WITH THEM.
+      .col-md-6.col-sm-12.workflow-column-image
+        img.workflow-image(src='/images/search.svg')
+    hr
+    .row.workflow-row
+      .col-md-6.col-sm-12.workflow-column-image
+        img.workflow-image(src='/images/money.svg')
+      .col-md-6.col-sm-12.workflow-column-description
+        h2.workflow-heading Predict
+        h3.workflow-description 
+          span Predict much they'll be worth when they graduate.
+          br
+          br
+          ul
+            li Form Filling
+            br
+            li Cover Letter Drafting
+            br
+            li Appointment Booking
+            br
+          span Get prerequisites done by an expert.
+    hr
+    .row.workflow-row.flip-in-phone
+      .col-md-6.col-sm-12.workflow-column-description
+        h2.workflow-heading Grow
+        h3.workflow-description 
+          span Grow you circle.
+          br
+          br
+          ul
+            li See the amazing ways in which people are related to you
+            br
+            li Understand your relationship better with people
+            br
+          span Get a T-shirt on growing your cirle to 100 people.
+      .col-md-6.col-sm-12.workflow-column-image
+        img.workflow-image(src='/images/brain.svg')
+    hr
   script.
-        var at;
-        function b64EncodeUnicode(str) {
-            // first we use encodeURIComponent to get percent-encoded UTF-8,
-            // then we convert the percent encodings into raw bytes which
-            // can be fed into btoa.
-            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
-                function toSolidBytes(match, p1) {
-                    return String.fromCharCode('0x' + p1);
-            }));
+    function clickLogin(login) {
+      $('#cover').css('display', 'inline');
+      $('.center-div').css({
+        '-webkit-animation-name': 'example', /* Safari 4.0 - 8.0 */
+        '-webkit-animation-duration': '0.5s', /* Safari 4.0 - 8.0 */
+        'animation-name': 'example',
+        'animation-duration': '0.5s'
+      });
+      $('#form-get-started').css({
+        'display':'inline'
+      });
+      $('#country').focus();
+      $('.dropdown-menu.typeahead').css({
+        'width': $( window ).width()>480 ? '440px': '120px' ,
+        'font-size': $( window ).width()>480 ? '24px': '20px'
+      });
+    }
+    $('.cancel, #cover, #form-get-started > :not(.center-div)').click(e=>{
+      $('.center-div').css({
+        '-webkit-animation-name': 'go', /* Safari 4.0 - 8.0 */
+        '-webkit-animation-duration': '0.5s', /* Safari 4.0 - 8.0 */
+        'animation-name': 'go',
+        'animation-duration': '0.5s'
+      });
+      setTimeout(()=>{
+        $('#cover').css('display', 'none');        
+        $('#form-get-started').css('display','none');
+      }, 400);
+    });
+    $('#cover').click(e=>{
+      $('.center-div').css({
+        '-webkit-animation-name': 'go', /* Safari 4.0 - 8.0 */
+        '-webkit-animation-duration': '0.5s', /* Safari 4.0 - 8.0 */
+        'animation-name': 'go',
+        'animation-duration': '0.5s'
+      });
+      setTimeout(()=>{
+        $('#cover').css('display', 'none');        
+        $('#form-get-started').css('display','none');
+      }, 400);
+    });
+    $(document).ready(function(){
+      $('.reviews').slick({
+        infinite: true,
+        responsive: [{
+
+        breakpoint: 1600,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3
         }
 
-        function getUrlParameter(sParam) {
-            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-                sURLVariables = sPageURL.split('&'),
-                sParameterName,
-                i;
+      }, {
 
-            for (i = 0; i < sURLVariables.length; i++) {
-                sParameterName = sURLVariables[i].split('=');
-
-                if (sParameterName[0] === sParam) {
-                    return sParameterName[1] === undefined ? true : sParameterName[1];
-                }
-            }
-        };
-        if(getUrlParameter('code')){
-            $.ajax({
-                url: 'https://gymkhana.iitb.ac.in/sso/oauth/token/',
-                type: 'POST',
-                crossDomain: true,
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'Basic '+b64EncodeUnicode('bbQgkfUMC4pI2kCYdt5RIfz9tnmPGLM1W5gInGFr:X689f2keETwV9hRYXtT9EfEmc8eVMMhE0P4BC7JBrvHWAivSVQfkN93svcuabEhNxOrKQD2GDFO4mkfpI3ZtEiALmNcPTCk75p7rbXz2nCaxV41fPpXBgzTdtJfhogoC'));
-                },
-                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
-                data: "code="+getUrlParameter('code')+"&redirect_uri=http://192.168.0.102:8080&grant_type=authorization_code",
-                success: function (data) {
-                    
-                },
-                error: function () { alert("fu"); }
-            });
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2
         }
-        $( "#target" ).click(function() {
-            $.ajax({
-                url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name',
-                type: 'GET',
-                crossDomain: true,
-                beforeSend: function (xhrg) {
-                    xhrg.setRequestHeader('Authorization', 'Bearer '+at);
-                },
-                success: function (info) {alert(info.first_name); },
-                error: function () { alert("fu"); }
-            });
-        });
 
-        new SSO_JS({
-            config: {
-                client_id: 'bbQgkfUMC4pI2kCYdt5RIfz9tnmPGLM1W5gInGFr',   // Compulsory
-                scope: ['basic', 'profile'],    // Optional. Default is  ['basic']
-                state: '', // Optional. Default None
-                response_type: 'code',  // Optional. Default is 'code'
-                redirect_uri: 'http://192.168.0.102:8080',    //Optional
-                new_window: 'false',    // Optional.
-                                        // Where authorization page should be opened in new tab or
-                                        // same tab Default is false.
-                sso_root: document.getElementById('sso-root'),
-                /* Optional
-                 document.getElementById don't work if your element is not in light DOM. In that case you need to
-                 provide selector here. In most of the cases this will work.
-                 */
-            },
-            colors: { // All Optional
-                button_div_bg_color: '303F9F', // Background color of button
-                button_anchor_color: 'FFFFFF', // Font color of Button
-                logout_anchor_color: '727272', // Font color of logout mark (The one with 'Login as other user'
-            },
-        }).init();
-  
+      }, {
+
+        breakpoint: 480,
+        slidesToShow: 1,
+        slidesToScroll: 1
+      }]
+      });
+    });

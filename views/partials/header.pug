@@ -25,23 +25,19 @@
             a(href='/login') Login
         else
           li.about
-            a(href='/suggestion') People you may know
-          li
-            a(href='/profile/'+user.ldap) My Profile
-          li.divider
-          li
-            a(href='/account/edit') Edit My Profile
-          li.divider
-          li
-            a(href='/circle') My Circle
-          li.divider
-          li
-            a(href='/prediction') My Predictions
-          li.divider
-          li
-            a(href='/invite') Get a free T-shirt
+            a(href='/suggestion') People I may know
           li.about
-            a(href='/about') Help
+            a(href='/profile/'+user.ldap) My Profile
+          li.about
+            a(href='/account/edit') Edit Profile
+          li.about
+            a(href='/circle') My Circle
+          li.about
+            a(href='/prediction') Predictions
+          li.about
+            a(href='/invite') Free Tee
+          li.about
+            a(href='/about') What else?
           li.notifications
             a.dropdown-toggle.electric-blue-text-color#notification-icon(href='#notifications', data-toggle='dropdown', onclick='$.post("/notification",{action:"see"});$("#notification-label").text("");')
               span.number-label#notification-label

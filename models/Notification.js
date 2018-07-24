@@ -44,7 +44,7 @@ notificationSchema.statics.createNotification = function createNotification(ldap
         notification: notification,
       });
 
-      let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'/notifications">here</a> to respond </p></div>');
+      let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'">here</a> to respond </p></div>');
       let pushSubscription = await Subscription.getSubscription(ldap);
       if(pushSubscription){
         if(pushSubscription.endpoint){
@@ -90,7 +90,7 @@ notificationSchema.statics.createNotificationWithSalary = function createNotific
         }
       });
       
-      let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'/notifications">here</a> to respond </p></div>');      
+      let send_email = await Email.to(ldap+'@iitb.ac.in', 'IIT-baba', '<div style="text-align:center;"><img src="'+process.env.DOMAIN+'/images/iitbabab.png" height="360"></img><h1>'+notification+'</h1><p>Click <a href="'+process.env.DOMAIN+'">here</a> to respond </p></div>');      
       let pushSubscription = await Subscription.getSubscription(ldap);
       if(pushSubscription){
         webPush.sendNotification(

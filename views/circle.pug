@@ -84,7 +84,7 @@ block content
       height = +svg.attr("height");
       var color = d3.scaleOrdinal(d3.schemeCategory20);
       var simulation = d3.forceSimulation()
-      .force("collide", d3.forceCollide().radius(function(d) { return d.sal*2; }))
+      .force("collide", d3.forceCollide().radius(function(d) { return 30; /*d.sal*2;*/ }))
       .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(function(d) {return 300;}).strength(0.3))
       .force("charge", d3.forceManyBody())
       .force("center", d3.forceCenter(width / 2, height / 2));
@@ -103,10 +103,10 @@ block content
                       .attr("x", "0")
                       .attr("y", "0")
                       .append("image")
-                      .attr("x", function(d){return d.sal*-0.22;})
+                      .attr("x", function(d){return /*d.sal*/15*-0.22;})
                       .attr("y", 0)
-                      .attr("height",function(d) { return d.sal*4; })
-                      .attr("width", function(d) { return d.sal*4.5; })
+                      .attr("height",function(d) { return /*d.sal*/15*4; })
+                      .attr("width", function(d) { return /*d.sal*/15*4.5; })
                       .attr("xlink:href", function(n){return "/images/profile/"+n.ldap+".png";} );
         
         let defsc = svg.append("defs")
@@ -141,12 +141,13 @@ block content
         .enter()
         .append('a')//.attr("xlink:href", function(d) { return "profile/"+ d.ldap; })
         .append("circle")
-        .attr("r", function(d) { return d.sal*2; })
+        .attr("r", function(d) { return /*d.sal*2;*/ 30; })
         .attr("fill", function(d) { return "url(#ldap"+d.ldap+")"; })
         .attr("id", function(d) { return "node"+d.id; })
         .attr("predicted", function(d) { return d.predicted; })
         //.attr("fill", function(d) {catpattern.append("image").attr("xlink:href", "/images/profile/"+d.ldap); return "url(#catpattern)";})
         //.attr("fill", function(d) { return color(d.group); })
+        .style("cursor", "pointer")
         .on("click", recenter)
         .call(d3.drag()
         .on("start", dragstarted)
@@ -215,7 +216,7 @@ block content
 
           previousCenter.mid = n.id;
           previousCenter.ldap = n.ldap;
-          previousCenter.radius = n.sal*2;
+          previousCenter.radius = /*n.sal*2*/ 30;
         }
         else return window.location = "/profile/"+n.ldap;
         node.select("title")
@@ -248,10 +249,10 @@ block content
         }))
         .force("x", d3.forceX().x(function(d) { return width/2; }).strength(function(d) { if(d.id == n.id) return 3.5; return 0; }))
         .force("y", d3.forceY().y(function(d) { return height/2; }).strength(function(d) { if(d.id == n.id) return 3.5; return 0;}))
-        .force("collide", d3.forceCollide().radius(function(d) { if(d.id == n.id) return 80; return d.sal*2; }));
+        .force("collide", d3.forceCollide().radius(function(d) { if(d.id == n.id) return 80; return 30;/*return d.sal*2;*/ }));
         simulation.force("link")
         .links(graph.links);
-        simulation.alphaTarget(0.5);
+        simulation.alphaTarget(0.4);
         }
       }
     //img.baba(src="/images/iitbabab.png" alt="iitbaba" height="480")

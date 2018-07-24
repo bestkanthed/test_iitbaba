@@ -7,7 +7,7 @@
             | IIT-baba
         if user
           form.navbar-form.search(role='search', method='get', action='/search', title="Search anything: h8, meta, girls, amay")
-            input.search-box#srch-term.form-control(placeholder='Search', name='box', type='text')
+            input.search-box#srch-term.form-control(placeholder='Type here H8, HIT ENTER', name='box', type='text')
       .navbar-header-right
         button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
           span.sr-only Toggle navigation
@@ -32,8 +32,9 @@
             a(href='/account/edit') Edit Profile
           li.about
             a(href='/circle') My Circle
-          li.about
-            a(href='/prediction') Predictions
+          //
+            li.about
+              a(href='/prediction') Predictions
           li.about
             a(href='/invite') Free Tee
           li.about

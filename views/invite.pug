@@ -5,9 +5,7 @@ block content
       .row
         .col-lg-12
             h1(style='text-align:center; padding-bottom: 40px;') 
-                    span Give good predictions for 
-                    strong 20
-                    span of your friends and get this
+                    span Give good predictions for span of your friends and get this
             .row
               .col-lg-6.col-sm-12.shirt-img-div-1
                 img.shirt-img(src='/images/baba_tshirt_front.png', height='400', style='border-radius : 20px;')
@@ -25,7 +23,8 @@ block content
             .row#desktop-invite.invite_button
                 .col-lg-4
                 .col-lg-4
-                    button.profile#invite(style='border-radius : 8px;') Invite
+                    a(href="https://api.whatsapp.com/send?text=https://iitbaba.com")
+                        button.profile(style='border-radius : 8px;') Invite
                 .col-lg-4
     script.
         $(document).ready(function() {

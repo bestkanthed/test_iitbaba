@@ -50,7 +50,7 @@ class Notification extends React.Component {
     let icon;
     let salaryDisplay;
     if(this.props.notification.salary) {
-      if(this.props.notification.salary.new > 0) icon = <i className="fa fa-arrow-circle-up"></i>
+      if(this.props.notification.salary.change > 0) icon = <i className="fa fa-arrow-circle-up"></i>
       else icon = <i className="fa fa-arrow-circle-down"></i>
       salaryDisplay = <div className="notifiaction-salary-stats" style={{color: this.props.notification.salary.color}}>
                         <span className="notifiaction-salary">{this.props.notification.salary.new+" "}</span>

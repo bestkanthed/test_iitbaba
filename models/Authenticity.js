@@ -70,8 +70,6 @@ authenticitySchema.statics.getAuthenticity = function getAuthenticity(ldap) {
   return new Promise ((resolve, reject) => { 
     this.model('Authenticity').findOne({ ldap: ldap },{},{sort:{ "createdAt" : -1} }).exec((err, auth)=>{
       if(err) reject(err);
-      console.log("Logging Auth weight:");
-      console.log(auth.auth);
       resolve(auth.auth);
     });
   });

@@ -24,6 +24,8 @@
           li.login
             a(href='/login') Login
         else
+          li.about
+            a(href='/about') Help
           li.notifications
             a.dropdown-toggle.electric-blue-text-color#notification-icon(href='#notifications', data-toggle='dropdown', onclick='$.post("/notification",{action:"see"});$("#notification-label").text("");')
               span.number-label#notification-label

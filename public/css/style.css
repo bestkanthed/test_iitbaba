@@ -1132,17 +1132,20 @@ input.city-typeahead {
 .banner_label{
   padding-top: 8%; 
   font-family :'Raleway', sans-serif;
-  letter-spacing: 8px;
-  font-size: 48px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  font-size: 56px;
   text-align: center;
-  color: white;
+  color: rgba(0, 0, 0, 0.85);
 }
 .banner_tagline{
   padding-top: 0; 
   letter-spacing: 1px;
   font-size: 20px;
+  font-family :'Raleway', sans-serif;
   text-align: center;
-  color: white;
+  font-weight: bold;
+  color:rgba(0, 0, 0, 0.85);
 }
 .get_started{
   text-align: center;
@@ -1269,14 +1272,14 @@ a.flag-link:hover{
     letter-spacing: 3.5px;
     font-size: 20px;
     text-align: center;
-    color: white;
+    color: black;
   }
   .banner_tagline{
-    padding-top: 0; 
+    padding-top: 0;
     letter-spacing: 1px;
     font-size: 12px;
     text-align: center;
-    color: white;
+    color: black;
   }
   .get_started{
     text-align: center;

@@ -23,7 +23,7 @@ block content
             .row#desktop-invite.invite_button
                 .col-lg-4
                 .col-lg-4
-                    a(href="https://api.whatsapp.com/send?text=https://iitbaba.com"+ ((user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME'))
+                    a(href="https://api.whatsapp.com/send?text=https://iitbaba.com/auth/iitbsso?"+ ((user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME'))
                         button.profile(style='border-radius : 8px;') Invite
                 .col-lg-4
     script.

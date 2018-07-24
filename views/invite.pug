@@ -13,17 +13,17 @@ block content
                 img.shirt-img(src='/images/baba_tshirt_back.png', height='400' , style='border-radius : 20px;')
             .row#mobile-invite(style='padding-top: 16px')            
                 .col-lg-6.col-sm-6.share(style='font-size:10px;')
-                    a(href="whatsapp://send?text=https://iitbaba.com/auth/iitbsso?"+ (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME' , data-action="share/whatsapp/share") 
+                    a(href="whatsapp://send?text=https://iitbaba.com/auth/iitbsso?"+ ( (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME' ) , data-action="share/whatsapp/share") 
                         i.fa.fa-whatsapp
                         | &nbsp;Invite via Whatsapp
                 .col-lg-6.col-sm-6.share(style='font-size:10px;')
-                    a(href="fb-messenger://share/?link=https://iitbaba.com/auth/iitbsso?"+ (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME')
+                    a(href="fb-messenger://share/?link=https://iitbaba.com/auth/iitbsso?"+ ((user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME'))
                         i.fa.fa-facebook
                         | &nbsp;Invite via Messenger
             .row#desktop-invite.invite_button
                 .col-lg-4
                 .col-lg-4
-                    a(href="https://api.whatsapp.com/send?text=https://iitbaba.com"+ (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME')
+                    a(href="https://api.whatsapp.com/send?text=https://iitbaba.com"+ ((user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME'))
                         button.profile(style='border-radius : 8px;') Invite
                 .col-lg-4
     script.

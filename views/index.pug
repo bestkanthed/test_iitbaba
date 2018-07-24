@@ -4,34 +4,8 @@ block content
   link(rel='stylesheet', type='text/css', href='/css/lib/slick/slick.css')
   link(rel='stylesheet', type='text/css', href='/css/lib/slick/slick-theme.css')
   script(type='text/javascript', src='/js/lib/slick.min.js')
-
   #cover
-  #form-get-started
-    .center-div
-      .row
-        .cancel ✕
-      .row.get-started-row
-        .col-lg-5.form-image
-          img.go(src='/images/go.png', width='100%', style='border-radius: 16px 0 0 16px;')
-        .col-lg-7
-          form.show-requirements(method='POST', id='show_requirements_form')
-                input(type='hidden', name='_csrf', value=_csrf)
-                span I am travelling to &nbsp;
-                br
-                input.get-started-input.typeahead(type='text', name='country', id='country', placeholder='Country', required, autocomplete='off')
-                br
-                span &nbsp;for&nbsp;
-                br
-                select.get-started-input(name='purpose', id='purpose', placeholder='Purpose', required)
-                  option(value="Purpose", selected) Purpose
-                br
-                span &nbsp;with&nbsp;
-                br
-                span(style='color:#4a90e2;') &nbsp;Indian Passport&nbsp;
-                .form-group.show-req
-                  .col-sm-12
-                      button.btn.btn-primary.show-requirements-button(type='submit') SHOW REQUIREMENTS
-
+  
   .row.landing-row
     .col-lg-12.banner
       h1.banner_label

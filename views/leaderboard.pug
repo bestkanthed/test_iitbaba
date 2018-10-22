@@ -1,0 +1,8 @@
+extends layout
+
+block content
+    .container.result
+      .row
+        .col-lg-12.predictions
+          - for (var r = 0; r < leaders.length; r++)
+            p=(r+1)+'. '+leaders[r].first_name+' '+leaders[r].last_name+" "+leaders[r].rating

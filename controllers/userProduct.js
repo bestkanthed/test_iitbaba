@@ -121,6 +121,7 @@ exports.getProfile = async (req, res, next) => {
           rels = rels + " "+rel;
         }
       }
+      
       return res.render('profile', {
         title: values[0].profile.first_name,
         userp : values[0],

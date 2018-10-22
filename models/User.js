@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   contact: String,
   email: String,
   looking: String,
+  rating: Number,
   
   google: String,
   facebook: String,

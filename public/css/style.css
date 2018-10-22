@@ -969,6 +969,14 @@ button.btn.dropdown-toggle:focus {
 #mobile-invite{
     display: none;
 }
+.person1-img-div{
+    text-align : center;
+    padding-bottom: 8px;
+}
+.person2-img-div{
+    text-align : center;
+    padding-bottom: 8px;
+}
 @media screen and (max-width: 480px) {
     .shirt-img {
         width: 95%;

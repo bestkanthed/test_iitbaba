@@ -1,0 +1,79 @@
+extends layout
+
+block content
+    .container.about
+      .row
+        .col-lg-12
+            h1(style='text-align:center; padding-bottom: 40px;') 
+                    span Who'll earn more ?
+            .row
+              form#user1(method="post").col-lg-6.col-sm-6.person1-img-div
+                input(type="hidden", name="winner", value=user1)
+                input(type="hidden", name="loser", value=user2)
+                img#user1Image.shirt-img(src='/images/profile/'+user1.ldap+'.png', style='border-radius : 20px; cursor: pointer; height: 240px;')
+                p
+                    strong=user1.first_name+" "+user1.last_name
+                if user1.profile.program
+                    p.profile.department=(user1.profile.program.degree ? user1.profile.program.degree : "") +" "+(user1.profile.program.department_name ? user1.profile.program.department_name : "")+" "+(user1.profile.program.join_year ? user1.profile.program.join_year : '')
+                if user1.hostel && user1.room
+                    p.profile.hostel="Hostel "+user1.hostel+" | Room "+user1.room
+                else
+                    if user1.hostel
+                        p.profile.hostel="Hostel "+user1.hostel
+                    else
+                        p.profile.hostel=(user1.profile.insti_address.hostel_name ? user1.profile.insti_address.hostel_name : '')+(user1.profile.insti_address.room ? " | Room "+user1.profile.insti_address.room : '')
+              form#user2(method="post").col-lg-6.col-sm-6.person2-img-div
+                input(type="hidden", name="loser", value=user1)
+                input(type="hidden", name="winner", value=user2)
+                img#user2Image.shirt-img(src='/images/profile/'+user2.ldap+'.png', style='border-radius : 20px; cursor: pointer; height: 240px;')
+                p
+                    strong=user2.first_name+" "+user2.last_name
+                if user2.profile.program
+                    p.profile.department=(user2.profile.program.degree ? user2.profile.program.degree : "") +" "+(user2.profile.program.department_name ? user2.profile.program.department_name : "")+" "+(user2.profile.program.join_year ? user2.profile.program.join_year : '')
+                if user2.hostel && user2.room
+                    p.profile.hostel="Hostel "+user2.hostel+" | Room "+user2.room
+                else
+                    if user2.hostel
+                        p.profile.hostel="Hostel "+user2.hostel
+                    else
+                        p.profile.hostel=(user2.profile.insti_address.hostel_name ? user2.profile.insti_address.hostel_name : '')+(user2.profile.insti_address.room ? " | Room "+user2.profile.insti_address.room : '')
+            .row#mobile-invite(style='padding-top: 16px')            
+                .col-lg-6.col-sm-6.share(style='font-size:10px;')
+                    a(href="whatsapp://send?text=See https://iitbaba.com" /*( (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME' )*/ , data-action="share/whatsapp/share") 
+                        i.fa.fa-whatsapp
+                        | &nbsp;Invite via Whatsapp
+                .col-lg-6.col-sm-6.share(style='font-size:10px;')
+                    a(href="fb-messenger://share/?link=See https://iitbaba.com")
+                        i.fa.fa-facebook
+                        | &nbsp;Invite via Messenger
+            .row#desktop-invite.invite_button
+                .col-lg-4
+                .col-lg-4
+                    a(href="https://api.whatsapp.com/send?text=See https://iitbaba.com", target='_blank' )
+                        button.profile(style='border-radius : 8px;') Invite
+                .col-lg-4
+    script.
+        $("#user1Image").click(function() {
+            $("#user1").submit();
+        });
+        $( "#user2Image" ).click(function() {
+            $("#user2").submit();
+        });
+        $(document).ready(function() {
+            $.ajaxSetup({ cache: true });
+            $.getScript('https://connect.facebook.net/en_US/sdk.js', function(){
+                FB.init({
+                    appId: '172447820214193',
+                    version: 'v2.7' // or v2.1, v2.2, v2.3, ...
+                });
+                $('#loginbutton,#feedbutton').removeAttr('disabled');
+                //FB.getLoginStatus(updateStatusCallback);
+            });
+        });
+        $('#invite').click(function() {
+            FB.ui({
+                method: 'send',
+                link: 'https://iitbaba.com/auth/iitbsso',
+            });
+        });
+        

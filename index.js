@@ -80,6 +80,7 @@ const userAccountSecurityController = require('./controllers/userAccountSecurity
 const userAccountController = require('./controllers/userAccount');
 const userProductController = require('./controllers/userProduct');
 const companyController = require('./controllers/company');
+const match = require('./controllers/match')
 
 /**
  * Open routes
@@ -162,6 +163,11 @@ app.post('/profile/:ldap', userProductController.postProfile);
 app.get('/search', userProductController.getSearch);
 
 app.get('/internship', userProductController.getInternshipPage);
+
+app.get('/match', match.getMatch)
+app.post('/match', match.postMatch)
+app.get('/leaderboard', match.getLeaders)
+
 /*
 app.get('/internship/:intern', userProductController.getInternship);
 app.post('/internship/:intern', userProductController.postInternship);
@@ -170,6 +176,8 @@ app.get('/internship/post', userProductController.getPostInternshipPage);
 app.post('/internship/post', userProductController.postPostInternshipPage);
 
 */
+
+
 app.get('/circle', userProductController.getCircle);
 
 app.post('/subscription', userProductController.postSubscription);

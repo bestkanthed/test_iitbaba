@@ -95,9 +95,15 @@ exports.postPicture = async (req, res, next)=>{
         }
       });
     }).catch(err1 => {
-      req.flash('errors', {msg: 'Please upload the image again'});
+      //req.flash('errors', {msg: 'Please upload the image again'});
       logger.error("Error in uploading image", err1);
-      return res.redirect('back');
+      existingUser.complete = 2;
+      existingUser.save((err) => {
+        if (err) return next(err);
+        req.flash('success', { msg: 'Picture Saved' });
+        return res.redirect('/account/setup/3');
+      });
+      //return res.redirect('back');
     });
   });
 };

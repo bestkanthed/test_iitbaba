@@ -191,7 +191,7 @@ app.get('/notification', userProductController.getNotification);
 app.post('/notification', userProductController.postNotification);
 
 app.get('*', function(req, res){
-  return res.render('notFound', { title : 'Not found' });
+  return res.render('notfound', { title : 'Not found' });
 });
 
 app.use(function (err, req, res, next) {

@@ -13,6 +13,7 @@
   "author": "kanthed",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.339.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.17.2",
     "connect-mongo": "^1.3.2",

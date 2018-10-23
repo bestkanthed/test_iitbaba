@@ -1,11 +1,23 @@
 const logger = require('../utilities/logger');
 const fs = require('fs');
 const im = require('imagickal');
+const AWS = require('aws-sdk')
 
 const Matrix = require('../models/Matrix');
 const Mean = require('../models/Mean');
 const Salary = require('../models/Salary');
 const User = require('../models/User');
+
+// Use setting credentials to allow secure connection
+AWS.config.update({
+  accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
+  secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY
+})
+
+// Create an S3 client setting the Endpoint to DigitalOcean Spaces
+const spacesEndpoint = new AWS.Endpoint('sgp1.digitaloceanspaces.com')
+const s3 = new AWS.S3({ endpoint: spacesEndpoint })
+const bucketName = 'thoughts'
 
 /**
  * GET /account/setup/1
@@ -76,7 +88,32 @@ exports.getPicture = async (req, res, next) => {
  * posted picture.
  */
 exports.postPicture = async (req, res, next)=>{
-  let base64Data = req.body.image_data.replace(/^data:image\/png;base64,/, "");
+  
+  let base64Data = req.body.image_data.replace(/^data:image\/\w+;base64,/, "")
+  if(!base64Data) {
+    let pic = Math.floor(Math.random() * 79) + 1  
+    base64Data = fs.readFileSync('./public/images/profile/default'+pic+'.png')
+  }
+  base64Data = new Buffer(base64Data, 'base64')
+  
+  keyName = req.user.ldap;
+  params = { Bucket: bucketName, Key: keyName, Body: base64Data }
+
+  User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
+    if (err) return next(err);
+    if (existingUser) {
+      s3.putObject(params, async (err, data) => {
+        if (err) return next(err);
+        req.flash('success', { msg: 'Picture Saved' });
+        existingUser.profile.upload_picture = true;
+        existingUser.complete = 2;
+        existingUser.save((err) => {
+          return res.redirect('/account/setup/3');
+        })
+      })
+    }
+  })
+  /*
   filename = "./public/images/profile/"+req.user.ldap+".png";
   fs.writeFile(filename, base64Data, 'base64', function(err) {
     if(err) return next(err);
@@ -106,6 +143,7 @@ exports.postPicture = async (req, res, next)=>{
       //return res.redirect('back');
     });
   });
+  */
 };
 
 /**

@@ -154,8 +154,11 @@ app.use((req, res, next) => {
 app.get('/account/edit', userAccountController.getEdit);
 app.post('/account/edit', userAccountController.postEdit);
 
+app.get('/account/picture/:ldap', userAccountController.getPicture);
+app.get('/images/profile/:name', userAccountController.getPicture);
+
 app.get('/account/edit/picture', userAccountController.getEditProfilePicture);
-app.post('/account/edit/picture', userAccountController.getEditProfilePicture);
+app.post('/account/edit/picture', userAccountController.postEditProfilePicture);
 
 app.get('/suggestion', userProductController.getPredict);
 app.get('/prediction', userProductController.getPredictions);

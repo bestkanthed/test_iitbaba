@@ -2,39 +2,10 @@ extends layout
 
 block content
   .container.center
-    style.
-      .links line {
-      stroke: #999;
-      stroke-opacity: 0.5;
-      }
-      .nodes circle {
-      stroke: #fff;
-      stroke-width: 0;
-      stroke-opacity: 0;
-      }
-      circle:hover  {
-      stroke: #fff;
-      stroke-width: 1.5px;
-      stroke-opacity: 1;
-      }
-    #predictCover
-      .card.popup
-          img.profile#profileImage
-          form#prediction(method='POST')
-              p#name
-              input(type='hidden', name='_csrf', value=_csrf)
-              input(type='hidden', name='mid', id='mid')
-              input(type='hidden', name='repredict', value=false)
-              input(type='hidden', name='popup', value="true")                                             
-              .input-icon
-                  input.salary.profile(type='number', step="0.01", name='salary', id='salary', placeholder='Lakh INR/yr', autofocus, required)
-              p
-                  input.submit-salary(type='submit', value='PREDICT')
+    link(rel='stylesheet', type='text/css', href='/css/circle.css')
     svg
     script(src='/js/lib/d3.v4.min.js')
     script.
-      console.log("logging width of window", $(window).width());
-      console.log("logging height of window", $(window).height());
       $("svg").attr({
         "width": $(window).width(),
         "height": $(window).height()

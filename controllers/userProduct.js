@@ -52,13 +52,15 @@ exports.getCircle = async (req, res, next) => {
  * Prediction page.
  */
 exports.getPredict = async (req, res, next) => {
-  let suggestions = Graph.suggestions(req.user.ldap, 20);
-  req.flash('success',{ msg : 'People you may know' });
+  //let suggestions = Graph.suggestions(req.user.ldap, 20)
+  let suggestions = await User.find({})
+
+  req.flash('success',{ msg : 'People you may know' })
   return res.render('results', {
     title: 'Suggestions',
     users : await suggestions
-  });
-};
+  })
+}
 
 /**
  * GET /predictons

@@ -183,5 +183,5 @@ exports.postAverage = async (req, res, next)=>{
   let setMid = User.setMID(req.user.ldap, (await salaries).length - 1);
   let updateSalaries = Salary.updateSalaries(await salaries);
   req.flash('success', { msg: 'Saved' });
-  return res.redirect('/');
+  return res.redirect('/suggestion');
 };

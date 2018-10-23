@@ -12,7 +12,7 @@ info.log
 
 #Uploads
 # First, ignore everything
-public/images/profile/*
+#public/images/profile/*
 
 #Uploads
 # First, ignore everything

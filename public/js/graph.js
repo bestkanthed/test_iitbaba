@@ -1,93 +1,203 @@
-var graph = !{JSON.stringify(graph).replace(/<\//g, '<\\/')};
-      var svg = d3.select("svg"),
-      width = +svg.attr("width"),
-      height = +svg.attr("height");
-      var color = d3.scaleOrdinal(d3.schemeCategory20);
-      var simulation = d3.forceSimulation()
-      .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(300).strength(0.3))
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(width / 2, height / 2));
-      //.force("linkDistance", 200);
-      //d3.json("miserables.json", function(error, graph) {
-        //if (error) throw error;
-       let defs = svg.append("defs")
-                      .attr("id", "imgdefs")
-                      .selectAll("pattern")
-                      .data(graph.nodes)
-                      .enter()
-                      .append("pattern")
-                      .attr("id", function(n){return n.ldap?n.ldap:"null";})
-                      .attr("height", 1)
-                      .attr("width", 1)
-                      .attr("x", "0")
-                      .attr("y", "0")
-                      .append("image")
-                      .attr("x", function(d){return d.sal*-0.22;})
-                      .attr("y", 0)
-                      .attr("height",function(d) { return d.sal*4; })
-                      .attr("width", function(d) { return d.sal*4.5; })
-                      .attr("xlink:href", function(n){return "/images/profile/"+n.ldap+".png";} )
+$("svg").attr({
+  "width": $(window).width(),
+  "height": $(window).height()
+});
 
+let sal = 0;
+let previousCenter = {
+  mid: 0,
+  ldap: "iitbaba",
+  radius:0
+}
 
-        var link = svg.append("g")
-        .attr("class", "links")
-        .selectAll("line")
-        .data(graph.links)
-        .enter().append("line")
-        .attr("stroke-width", function(d) { return Math.sqrt(d.value)/3; });
-        
-        var node = svg.append("g")
-        .attr("class", "nodes")
-        .selectAll("circle")
-        .data(graph.nodes)
-        .enter()
-        .append('a').attr("xlink:href", function(d) { return "profile/"+ d.ldap; })
-        .append("circle")
-        .attr("r", function(d) { return d.sal*2; })
-        .attr("fill", function(d) { return "url(#"+d.ldap+")"; })
-        //.attr("fill", function(d) {catpattern.append("image").attr("xlink:href", "/images/profile/"+d.ldap); return "url(#catpattern)";})
-        //.attr("fill", function(d) { return color(d.group); })
-        .call(d3.drag()
-        .on("start", dragstarted)
-        .on("drag", dragged)
-        .on("end", dragended));
-        
-        node.append("title")
-        .text(function(d) { return d.name; });
-        
-        simulation
-        .nodes(graph.nodes)
-        .on("tick", ticked);
-        
-        simulation.force("link")
-        .links(graph.links);
-        
-        function ticked() {
-          link
-          .attr("x1", function(d) { return d.source.x; })
-          .attr("y1", function(d) { return d.source.y; })
-          .attr("x2", function(d) { return d.target.x; })
-          .attr("y2", function(d) { return d.target.y; });
-          node
-          .attr("cx", function(d) { return d.x; })
-          .attr("cy", function(d) { return d.y; });
+$.get('/graph', response => {
+  let graph = response.graph
+  console.log('logging', response.graph)
+  
+  let userLdap = response.user.ldap
+  // here i just need nodes and links
+
+  $("svg").css('margin','0');
+  $("svg").css('position','absolute');
+  $("svg").css('left','0');
+  $("svg").css('top','0');
+
+  var svg = d3.select("svg"),
+  width = +svg.attr("width"),
+  height = +svg.attr("height");
+  var color = d3.scaleOrdinal(d3.schemeCategory20);
+  var simulation = d3.forceSimulation()
+  .force("collide", d3.forceCollide().radius(function(d) { return 30; /*d.sal*2;*/ }))
+  .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(function(d) {return 300;}).strength(0.3))
+  .force("charge", d3.forceManyBody())
+  .force("center", d3.forceCenter(width / 2, height / 2));
+  
+  //.force("linkDistance", 200);
+  //d3.json("miserables.json", function(error, graph) {
+  //if (error) throw error;
+  
+  let defs = svg.append("defs")
+    .attr("id", "imgdefs")
+    .selectAll("pattern")
+    .data(graph.nodes)
+    .enter()
+    .append("pattern")
+    .attr("id", function(n){return n.ldap?"ldap"+n.ldap:"ldapnull";})
+    .attr("height", 1)
+    .attr("width", 1)
+    .attr("x", "0")
+    .attr("y", "0")
+    .append("image")
+    .attr("x", function(d){return /*d.sal*/15*-0.22;})
+    .attr("y", 0)
+    .attr("height",function(d) { return /*d.sal*/15*4; })
+    .attr("width", function(d) { return /*d.sal*/15*4.5; })
+    .attr("xlink:href", function(n){return "/images/profile/"+n.ldap+".png";} );
+  
+    let defsc = svg.append("defs")
+      .attr("id", "imgdefsc")
+      .selectAll("pattern")
+      .data(graph.nodes)
+      .enter()
+      .append("pattern")
+      .attr("id", function(n){return n.ldap?"ldapc"+n.ldap:"ldapcnull";})
+      .attr("height", 1)
+      .attr("width", 1)
+      .attr("x", "0")
+      .attr("y", "0")
+      .append("image")
+      .attr("x", -10)
+      .attr("y", 0)
+      .attr("height", 150)
+      .attr("width", 170)
+      .attr("xlink:href", function(n){return "/images/profile/"+n.ldap+".png";} );
+
+    var link = svg.append("g")
+    .attr("class", "links")
+    .selectAll("line")
+    .data(graph.links)
+    .enter().append("line")
+    .attr("stroke-width", function(d) { return Math.sqrt(d.value)/3; });
+    
+    var node = svg.append("g")
+    .attr("class", "nodes")
+    .selectAll("circle")
+    .data(graph.nodes)
+    .enter()
+    .append('a')//.attr("xlink:href", function(d) { return "profile/"+ d.ldap; })
+    .append("circle")
+    .attr("r", function(d) { return /*d.sal*2;*/ 30; })
+    .attr("fill", function(d) { return "url(#ldap"+d.ldap+")"; })
+    .attr("id", function(d) { return "node"+d.id; })
+    .attr("predicted", function(d) { return d.predicted; })
+    //.attr("fill", function(d) {catpattern.append("image").attr("xlink:href", "/images/profile/"+d.ldap); return "url(#catpattern)";})
+    //.attr("fill", function(d) { return color(d.group); })
+    .style("cursor", "pointer")
+    .on("click", recenter)
+    .call(d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended));
+    
+    node.append("title")
+    .text(function(d) { return d.name; });
+    
+    simulation
+    .nodes(graph.nodes)
+    .on("tick", ticked);
+    
+    simulation.force("link")
+    .links(graph.links);
+    
+    let user = $.grep(graph.nodes, function(e){return e.ldap == userLdap});
+    setTimeout(function(){recenter(user[0]);}, 3000);
+
+    function ticked() {
+      link
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+      node
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+    }
+  //});
+
+  function dragstarted(d) {        
+    if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+  }
+
+  function dragged(d) {
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
+  }
+
+  function dragended(d) {
+    if (!d3.event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+  function recenter(n){
+    
+    if(!n.predicted){
+      sal = n.sal;
+      $("#profileImage").attr("src", '/images/profile/'+n.ldap+'.png');
+      $("#name").text(n.name);
+      $("#mid").attr('value', n.id);
+      $("#prediction").attr('ldap', n.ldap);
+      $("#predictCover").css({"display":"inline"});
+      // add a dropdown to predict
+    }
+    else{
+
+      var circleEdit = d3.select("#node"+n.id);
+      circleEdit.attr("r", 75).attr("fill", "url(#ldapc"+n.ldap+")");
+      if(previousCenter.mid!=n.id){
+        var previousCircleEdit = d3.select("#node"+previousCenter.mid);
+        previousCircleEdit.attr("r", previousCenter.radius).attr("fill", "url(#ldap"+previousCenter.ldap+")");
+
+        previousCenter.mid = n.id;
+        previousCenter.ldap = n.ldap;
+        previousCenter.radius = /*n.sal*2*/ 30;
+      }
+      else return window.location = "/profile/"+n.ldap;
+    node.select("title")
+    .text(function(d) { 
+      let connection = $.grep(graph.links, function(e){return e.source.id == n.id && e.target.id == d.id;});
+      if(connection.length){
+        if(connection[0].relationship) {
+          if(userLdap==n.ldap) return d.name+"\n"+connection[0].relationship.slice(1);
+          return d.name+"\n"+n.name+"'s"+connection[0].relationship; 
         }
-      //});
-      
-      function dragstarted(d) {
-        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
       }
-
-      function dragged(d) {
-        d.fx = d3.event.x;
-        d.fy = d3.event.y;
+      return d.name;
+    });
+    simulation
+    //.force("link", d3.forceLink().strength( function(d) { console.log(d); if(d.source=="2" || d.target=="2") return 1; return 1; }))
+    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance( function(d) { 
+      if(d.source.id==n.id){
+        if(d.relationship) return 300;
+        else return 400;
       }
-
-      function dragended(d) {
-        if (!d3.event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+      if(d.target.id==n.id) return 400;
+      return 2000;
+    }).strength( function(d) {
+      if(d.source.id==n.id){
+        if(d.relationship) return 1.5;
+        else return 1;
       }
-    //img.baba(src="/images/iitbabab.png" alt="iitbaba" height="480")
+      if(d.target.id==n.id) return 0.5;
+      return 0.001;
+    }))
+      .force("x", d3.forceX().x(function(d) { return width/2; }).strength(function(d) { if(d.id == n.id) return 3.5; return 0; }))
+      .force("y", d3.forceY().y(function(d) { return height/2; }).strength(function(d) { if(d.id == n.id) return 3.5; return 0;}))
+      .force("collide", d3.forceCollide().radius(function(d) { if(d.id == n.id) return 80; return 30;/*return d.sal*2;*/ }));
+      simulation.force("link")
+      .links(graph.links);
+      simulation.alphaTarget(0);
+    }
+  }
+})

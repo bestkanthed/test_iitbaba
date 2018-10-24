@@ -2,25 +2,30 @@ const mongoose = require('mongoose');
 const relationMatrix = require('../matrix/relationMatrix');
 const User = require('./User');
 const _ = require('lodash');
+
 // put asyncs at the right places
 // like here in exec 
 // Take care on where to find one and where to find many
 const relationSchema = new mongoose.Schema({
+  idUser1:  { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  idUser2:  { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   ldap1: String, //
   ldap2: String, // if here predicted is true means 2 predicted for 1
   predicted: Boolean,
-  request:Boolean,
+  request: Boolean,
   relationship: Array,
   relation: Number // this is a number to capture the relation
 }, { timestamps: true });
 
-relationSchema.statics.createRelation = function createRelation(ldap1, ldap2) {
+relationSchema.statics.createRelation = function createRelation(ldap1, ldap2, idUser1, idUser2) {
   return new Promise (async (resolve, reject) => {
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
       if(!rel){
         this.model('Relation').create({
-          ldap1: ldap1, 
+          idUser1,
+          idUser2,
+          ldap1: ldap1,
           ldap2: ldap2,
           predicted: false,
           request: false,

@@ -7,6 +7,16 @@ const User = require('../models/User');
  * creates a test user
  */
 
+exports.testing = async (req, res, next) => {
+  console.log('logging user', req.user)
+  return res.send()
+}
+
+/**
+ * GET /testUser
+ * creates a test user
+ */
+
 exports.createTestUser = async (req, res, next) => {
   
   console.log('will now try to create')
@@ -18,8 +28,8 @@ exports.createTestUser = async (req, res, next) => {
   let allUsers = await User.getAllLdaps();
   
   for(let one of await allUsers) {
-    await Relation.createRelation(user.ldap, one.ldap);
-    await Relation.createRelation(one.ldap, user.ldap);
+    await Relation.createRelation(user.ldap, one.ldap, user._id, one._id);
+    await Relation.createRelation(one.ldap, user.ldap, one._id, user._id);
   }
   
   console.log('second last')

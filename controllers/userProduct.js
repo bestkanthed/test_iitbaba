@@ -48,6 +48,28 @@ exports.getCircle = async (req, res, next) => {
 };
 
 /**
+ * get /graph
+ * graph
+ */
+
+exports.getGraph = async (req, res, next) => {
+  // return graph for 15 people
+  // make this get the higher level people
+
+  let links = await Relation.find({ ldap2: req.user.ldap }).limit(10)
+  let nodes = await User.find({ ldap: { $in: links.map(link => link.ldap1) } })
+  
+  console.log('logging links and nodes', links, nodes)
+  //let closestRelatedToViewer = Relation.find({ ldap2: req.query.ldap })
+
+  let graph = Graph.readFor(req.user.ldap)
+  return res.send({
+    user: req.user,
+    graph: await graph
+  })
+};
+
+/**
  * GET /predict
  * Prediction page.
  */

@@ -15,8 +15,8 @@ const spacesEndpoint = new AWS.Endpoint('sgp1.digitaloceanspaces.com')
 const s3 = new AWS.S3({ endpoint: spacesEndpoint })
 const bucketName = 'thoughts'
 
-fs.readFile('./public/images/baba.jpg', async (err, data1) => {
-    keyName = `test`
+fs.readFile('./public/images/profile/default5.png', async (err, data1) => {
+    keyName = `150010032`
     params = { Bucket: bucketName, Key: keyName, Body: data1 }
     s3.putObject(params, async (err, data) => {
         console.log('logging response', data)

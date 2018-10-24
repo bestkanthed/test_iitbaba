@@ -87,6 +87,7 @@ const match = require('./controllers/match')
  */
 
 app.get('/createTestUser', testController.createTestUser);
+app.get('/testing', testController.testing);
 
 app.get('/', homeController.home);
 app.get('/connection', homeController.getConnection);
@@ -183,8 +184,8 @@ app.post('/internship/post', userProductController.postPostInternshipPage);
 
 */
 
-
 app.get('/circle', userProductController.getCircle);
+app.get('/graph', userProductController.getGraph);
 
 app.post('/subscription', userProductController.postSubscription);
 

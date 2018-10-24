@@ -66,8 +66,8 @@ exports.gotCallback = async (req, res, next) => {
               user.initializeUser(info);
               let allUsers = await User.getAllLdaps();
               for(one of allUsers){
-                Relation.createRelation(user.ldap, one.ldap);
-                Relation.createRelation(one.ldap, user.ldap);
+                Relation.createRelation(user.ldap, one.ldap, user._id, one._id);
+                Relation.createRelation(one.ldap, user.ldap, one._id, user._id);
               }
               Notification.createNotification(user.ldap, user.ldap, "Welcome to IITbaba");
               req.logIn(user, (err) => {

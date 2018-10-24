@@ -38,9 +38,12 @@ exports.readFor = (ldap) => {
     
     let noOfUsers = Matrix.getLength();
     let links = Relation.getGraphLinks();
+    
+    console.log('logging links', await links)
+
     let nodes = [];
 
-    for(let i=1; i< await noOfUsers; i++){
+    for(let i=1; i < await noOfUsers; i++) {
       let ldap1 = await User.getUserLdapByMID(i);
       let predicted;
       let name = await User.getUserNameByMID(i);
@@ -53,7 +56,7 @@ exports.readFor = (ldap) => {
         ldap: ldap1,
         name: name,
         predicted: predicted
-      });    
+      })
     }
 
     return resolve({

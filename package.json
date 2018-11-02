@@ -30,7 +30,7 @@
     "lodash": "^4.17.4",
     "math-erf": "^1.0.0",
     "mathjs": "^3.16.3",
-    "mongoose": "^4.11.12",
+    "mongoose": "^4.12.2",
     "morgan": "^1.8.2",
     "node-matrix": "^1.0.0",
     "nodemailer": "^4.4.2",

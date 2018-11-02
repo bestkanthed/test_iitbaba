@@ -21,6 +21,7 @@ relationSchema.statics.createRelation = function createRelation(ldap1, ldap2, id
   return new Promise (async (resolve, reject) => {
     this.model('Relation').findOne({ ldap1: ldap1, ldap2: ldap2 },{},{sort:{ "createdAt" : -1} }).exec(async (err, rel)=>{
       if(err) reject(err);
+      console.log('logging user id from relation', idUser1)
       if(!rel){
         this.model('Relation').create({
           idUser1,

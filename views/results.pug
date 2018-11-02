@@ -15,13 +15,12 @@ block content
                     img(src="/images/profile/"+users[r].ldap+".png", alt=users[r].ldap)                   
                 .text
                   p
-                    span= users[r].first_name+" "+users[r].last_name
+                    span=users[r].first_name+" "+users[r].last_name
                   p
-                    span= users[r].profile.insti_address.hostel_name
+                    span=(users[r].profile.insti_address ? users[r].profile.insti_address.hostel_name : null)
                   p
-                    span= users[r].profile.program.department_name+" "+users[r].profile.program.join_year  
+                    span=(users[r].profile.program ? ( (users[r].profile.program.department_name ? users[r].profile.program.department_name : "")+" "+(users[r].profile.program.join_year ? users[r].profile.program.join_year: '')) : null)
 
-                      
         .Controller
         .ScrollBar
       script(src='coverflow/js/coverflow.min.js')

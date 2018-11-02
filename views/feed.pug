@@ -1,0 +1,23 @@
+extends layout
+
+block content
+    link(rel='stylesheet', href='/css/feed.css')
+    .container.about
+      - for(let story of feed)
+        .row.feed-story
+            if story.to[0]
+                if story.to[0].first_name
+                    a(href='/profile'+story.to[0].ldap)
+                        img(src="/images/profile/"+story.to[0].ldap+".png")
+                        - let name = story.to[0].first_name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ')
+                        if story.notification.includes('you')
+                            if story.to[0]
+                                p=story.notification.replace('you', name)
+                        else if story.notification.includes('You are')
+                            if story.to[0]
+                                p=story.notification.replace('You are', name+' is')
+                        else if story.notification.includes('You')
+                            if story.to[0]
+                                p=story.notification.replace('You', name)
+                        else
+                            p=name+' joined IIT-baba'

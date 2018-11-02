@@ -16,6 +16,11 @@ exports.testing = async (req, res, next) => {
  * GET /testUser
  * creates a test user
  */
+exports.testRegister = async (req, res, next) => {    
+  req.session.ref = req.query.ref;
+  return res.redirect('/createTestUser')
+}
+
 
 exports.createTestUser = async (req, res, next) => {
   
@@ -25,6 +30,7 @@ exports.createTestUser = async (req, res, next) => {
   user.profile = {};
   user.profile.first_name =  "testUser"+n;
   user.save();
+  console.log('logging user id', user._id)
   let allUsers = await User.getAllLdaps();
   
   for(let one of await allUsers) {
@@ -32,13 +38,12 @@ exports.createTestUser = async (req, res, next) => {
     await Relation.createRelation(one.ldap, user.ldap, one._id, user._id);
   }
   
-  console.log('second last')
-  //await Notification.createNotification(user.ldap, user.ldap, "Welcome to IIT-baba");
-  
+  Notification.createNotification("testUser"+n, "testUser"+n, "Welcome to IIT-baba")
+
   req.logIn(user, (err) => {
     console.log('eereo in login', err)
     if (err) { return next(err); }         
-    req.flash('success', { msg: 'Success! Registered.' });
+    //req.flash('success', { msg: 'Success! Registered.' });
     return res.redirect('/account/setup/1');
   });
 };

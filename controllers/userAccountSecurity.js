@@ -19,6 +19,7 @@ const Notification = require('../models/Notification');
 exports.gotCallback = async (req, res, next) => {
   var code = req.query.code;
   const user = new User({ldap: "newRequest"});
+  console.log('logging user id', user._id)
   request({
         url: 'https://gymkhana.iitb.ac.in/sso/oauth/token/',
         method: 'POST',
@@ -59,7 +60,7 @@ exports.gotCallback = async (req, res, next) => {
             if(userLogin) {
                 req.logIn(userLogin, (err) => {
                     if (err) return next(err);
-                    req.flash('success', { msg: 'Successful Login!' });
+                    //req.flash('success', { msg: 'Successful Login!' });
                     return res.redirect('/');
                 });
             } else {
@@ -69,10 +70,12 @@ exports.gotCallback = async (req, res, next) => {
                 Relation.createRelation(user.ldap, one.ldap, user._id, one._id);
                 Relation.createRelation(one.ldap, user.ldap, one._id, user._id);
               }
+              
               Notification.createNotification(user.ldap, user.ldap, "Welcome to IITbaba");
+
               req.logIn(user, (err) => {
                 if (err) { return next(err); }         
-                req.flash('success', { msg: 'Authentication successful'});
+                //req.flash('success', { msg: 'Authentication successful'});
                 return res.redirect('/account/setup/1');
               });
             }
@@ -120,7 +123,7 @@ exports.postLogin = (req, res, next) => {
     else {
       req.logIn(user, (err) => {
         if (err) { return next(err); }
-        req.flash('success', { msg: 'Success! You are logged in.' });
+        //req.flash('success', { msg: 'Success! You are logged in.' });
         if (req.session.returnTo) return res.redirect(req.session.returnTo); 
         return res.redirect('/circle');
       });

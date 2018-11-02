@@ -18,9 +18,9 @@ block content
                   p
                     span= users[r].profile.first_name+" "+users[r].profile.last_name
                   p
-                    span= users[r].profile.insti_address.hostel_name
+                    span= users[r].profile.insti_address ? users[r].profile.insti_address.hostel_name : null
                   p
-                    span= users[r].profile.program.department_name+" "+users[r].profile.program.join_year  
+                    span= users[r].profile.program ? (users[r].profile.program.department_name+" "+users[r].profile.program.join_year) : null  
 
                       
         .Controller

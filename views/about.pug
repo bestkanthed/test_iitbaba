@@ -25,7 +25,9 @@ block content
             h1 Give Suggestions.
             h3 Feedbacks are highly appreciated.
             p If there is any error or feature that you want added or any feedback,
-            p Drop a mail at 
-                b bestkanthed@gmail.com
-            p Call or Whatsapp at 
-                b +91 8828291950
+            p This site is still under construction. We want to roll out more feature that you want.
+            form#prediction(method='POST')
+              if user
+                input(type='hidden', name='idFrom', value=user._id)
+              textarea.feedback(name="content", placeholder='Say anything you want...', style='width: 100%;')
+              button.profile#invite(type="Sumbit") Send Feedback

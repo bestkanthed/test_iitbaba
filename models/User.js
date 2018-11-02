@@ -217,8 +217,8 @@ userSchema.statics.getUsers = function getUsers(ldaps) { // This is getting pass
 };
 
 userSchema.statics.getAllLdaps = function getAllLdaps(){
-  return new Promise ((resolve, reject) => { 
-    this.model('User').find({},{},{sort:{ "createdAt" : -1} }).select('ldap -_id').exec((err, ldaps)=>{
+  return new Promise ((resolve, reject) => {
+    this.model('User').find({},{},{sort:{ "createdAt" : -1} }).exec((err, ldaps)=>{
       if(err) reject(err);
       resolve(ldaps);
     });

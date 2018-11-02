@@ -1,36 +1,25 @@
-const logger = require('../utilities/logger');
-const User = require('../models/User');
+const logger = require('../utilities/logger')
+const User = require('../models/User')
+const Notification = require('../models/Notification')
 
-const AWS = require('aws-sdk')
+const s3 = require('../config/awsS3')
 const fs = require('fs')
 const im = require('imagickal')
-
-AWS.config.update({
-  accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
-  secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY
-})
-
-// Create an S3 client setting the Endpoint to DigitalOcean Spaces
-const spacesEndpoint = new AWS.Endpoint('sgp1.digitaloceanspaces.com')
-const s3 = new AWS.S3({ endpoint: spacesEndpoint })
-const bucketName = 'thoughts'
-
 
 /**
  * GET /picture
  * Get picture page.
  */
 exports.getPicture = async (req, res, next) => {
-  let keyName = req.params.ldap ? req.params.ldap : req.params.name.slice(0, -4)
-  let params = {Bucket: bucketName, Key: keyName}
+  let keyName = 'profile/'+ (req.params.ldap ? req.params.ldap : req.params.name.slice(0, -4))
+  let params = { Key: keyName }
   s3.getObject(params, (err, data) => {
     if (err) return res.send()
     res.setHeader('Content-Disposition', 'inline')
-
     /*
     res.setHeader('Content-Disposition', "filename=\"" + file.uploadName.replace(/[^\x20-\x7E]+/g, '') + "\"" );
     if((file.uploadName.split('.').pop()).toLowerCase() === 'pdf') {
-        res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader('Content-Type', 'application/pdf')
     }
     */
     return res.send(data.Body)
@@ -53,9 +42,25 @@ exports.getEdit = async (req, res, next) => {
  */
 exports.postEdit = (req, res, next) => {
   
-  User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
+  // check what is changed.
+  // create a feed element for it.
+  // for
+
+  User.findOne({ ldap: req.user.ldap }, async (err, existingUser) => {
     if (err) { return next(err); }
+    
     if (existingUser) {
+      // run the loop to check what changed
+      // hobbies and looking
+      
+      if((existingUser.looking !== req.body.looking) && req.body.looking) {
+        Notification.createNotification(existingUser.ldap, existingUser.ldap, "You are looking for "+req.body.looking);
+      }
+
+      if((existingUser.hobbies !== req.body.hobbies) && req.body.hobbies) {
+        Notification.createNotification(existingUser.ldap, existingUser.ldap, "You updated hobbies to "+req.body.hobbies);
+      }
+
       existingUser.first_name = req.body.first.toUpperCase();
       existingUser.last_name = req.body.last.toUpperCase();
       existingUser.hostel = req.body.hostel.toUpperCase();
@@ -76,7 +81,7 @@ exports.postEdit = (req, res, next) => {
       existingUser.snapchat = req.body.snapchat;
       
       existingUser.save((err) => {
-        if (err) { 
+        if (err) {
           logger.error(err);
           return next(err); 
         }
@@ -110,15 +115,15 @@ exports.postEditProfilePicture = async (req, res, next)=>{
   }
   base64Data = new Buffer(base64Data, 'base64')
 
-  keyName = req.user.ldap;
-  params = { Bucket: bucketName, Key: keyName, Body: base64Data }
+  keyName = 'profile/'+req.user.ldap;
+  params = { Key: keyName, Body: base64Data }
 
   User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
     if (err) return next(err);
     if (existingUser) {
       s3.putObject(params, async (err, data) => {
         if (err) return next(err);
-        req.flash('success', { msg: 'Picture Saved' });
+        //req.flash('success', { msg: 'Picture Saved' });
         existingUser.profile.upload_picture = true;
         existingUser.save((err) => {
           return res.redirect('/profile/'+req.user.ldap);

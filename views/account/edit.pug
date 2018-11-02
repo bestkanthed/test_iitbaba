@@ -43,21 +43,22 @@ block content
                 h1(title='People will search for these') Persona
             .row
                 .col-sm-4
-                    label.control-label(for='known', title='Under your name', value=user.first_name, placeholder='Under your name') Uyn
+                    label.control-label(for='known', title='Under your name', value=user.first_name, placeholder='Under your name') Your Title
                 .col-sm-8
                     input.form-control(type='text', title='What should appear under your name', value=user.known, name='known', id='known', placeholder='Under your name', autofocus)
             .row
                 label.col-sm-4.control-label(for='hobbies', title='You just love') Hobbies
                 .col-sm-8
                     input.form-control(type='text', name='hobbies', id='hobbies', value=user.hobbies, placeholder='You do for fun', autofocus)
-            .row
-                label.col-sm-4.control-label(for='skills', title='You can help others with') Skills
-                .col-sm-8
-                    input.form-control(type='text', name='skills', id='skills', value=user.skills, placeholder='You are expert in', autofocus)
+            //
+                .row
+                    label.col-sm-4.control-label(for='skills', title='You can help others with') Skills
+                    .col-sm-8
+                        input.form-control(type='text', name='skills', id='skills', value=user.skills, placeholder='You are expert in', autofocus)
             .row
                 label.col-sm-4.control-label(for='looking', title='Missing out on') Looking For
                 .col-sm-8
-                    input.form-control(type='text', name='looking', id='looking', value=user.looking, placeholder='Ex: Co-founder, Boyfriend, Gay Friend', autofocus)
+                    input.form-control(type='text', name='looking', id='looking', value=user.looking, placeholder='What kind of people/things are you looking for in ', autofocus)
           .col-xs-12.col-lg-3.col-edit
             .row
                 h1 Social

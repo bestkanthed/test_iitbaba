@@ -38,8 +38,6 @@ exports.readFor = (ldap) => {
     
     let noOfUsers = Matrix.getLength();
     let links = Relation.getGraphLinks();
-    
-    console.log('logging links', await links)
 
     let nodes = [];
 

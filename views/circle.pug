@@ -1,8 +1,86 @@
 extends layout
 
 block content
+  link(rel='stylesheet', href='/css/bootstrap-select.min.css')
+  script(src='/js/lib/bootstrap-select.min.js')
   .container.center
     link(rel='stylesheet', type='text/css', href='/css/circle.css')
-    svg
+    .profile-preview
+      .row.profile
+        .card.profile
+          img.profile(src='/account/picture/'+userp.ldap)
+        .card.profile-info
+          p.profile.name.info-title
+            strong=userp.first_name+" "+userp.last_name
+          p.profile.known=userp.known
+          if userp.profile.program && userp.profile.program.degree
+            p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
+          if userp.hostel
+            p.profile.hostel="Hostel "+userp.hostel
+          else
+            if userp.profile.insti_address.hostel_name
+              p.profile.hostel=userp.profile.insti_address.hostel_name
+          if userp.hobbies
+            p.profile.hobbies=userp.hobbies.toLowerCase()
+          if userp.looking
+            p.profile.looking="Looking for "+userp.looking.toLowerCase()
+    svg.relation-circle
+    .people-you-may-know
+      p.relate-instruction People you may know below.
+      p.relate-instruction You can add them to you circle by relating them.
+      .suggestion-box
+        - for(let suggestion of suggestions)
+          .suggestion-view
+            a.suggestion-profile(href='/profile/'+suggestion.ldap)
+              .suggestion-profile-image
+                img.profile(src='/account/picture/'+suggestion.ldap)
+              .suggestion-name=suggestion.first_name+' '+suggestion.last_name
+            .suggestion-add-relationship
+              p.suggestion-relation(id="rel-display"+suggestion._id)=null
+              div.collapse.relationship-update(id='relationship'+suggestion._id)
+                form(class='rel', id='relForm'+suggestion._id, action='/request', method='post')
+                    input(type='hidden', name='ldap', value=suggestion.ldap)
+                    .relationship-picker
+                        select.selectpicker(data-live-search='true', multiple, name='relationship')
+                            optgroup(label="Prefix", data-max-options="2")
+                                option Ex
+                                option Best
+                            optgroup(label="Relationship", data-max-options="3")
+                                option Roommate
+                                option Wingmate
+                                option Hostelmate
+                                option Friend
+                                option Girlfriend
+                                option Boyfriend
+                                option Crush
+                                option Classmate
+                                option Batchmate
+                                option Teammate
+              button.profile.update(id=suggestion._id, data-toggle="collapse", data-target="#relationship"+suggestion._id, state='update') RELATE
+
     script(src='/js/lib/d3.v4.min.js')
     script(src='/js/graph.js')
+    script.
+      $('[id^="relForm"]').on('submit', function(e) {
+          let id = ($(this).attr('id')).substring(7)
+          e.preventDefault();
+          if(($(this).serialize()).includes('relationship'))
+          $.post("/request", $(this).serialize()).done(function( data ) {
+              $('#rel-display'+id).text(data);
+              window.location.href = '/circle'
+          });
+      });
+
+      $(".update").click(function() {
+        if($(this).attr("state") == 'update') {
+            $(this).text("SAVE");
+            $(this).attr("state", 'save');
+            return 0;
+        }
+        if($(this).attr("state") == 'save') {
+            $('#relForm'+$(this).attr("id")).submit();
+            $(this).text("UPDATE");
+            $(this).attr("state", 'update');
+            return 0;
+        }
+      });

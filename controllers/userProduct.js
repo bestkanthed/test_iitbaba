@@ -14,6 +14,7 @@ const Salary = require('../models/Salary');
 const SalaryMatrix = require('../models/SalaryMatrix');
 const SalaryStat = require('../models/SalaryStat');
 const Search = require('../models/Search');
+const SearchQuery = require('../models/SearchQuery');
 const Subscription = require('../models/Subscription');
 const _ = require('lodash');
 
@@ -36,14 +37,46 @@ exports.postReviewInternship = internship.postReviewInternship;
 */
 
 /**
+ * get /feed
+ * Feed
+ */
+exports.getFeed = async (req, res, next) => {
+  
+  // All the stuff happening with others appears in the feed.
+  // Feed is same for everyone.
+  // Someone relates to someone, and someone predicts for someone, someone updates profile.
+  let feed = (await Notifications.find({ to : { $ne : req.user.ldap } })).reverse()
+
+  return res.render('feed', {
+    title: 'Home',
+    feed
+  });
+};
+
+/**
  * get /circle
  * circle
  */
 exports.getCircle = async (req, res, next) => {
-    let graph = Graph.readFor(req.user.ldap);
-    return res.render('circle', {
+  let profile = await User.findOne({ _id: req.query.id })
+  let suggestions = (await Relation.aggregate([
+    { $match: { ldap2: req.user.ldap, relationship: [] } },
+    { $lookup:
+      {
+        from: "users",
+        localField: "ldap1",
+        foreignField: "ldap",
+        as: "user"
+      }
+    },
+    { $sort: { "relation" : -1 } }
+  ]) ).map(relation => relation.user[0])
+  // this user is profile must contain data as required.
+  // Name, what he does, his department, hobbies and looking for.
+  return res.render('circle', {
       title: 'Circle',
-      graph: await graph
+      userp: profile ? profile : req.user,
+      suggestions : suggestions.filter(user => user.profile.upload_picture)
     });
 };
 
@@ -55,17 +88,39 @@ exports.getCircle = async (req, res, next) => {
 exports.getGraph = async (req, res, next) => {
   // return graph for 15 people
   // make this get the higher level people
-
-  let links = await Relation.find({ ldap2: req.user.ldap }).limit(10)
-  let nodes = await User.find({ ldap: { $in: links.map(link => link.ldap1) } })
+  let user
+  if(req.query.id) user = await User.findOne({ _id: req.query.id })
+  else user = await User.findOne({ _id: req.user._id })
   
-  console.log('logging links and nodes', links, nodes)
+  let links = await Relation.find({ idUser2: user._id, relationship: { $ne : [] } }).limit(10)
+  let nodes = await User.find({ _id: { $in: links.map(link => link.idUser1) } })
+  nodes.push(user)
   //let closestRelatedToViewer = Relation.find({ ldap2: req.query.ldap })
 
-  let graph = Graph.readFor(req.user.ldap)
+  nodes = nodes.map(node => ({
+    ...node.toObject(),
+    id: node._id,
+  }))
+  
+  for(let i = 0; i < nodes.length; i++) {
+    let link = links.find(link => (JSON.stringify(link.idUser1) === JSON.stringify(nodes[i]._id)))
+    if(link) nodes[i].relationship = link.relationship
+    else nodes[i].relationship = []
+  }
+
+  //console.log('logging links and relationships', links, nodes)
+
   return res.send({
     user: req.user,
-    graph: await graph
+    graph: {
+      nodes: nodes,
+      links: links.map(link => ({
+        id: link._id,
+        source: link.idUser1,
+        target: link.idUser2,
+        relationship: link.relationship.join(' ')
+      }))
+    }
   })
 };
 
@@ -75,12 +130,24 @@ exports.getGraph = async (req, res, next) => {
  */
 exports.getPredict = async (req, res, next) => {
   //let suggestions = Graph.suggestions(req.user.ldap, 20)
-  let suggestions = await User.find({})
+  //let suggestions = await User.find({})
+  let suggestions = (await Relation.aggregate([
+    { $match: { ldap2: req.user.ldap, relationship: [] } },
+    { $lookup:
+      {
+        from: "users",
+        localField: "ldap1",
+        foreignField: "ldap",
+        as: "user"
+      }
+    },
+    { $sort: { "relation" : -1 } }
+  ]) ).map(relation => relation.user[0])
 
-  req.flash('success',{ msg : 'People you may know' })
+  //req.flash('success', { msg : 'People you may know' })
   return res.render('results', {
     title: 'Suggestions',
-    users : await suggestions
+    users : suggestions.filter(user => user.profile.upload_picture)
   })
 }
 
@@ -203,7 +270,7 @@ exports.postProfile = async (req, res, next) => {
     let notification = Notification.createNotificationWithSalary(req.params.ldap, req.user.ldap, toTitleCase(req.user.first_name)+" predicted for you", (await salary));
 
     if(req.body.popup) return res.send("predicted");
-    req.flash('success', { msg: 'Predicted!' });
+    //req.flash('success', { msg: 'Predicted!' });
     return res.redirect('back');  
 };
 
@@ -214,8 +281,15 @@ exports.postProfile = async (req, res, next) => {
 exports.getSearch = async (req, res, next) => {
   
  // if search from box
+
   if(req.query.box) {
     if(_.isEmpty(req.query.box)) return res.render('/predict');
+
+    let saveSearch = SearchQuery.create({
+      idUser: req.user._id,
+      query: req.query.box
+    })
+
     let finalResults = await Search.box(req.query.box);
     finalResults = _.uniq(finalResults);
 
@@ -244,21 +318,24 @@ exports.getSearch = async (req, res, next) => {
  */
 
 exports.postRequest = async (req, res, next) => {
-  if(req.body.relationship) {
-    if( typeof req.body.relationship === 'string' ) {
+
+  if(req.body.ldap && req.user.ldap) {
+    if(req.body.relationship) {
+      if( typeof req.body.relationship === 'string' ) {
         req.body.relationship = [ req.body.relationship ];
+      }
+      await Relation.setRelationship(req.body.ldap, req.user.ldap, req.body.relationship)
+      let relationship = "";
+      for(rel of req.body.relationship) {
+        relationship = relationship + " " + rel;
+      }
+      Notification.createNotification(req.body.ldap, req.user.ldap, toTitleCase(req.user.first_name)+" related you as"+relationship);
+      return res.send(relationship);
+    } else {
+      Relation.setRelationship(req.body.ldap, req.user.ldap, []);    
+      return res.send(null);
     }
-    Relation.setRelationship(req.body.ldap, req.user.ldap, req.body.relationship);
-    let relationship = "";
-    for(rel of req.body.relationship) {
-      relationship = relationship + " "+rel;
-    }
-    Notification.createNotification(req.body.ldap, req.user.ldap, toTitleCase(req.user.first_name)+" related to you as"+relationship);
-    return res.send(relationship);
-  } else {
-    Relation.setRelationship(req.body.ldap, req.user.ldap, null);    
-    return res.send(null);
-  }
+  } else return res.send(null)
 };
 
 /**

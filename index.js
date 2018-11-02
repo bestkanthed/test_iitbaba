@@ -86,13 +86,16 @@ const match = require('./controllers/match')
  * Open routes
  */
 
+app.get('/testRegister', testController.testRegister);
 app.get('/createTestUser', testController.createTestUser);
 app.get('/testing', testController.testing);
 
 app.get('/', homeController.home);
+app.get('/register', homeController.getRegister)
 app.get('/connection', homeController.getConnection);
 
 app.get('/about', homeController.getAbout);
+app.post('/about', homeController.postAbout);
 
 app.get('/invite', homeController.getInvite);
 

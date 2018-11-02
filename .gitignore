@@ -20,3 +20,6 @@ public/images/company/logo/*
 
 # Whitelist default flag image
 !public/images/company/logo/default.png
+
+#Access key
+IITBABA.pem

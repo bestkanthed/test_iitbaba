@@ -35,7 +35,7 @@ block content
                 p.profile.name.info-title
                     strong=userp.first_name+" "+userp.last_name
                 p.profile.known=userp.known
-                if userp.profile.program
+                if userp.profile.program && userp.profile.program.degree && userp.profile.program.department_name
                     p.profile.department=userp.profile.program.degree+" "+userp.profile.program.department_name+" "+userp.profile.program.join_year
                 if userp.hostel && user.room
                     p.profile.hostel="Hostel "+userp.hostel+" | Room "+userp.room
@@ -43,18 +43,19 @@ block content
                     if userp.hostel
                         p.profile.hostel="Hostel "+userp.hostel
                     else
-                        p.profile.hostel=userp.profile.insti_address.hostel_name+" | Room "+userp.profile.insti_address.room
+                        if userp.profile.insti_address && userp.profile.insti_address.hostel_name
+                            p.profile.hostel=userp.profile.insti_address.hostel_name+ (userp.profile.insti_address.room ? " | Room "+userp.profile.insti_address.room : '')
                 
-                p.profile.hobbies=userp.hobbies?userp.hobbies.toLowerCase():undefined
-                p.profile.skills=userp.skills?userp.skills.toLowerCase():undefined
-                p.profile.from=userp.from?userp.from.toLowerCase():undefined
+                p.profile.hobbies=userp.hobbies ? userp.hobbies.toLowerCase():undefined
+                p.profile.skills=userp.skills ? userp.skills.toLowerCase():undefined
+                p.profile.from=userp.from ? userp.from.toLowerCase():undefined
                 if userp.contact && userp.email
                     p.profile.email=userp.contact.toLowerCase()+' | '+userp.email.toLowerCase()
                 else
                     if userp.contact
                         p.profile.email=userp.contact.toLowerCase()
                     if userp.email
-                        p.profile.email=userp.contact.toLowerCase()                           
+                        p.profile.email=userp.contact.toLowerCase()
                 if userp.looking
                     p.profile.looking="Looking for "+userp.looking.toLowerCase()
                 div(style='margin: 20px 0;')
@@ -76,6 +77,8 @@ block content
                     if userp.snapchat
                         a.profile
                             i.fa.fa-snapchat-ghost=userp.snapchat
+                p.circles-link
+                    a(href='/circle?id='+user._id) Circle
         .col-lg-3.col-sm-12.profile-relationship
             .card.relationship.col-relationship
                 .card.title 
@@ -90,26 +93,21 @@ block content
                                 input(type='hidden', name='ldap', value=userp.ldap)
                                 .relationship-picker
                                     select.selectpicker(data-live-search='true', multiple, name='relationship')
-                                        
-                                        optgroup(label="Time", data-max-options="1") 
+                                        optgroup(label="Prefix", data-max-options="2")
                                             option Ex
-                                        optgroup(label="Surperlative", data-max-options="1") 
                                             option Best
-                                        optgroup(label="Locus", data-max-options="1") 
+                                        optgroup(label="Relationship", data-max-options="3") 
                                             option Roommate
                                             option Wingmate
-                                            option Inmate
-                                        optgroup(label="Psyche", data-max-options="1") 
+                                            option Hostelmate
                                             option Friend                                    
                                             option Girlfriend
                                             option Boyfriend
                                             option Crush
-                                        optgroup(label="Intellect", data-max-options="1") 
                                             option Classmate
                                             option Batchmate
                                             option Teammate
-                                            
-                                        
+
                             p &nbsp;
                         p
                             button.profile#update(data-toggle="collapse",data-target="#relationship",state='update') UPDATE
@@ -117,10 +115,6 @@ block content
                            
                     
     script.
-      const ldp1 = !{JSON.stringify(userp.ldap).replace(/<\//g, '<\\/')};
-      const sal = !{JSON.stringify(salary).replace(/<\//g, '<\\/')};
-      const id = !{JSON.stringify(requestReceived).replace(/<\//g, '<\\/')};
-
       $('#rel').on('submit', function(e) {
         e.preventDefault();
         $.post("/request", $(this).serialize()).done(function( data ) {
@@ -141,5 +135,4 @@ block content
             $(this).attr("state", 'update');
             return 0;
         }
-        
       });

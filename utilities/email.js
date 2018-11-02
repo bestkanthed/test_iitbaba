@@ -20,14 +20,16 @@ let transporter = nodemailer.createTransport({
 
 exports.to = (email, subject, html) => {
     return new Promise((resolve, reject) => {
-      var mailOptions = {
+      let mailOptions = {
           from: process.env.EMAIL_ID,
           to: email.toLowerCase(), 
           subject: subject,
           html: html
       }
+
       transporter.sendMail(mailOptions, function (error, info) {
           if (error) {
+              console.log("Error occured in", mailOptions);
               console.log("Error in sending mail", error);
               return resolve(false);   
           }

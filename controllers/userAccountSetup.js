@@ -1,23 +1,13 @@
 const logger = require('../utilities/logger');
 const fs = require('fs');
 const im = require('imagickal');
-const AWS = require('aws-sdk')
+const s3 = require('../config/awsS3')
 
 const Matrix = require('../models/Matrix');
 const Mean = require('../models/Mean');
 const Salary = require('../models/Salary');
 const User = require('../models/User');
-
-// Use setting credentials to allow secure connection
-AWS.config.update({
-  accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
-  secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY
-})
-
-// Create an S3 client setting the Endpoint to DigitalOcean Spaces
-const spacesEndpoint = new AWS.Endpoint('sgp1.digitaloceanspaces.com')
-const s3 = new AWS.S3({ endpoint: spacesEndpoint })
-const bucketName = 'thoughts'
+const Referal = require('../models/Referal')
 
 /**
  * GET /account/setup/1
@@ -96,15 +86,15 @@ exports.postPicture = async (req, res, next)=>{
   }
   base64Data = new Buffer(base64Data, 'base64')
   
-  keyName = req.user.ldap;
-  params = { Bucket: bucketName, Key: keyName, Body: base64Data }
+  keyName = 'profile/'+req.user.ldap;
+  params = { Key: keyName, Body: base64Data }
 
   User.findOne({ ldap: req.user.ldap }, (err, existingUser) => {
     if (err) return next(err);
     if (existingUser) {
       s3.putObject(params, async (err, data) => {
         if (err) return next(err);
-        req.flash('success', { msg: 'Picture Saved' });
+        //req.flash('success', { msg: 'Picture Saved' });
         existingUser.profile.upload_picture = true;
         existingUser.complete = 2;
         existingUser.save((err) => {
@@ -163,14 +153,12 @@ exports.getAverage = async (req, res, next) => {
  * POST /avg
  * posted avg.
  */
-exports.postAverage = async (req, res, next)=>{
+exports.postAverage = async (req, res, next) => {
   let userPredictionForBaba = Number(req.body.babaSalary);
-
   if(userPredictionForBaba < 3.5 || userPredictionForBaba > 35){
     req.flash('errors', 'Not a good estimate');
     return res.redirect('/account/setup/3');
   }
-  
   let mean = await Mean.getMean(); 
   let newMean = {
     total : mean.total + userPredictionForBaba,
@@ -182,6 +170,13 @@ exports.postAverage = async (req, res, next)=>{
   let salaries = Matrix.addNewUserToMatrix(newMean.total/newMean.n, userPredictionForBaba);
   let setMid = User.setMID(req.user.ldap, (await salaries).length - 1);
   let updateSalaries = Salary.updateSalaries(await salaries);
-  req.flash('success', { msg: 'Saved' });
+  
+  if(req.session.ref) Referal.create({
+    idReferedBy: req.session.ref,
+    idReferedTo: req.user._id
+  })
+
+  //req.flash('success', { msg: 'Saved' });
   return res.redirect('/suggestion');
+
 };

@@ -1,3 +1,44 @@
+.relate-instruction {
+    padding-bottom: 40px;
+    text-align: center;
+}
+
+.suggestion-box {
+    overflow: auto;
+    height: 80%
+}
+
+.suggestion-view {
+    padding: 10px;
+}
+
+.suggestion-relation, .suggestion-name {
+    text-align: center;
+}
+
+.people-you-may-know {
+    font-family: 'Raleway', sans-serif;
+    margin: 0px;
+    position: absolute;
+    left: 75%;
+    top: 80px;
+    height: 80%;
+}
+
+.profile-preview {
+    margin: 0px;
+    position: absolute;
+    left: 0;
+    top: 80px;
+}
+
+.relation-circle{
+    margin: 0px;
+    position: absolute;
+    left: 25%;
+    top: 0;
+}
+
 .links line {
     stroke: #999;
     stroke-opacity: 0.5;
@@ -13,4 +54,46 @@ circle:hover  {
     stroke: #fff;
     stroke-width: 1.5px;
     stroke-opacity: 1;
+}
+
+@media screen and (max-width: 400px) {
+
+    .suggestion-view {
+        padding: 10px;
+        display: inline-block;
+    }
+
+    .suggestion-relation, .suggestion-name {
+        text-align: center;
+    }
+
+    .relation-circle {
+        margin: 0px;
+        position: absolute;
+        left: 0;
+        top: 5%;
+    }
+
+    .people-you-may-know {
+        margin: 0px;
+        position: absolute;
+        left: 0;
+        top: 80%;
+        width: 100%
+    }
+
+    .relate-instruction {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .suggestion-box {
+        overflow: auto;
+        white-space: nowrap;
+        display: block;
+    }
+
+    .profile-preview {
+        display: none;
+    }
 }

@@ -124,7 +124,7 @@ notificationSchema.statics.seeNotifications = function seeNotifications(ldap) {
           if(err) reject(err);
         });
       }
-      resolve("seen");  
+      resolve("seen");
     });
   });
 };

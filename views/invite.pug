@@ -5,13 +5,22 @@ block content
       .row
         .col-lg-12
             h1(style='text-align:center; padding-bottom: 40px;') 
-                    span Give good predictions for span of your friends and get this
+                p Invite three friends and when they register you get this awesome Tee.
+                p='https://iitbaba.com/register?ref='+user._id
+                //p=JSON.stringify(referals)
+                p='Invited '
+                - for (let referal of referals)
+                    span=referal.user[0].first_name+" "
+                if referals.length < 3
+                    p=(3 - referals.length) + ' more to get T-Shirt'
+                else
+                    p='Congratulations. You tshirt will soon be delivered.'
             .row
               .col-lg-6.col-sm-12.shirt-img-div-1
                 img.shirt-img(src='/images/baba_tshirt_front.png', height='400', style='border-radius : 20px;')
               .col-lg-6.col-sm-12.shirt-img-div-2
                 img.shirt-img(src='/images/baba_tshirt_back.png', height='400' , style='border-radius : 20px;')
-            .row#mobile-invite(style='padding-top: 16px')            
+            .row#mobile-invite(style='padding-top: 16px')
                 .col-lg-6.col-sm-6.share(style='font-size:10px;')
                     a(href="whatsapp://send?text=https://iitbaba.com/auth/iitbsso?"+ ( (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME' ) , data-action="share/whatsapp/share") 
                         i.fa.fa-whatsapp

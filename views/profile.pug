@@ -79,8 +79,9 @@ block content
                             i.fa.fa-snapchat-ghost=userp.snapchat
                 p.circles-link
                     a(href='/circle?id='+user._id) Circle
-                p.circles-link
-                    a(href='/account/edit') Edit
+                if user.ldap == userp.ldap
+                    p.circles-link
+                        a(href='/account/edit') Edit
         .col-lg-3.col-sm-12.profile-relationship
             .card.relationship.col-relationship
                 .card.title 

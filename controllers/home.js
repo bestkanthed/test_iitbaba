@@ -76,6 +76,8 @@ exports.postAbout = (req, res) => {
  */
 exports.getInvite = async (req, res) => {
   
+  if(!req.user) return res.redirect('/login')
+
   let referals = Referal.aggregate([
     { $match : { idReferedBy : req.user._id } },
     { $lookup:

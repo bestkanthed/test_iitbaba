@@ -97,7 +97,7 @@ $.get('/graph'+location.search, response => {
       a.append("text")
       .attr("dx", node => profileId === node._id ? node.x - 13 : node.x - 30)
       .attr("dy", node => node.y + 30)
-      .text(node => profileId === node._id ? 'ME' : node.first_name)
+      .text(node => (profileId === node._id && profileId === user._id) ? 'ME' : node.first_name)
 
       node.append("title")
       .text(node => `${toProperCase(node.first_name)} ${toProperCase(node.last_name)} ${ node.relationship.length ? `\n${relationSuffix} ${node.relationship.join(' ')}` : '' }`)

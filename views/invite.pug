@@ -1,14 +1,20 @@
 extends layout
 
 block content
+    link(rel='stylesheet', href='/css/invite.css')
     .container.about
       .row
+        - let link = 'https://iitbaba.com/register?ref='+user._id
+        - let message = "I am getting a Tshirt. Do you want one too? "
+        - let whatsappLink = "whatsapp://send?text="+message+link
+        - let whatsappApiLink = "https://api.whatsapp.com/send?text="+link
+        - let fbLink = "fb-messenger://share/?link="+message+link
         .col-lg-12
             h1(style='text-align:center; padding-bottom: 40px;') 
                 p Invite three friends and when they register you get this awesome Tee.
-                p='https://iitbaba.com/register?ref='+user._id
+                p.ref-link='Ask your friends to register with your referal link : https://iitbaba.com/register?ref='+user._id
                 //p=JSON.stringify(referals)
-                p='Invited '
+                p= referals.length ? 'Invited ' : 'You have invited no one yet.'
                 - for (let referal of referals)
                     span=referal.user[0].first_name+" "
                 if referals.length < 3
@@ -20,21 +26,22 @@ block content
                 img.shirt-img(src='/images/baba_tshirt_front.png', height='400', style='border-radius : 20px;')
               .col-lg-6.col-sm-12.shirt-img-div-2
                 img.shirt-img(src='/images/baba_tshirt_back.png', height='400' , style='border-radius : 20px;')
-            .row#mobile-invite(style='padding-top: 16px')
-                .col-lg-6.col-sm-6.share(style='font-size:10px;')
-                    a(href="whatsapp://send?text=https://iitbaba.com/auth/iitbsso?"+ ( (user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME' ) , data-action="share/whatsapp/share") 
-                        i.fa.fa-whatsapp
-                        | &nbsp;Invite via Whatsapp
-                .col-lg-6.col-sm-6.share(style='font-size:10px;')
-                    a(href="fb-messenger://share/?link=https://iitbaba.com/auth/iitbsso?"+ ((user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME'))
-                        i.fa.fa-facebook
-                        | &nbsp;Invite via Messenger
-            .row#desktop-invite.invite_button
-                .col-lg-4
-                .col-lg-4
-                    a(href="https://api.whatsapp.com/send?text=https://iitbaba.com/auth/iitbsso?"+ ((user && user.first_name) ? (user.first_name.substr(0,4)+user.id.substr(user.id.length - 2)) : 'REFME'))
-                        button.profile(style='border-radius : 8px;') Invite
-                .col-lg-4
+            //
+                .row#mobile-invite(style='padding-top: 16px')
+                    .col-lg-6.col-sm-6.share(style='font-size:10px;')
+                        a(href=whatsappLink , data-action="share/whatsapp/share") 
+                            i.fa.fa-whatsapp
+                            | &nbsp;Invite via Whatsapp
+                    .col-lg-6.col-sm-6.share(style='font-size:10px;')
+                        a(href=fbLink)
+                            i.fa.fa-facebook
+                            | &nbsp;Invite via Messenger
+                .row#desktop-invite.invite_button
+                    .col-lg-4
+                    .col-lg-4
+                        a(href=whatsappApiLink)
+                            button.profile(style='border-radius : 8px;') Invite
+                    .col-lg-4
     script.
         $(document).ready(function() {
             $.ajaxSetup({ cache: true });

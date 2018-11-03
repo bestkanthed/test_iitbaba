@@ -83,10 +83,10 @@ input[type=text].search-box {
 
 @media screen and (min-width: 480px) {
     input[type=text].search-box:focus {
-        width: 360px;
+        width: 480px;
     }
     input[type=text].search-box {
-        width: 240px;
+        width: 360px;
     }
 }
 @media screen and (max-width: 480px) {

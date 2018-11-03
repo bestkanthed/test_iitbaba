@@ -1,8 +1,11 @@
 Growth Group
+
 /*
-//Offer people equity
+// Offer people equity
 People you may know
-Young people
+Young people => IITB freshers
 */
+
+// Tagline
 
 /* Make a system to observe what is happening */

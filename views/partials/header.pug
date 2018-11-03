@@ -7,7 +7,7 @@
             | IIT-baba
         if user
           form.navbar-form.search(role='search', method='get', action='/search', title="Search anything: h8, meta, girls, amay")
-            input.search-box#srch-term.form-control(placeholder='Searches look like "H8", "girls", "Amay", "chem" etc.', name='box', type='text')
+            input.search-box#srch-term.form-control(placeholder='Search for anyone in IIT. Searches look like "H8", "girls", "Amay", "chem" etc.', name='box', type='text')
       .navbar-header-right
         button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
           span.sr-only Toggle navigation
@@ -31,21 +31,23 @@
               a(href='/profile/'+user.ldap) My Profile
             li.about
               a(href='/account/edit') Edit Profile
-            
+            li.about
+              a(href='/about') Feedback  
             li.about
               a(href='/prediction') Predictions
-            li.about
-              a(href='/invite') Free Tee
-            li.about
-              a(href='/about') What else?
           li.about
-              a(href='/suggestion') Explore
+            a(href='/') Feed
+          li.about
+              a(href='/suggestion') New People
           li.about
               a(href='/circle') My Circle
           li.about
               a(href='/profile/'+user.ldap) My Profile
           li.about
-            a(href='/account/edit') Edit Profile
+            a(href='/invite') Free T-Shirt
+          //
+            li.about
+              a(href='/account/edit') Edit Profile
           li.notifications
             a.dropdown-toggle.electric-blue-text-color#notification-icon(href='#notifications', data-toggle='dropdown', onclick='$.post("/notification",{action:"see"});$("#notification-label").text("");')
               span.number-label#notification-label
@@ -62,20 +64,24 @@
                 img.navbar-profile-img(src='/images/baba.jpg')
               i.caret
             ul.dropdown-menu.settings
+              //
+                li
+                  a(href='/profile/'+user.ldap) Account
+                li.divider
+                li
+                  a(href='/account/edit') Edit Profile
+                li.divider
+                li
+                  a(href='/circle') Circle
+                li.divider
+                li
+                  a(href='/prediction') Previous Predictions
+                li.divider
+                li
+                  a(href='/invite') Get a free T-shirt
+                li.divider
               li
-                a(href='/profile/'+user.ldap) Account
-              li.divider
-              li
-                a(href='/account/edit') Edit Profile
-              li.divider
-              li
-                a(href='/circle') Circle
-              li.divider
-              li
-                a(href='/prediction') Previous Predictions
-              li.divider
-              li
-                a(href='/invite') Get a free T-shirt
+                a(href='/about') Feedback
               li.divider
               li
                 a(href='/logout') Logout

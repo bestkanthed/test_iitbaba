@@ -7,12 +7,14 @@ this link when someone uses the person gets ok
 //
 ...///
 
-8) need to really clear on what we want people to know about us => about page. Have a very clear about page. Features you want.
-9) test riggrously with multiple users and mobile views show relationship explicitly
-10) cut off createTestUser.
-12) Improve default image quality.
-14) Use google ads to target IIT people.
-
+0.5) Write test cases for testing user limits and response times.
+1) need to really clear on what we want people to know about us => about page. Have a very clear about page. Features you want.
+2) test riggrously with multiple users and mobile views show relationship explicitly
+3) cut off createTestUser.
+4) Improve default image quality.
+5) Hobbies search
+6) Backend : Tracking activity and displaying to user.
+7) 
 ...///
 
 /*

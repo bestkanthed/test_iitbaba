@@ -7,7 +7,7 @@ block content
         .row.feed-story
             if story.to[0]
                 if story.to[0].first_name
-                    a(href='/profile'+story.to[0].ldap)
+                    a(href='/profile/'+story.to[0].ldap)
                         img(src="/images/profile/"+story.to[0].ldap+".png")
                         - let name = story.to[0].first_name.split(' ').map(w => w[0].toUpperCase() + w.substr(1).toLowerCase()).join(' ')
                         if story.notification.includes('you')

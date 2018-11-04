@@ -126,7 +126,7 @@ userSchema.methods.gravatar = function gravatar(size) {
 };
 
 userSchema.methods.initializeUser = function initializeUser(info){
-  return new Promise ((resolve, reject) => { 
+  return new Promise ((resolve, reject) => {
     this.profile.id =  info.id;
     this.profile.first_name =  info.first_name;
     this.profile.last_name = info.last_name;

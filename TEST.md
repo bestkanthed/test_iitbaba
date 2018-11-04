@@ -6,4 +6,4 @@ Don't complete the registration process. at various stages.
 
 Crash it at that place.
 
-Run test in the data base regularly to see if anything is undefined
+Run test in the data base regularly to see if anything is undefined.

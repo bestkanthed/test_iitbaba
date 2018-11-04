@@ -17,7 +17,7 @@ exports.getSet = async (req, res, next) => {
   if(req.user.complete) return res.redirect('/account/setup/2');
   return res.render('account/set', {
     title: 'Set Password'
-  });
+  })
 };
 
 /**
@@ -50,9 +50,9 @@ exports.postSet = async (req, res, next) => {
       // existingUser.hobbies = req.body.hobbies.toUpperCase();
       existingUser.complete = 1;
       existingUser.save((err) => {
-        if (err) { 
+        if (err) {
           logger.error(err);
-          return next(err); 
+          return next(err);
         }
         req.flash({ msg: 'Profile updated' });
         return res.redirect('/account/setup/2');
@@ -165,7 +165,7 @@ exports.postAverage = async (req, res, next) => {
     n: mean.n + 1
   }
 
-  let complete = await User.setComplete(req.user.ldap, 3);  
+  let complete = await User.setComplete(req.user.ldap, 3);
   let createMean = await Mean.newMean(newMean);
   let salaries = Matrix.addNewUserToMatrix(newMean.total/newMean.n, userPredictionForBaba);
   let setMid = User.setMID(req.user.ldap, (await salaries).length - 1);

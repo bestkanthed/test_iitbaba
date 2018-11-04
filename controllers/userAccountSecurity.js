@@ -5,6 +5,7 @@ const passport = require('passport');
 const bluebird = require('bluebird');
 const crypto = bluebird.promisifyAll(require('crypto'));
 const ssl = require('ssl-root-cas/latest').inject();
+const fs = require('fs');
 
 const Relation =  require('../models/Relation');
 const User = require('../models/User');
@@ -42,19 +43,27 @@ exports.gotCallback = async (req, res, next) => {
         user.tokens.refresh_token = tokens.refresh_token;
         user.tokens.scope = tokens.scope;
         request({
-              url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,email,program,contacts,insti_address,secondary_emails,mobile,roll_number',
+              url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,program,insti_address',
               method: 'GET',
               rejectUnauthorized: false,
               headers : {
                   "Authorization" : "Bearer "+ tokens.access_token
               }
           }, async (err1, res1) => {
-            
-            var info = JSON.parse(res1.body);
+
+            console.log('logging response body', res1.body)
+            fs.appendFile('ldap_info.txt', res1.body, function (err) {
+              if (err) throw err;
+              console.log('Saved!');
+            })
+
+            var info = JSON.parse(res1.body)
+
             if(!info.username) {
-                req.flash('error', { msg: 'Not enough permissions for authorization' });
-                return res.redirect('/login');
+              req.flash('error', { msg: 'Not enough permissions for authorization' });
+              return res.redirect('/login');
             }
+
             user.ldap = info.username;
             let userLogin = await User.getUser(info.username);
             if(userLogin) {
@@ -257,13 +266,15 @@ exports.postForgot = (req, res, next) => {
 
   const sendForgotPasswordEmail = (user) => {
     if (!user) { return; }
+    
     const token = user.passwordResetToken;
     let sendEmail = email.to(
       user.ldap+'@iitb.ac.in',
       'Reset your password on IIT-baba Account',
       '<h1>You requested for a new password</h1><p>You are receiving this email because you (or someone else) have requested the reset of the password for your account.</p><p><a href="http://'+process.env.HOST_NAME+'/internal/reset/'+token+'">Click here</a> to go to reset page.</p><p>If you did not request this, please ignore this email and your password will remain unchanged.</p>'
     );
-    sendEmail.then(sent=>{
+
+    sendEmail.then(sent => {
       if(sendEmail) req.flash('info', { msg: `An e-mail has been sent to ${user.email} with further instructions.` });
       else req.flash('errors', {msg : 'There is an internal problem. Contact support@iitbaba.com'});
       return true;

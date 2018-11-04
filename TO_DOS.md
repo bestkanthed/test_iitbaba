@@ -7,12 +7,22 @@ this link when someone uses the person gets ok
 //
 ...///
 
+0.5) Signup with phone.
+1) Make sigup infinitely easy.
+ - remove password
+ - 
+2) Drop the salary thing up front. // maybe you can add it later.
+3) Improve and highlight the free tee page.
+0) Make the pictures all the same.
+5) Check if email is working.
+//4) 
+
 0.5) Write test cases for testing user limits and response times.
 1) need to really clear on what we want people to know about us => about page. Have a very clear about page. Features you want.
 2) test riggrously with multiple users and mobile views show relationship explicitly
 3) cut off createTestUser.
 4) Improve default image quality.
-5) Hobbies search
+5) Hobbies search.
 6) Backend : Tracking activity and displaying to user.
 7) 
 ...///

@@ -208,5 +208,6 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(process.env.PORT, '0.0.0.0' ,() => {
+  console.log('passport', process.env.DOMAIN)
   console.log('  Press CTRL-C to stop\n');
 });

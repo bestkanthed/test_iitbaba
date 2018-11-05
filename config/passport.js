@@ -39,7 +39,7 @@ passport.use(new LocalStrategy((username, password, done) => {
 /**
  * Sign in using Email and Password.
  */
-console.log('passport', process.env.DOMAIN)
+
 passport.use('oauth2', new OAuth2Strategy({
     authorizationURL: 'https://gymkhana.iitb.ac.in/sso/oauth/authorize',
     tokenURL: 'https://gymkhana.iitb.ac.in/sso/oauth/token',

@@ -39,7 +39,7 @@ passport.use(new LocalStrategy((username, password, done) => {
 /**
  * Sign in using Email and Password.
  */
-
+console.log('passport', process.env.DOMAIN)
 passport.use('oauth2', new OAuth2Strategy({
     authorizationURL: 'https://gymkhana.iitb.ac.in/sso/oauth/authorize',
     tokenURL: 'https://gymkhana.iitb.ac.in/sso/oauth/token',
@@ -48,8 +48,8 @@ passport.use('oauth2', new OAuth2Strategy({
     callbackURL: process.env.DOMAIN+'/auth/iitbsso/callback',
     passReqToCallback: true
   },
-  function(req, accessToken, refreshToken, profile, done) {
-     done(null,null);
+  function(req, accessToken, refreshToken, profile, done) { 
+    done(null,null);
   }
 ));
 

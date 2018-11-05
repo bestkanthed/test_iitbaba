@@ -43,7 +43,7 @@ exports.gotCallback = async (req, res, next) => {
         user.tokens.refresh_token = tokens.refresh_token;
         user.tokens.scope = tokens.scope;
         request({
-              url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,profile_picture,sex,username,program,insti_address',
+              url: 'https://gymkhana.iitb.ac.in/sso/user/api/user/?fields=first_name,last_name,type,sex,username,program,insti_address',
               method: 'GET',
               rejectUnauthorized: false,
               headers : {
@@ -58,9 +58,10 @@ exports.gotCallback = async (req, res, next) => {
             })
 
             var info = JSON.parse(res1.body)
-
-            if(!info.username) {
+            let { username, first_name, last_name } = info
+            if(!(username && first_name && last_name)) {
               req.flash('error', { msg: 'Not enough permissions for authorization' });
+              // Register again
               return res.redirect('/login');
             }
 
@@ -75,17 +76,18 @@ exports.gotCallback = async (req, res, next) => {
             } else {
               user.initializeUser(info);
               let allUsers = await User.getAllLdaps();
-              for(one of allUsers){
+              for(one of allUsers) {
                 Relation.createRelation(user.ldap, one.ldap, user._id, one._id);
                 Relation.createRelation(one.ldap, user.ldap, one._id, user._id);
               }
-              
+
               Notification.createNotification(user.ldap, user.ldap, "Welcome to IITbaba");
 
               req.logIn(user, (err) => {
-                if (err) { return next(err); }         
-                //req.flash('success', { msg: 'Authentication successful'});
-                return res.redirect('/account/setup/1');
+                if (err) { return next(err); }
+                // req.flash('success', { msg: 'Authentication successful'});
+                // go to feed
+                // return res.redirect('/account/setup/1');
               });
             }
           });

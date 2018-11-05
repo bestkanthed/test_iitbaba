@@ -44,7 +44,7 @@ exports.postSet = async (req, res, next) => {
       existingUser.password = req.body.password;
       existingUser.first_name = req.body.first.toUpperCase();
       existingUser.last_name = req.body.last.toUpperCase();
-      //add in second form
+      // add in second form
       // existingUser.known = req.body.known.toUpperCase();
       // existingUser.skills = req.body.skills.toUpperCase();
       // existingUser.hobbies = req.body.hobbies.toUpperCase();
@@ -85,7 +85,7 @@ exports.postPicture = async (req, res, next)=>{
     base64Data = fs.readFileSync('./public/images/profile/default'+pic+'.png')
   }
   base64Data = new Buffer(base64Data, 'base64')
-  
+
   keyName = 'profile/'+req.user.ldap;
   params = { Key: keyName, Body: base64Data }
 

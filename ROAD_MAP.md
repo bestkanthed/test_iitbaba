@@ -1,5 +1,3 @@
-1 Satwik/Siddaarth.
-
 10 users.
 Annex wing people.
   

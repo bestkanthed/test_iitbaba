@@ -125,7 +125,7 @@ userSchema.methods.gravatar = function gravatar(size) {
   return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 
-userSchema.methods.initializeUser = function initializeUser(info){
+userSchema.methods.initializeUser = function initializeUser(info) {
   return new Promise ((resolve, reject) => {
     this.profile.id =  info.id;
     this.profile.first_name =  info.first_name;

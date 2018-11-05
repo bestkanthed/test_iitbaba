@@ -1,3 +1,6 @@
+# Process env
+.env.test
+
 # Node build artifacts
 node_modules
 npm-debug.log

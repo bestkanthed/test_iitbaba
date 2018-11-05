@@ -11,14 +11,15 @@ Branding :
 
 1) Think about the icon and fix it.
 2) Think about the icon for iitbaba.
-3) Improve and highlight the free tee page.
+3) Improve and highlight the free tee page. Ask a really intesrting question.
 4) Name of the website.
 5) Improve default image quality.
 4) Make the pictures all the same.
+6) Create a really intersting question and share it on facebook to people so that the wanna join.
 
 // Ask someone for help. => From all your friends.
 // Make a list of all friend and ask them all for help.
-1) Satwik, Shubham, Joshi.
+1) Satwik, Shubham.
 // Fix time for everything.
 // Post stories anonumusly with code name.
 // Post question anonumusly or nonumusly with and up vote.
@@ -33,7 +34,11 @@ Product:
 3) And entire use in phone Signup with phone.
 4) Add posts with images.
 5) Add questions.
-6) Change feed look. For relations.
+6) Change feed look. Make everything look as you want in the feed. For relations.
+    - link difference for names.
+    - adding photo of the next person.
+    - Feed format.
+    - Later give an option to connect stuff and show connected stuff.
 7) Show relationships explicilty.
 
 0.5) Write test cases for testing user limits and response times.
